@@ -1319,7 +1319,7 @@ var zh = {
   sev1: "1 \u4E2D",
   sev2: "2 \u4F4E",
   descSilence: "\u8BF4\u5B8C\u6574\u4E00\u53E5\u7684\u9759\u97F3\u505C\u987F\u6BEB\u79D2\u6570\uFF08\u9ED8\u8BA4 1500 \u6BEB\u79D2\uFF0C\u7ED9\u601D\u8003\u505C\u987F\u7559\u7A7A\u95F4\uFF1B\u81F3\u5C11 250ms \u8BED\u97F3\u624D\u5224\u53E5\uFF0C\u9632\u77ED\u4FC3\u566A\u58F0\u8BEF\u89E6\u53D1\uFF09",
-  descIdle: "\u65E0\u6D3B\u52A8\u81EA\u52A8\u9000\u51FA\u8BED\u97F3\u6A21\u5F0F\u7684\u5206\u949F\u6570\uFF08\u9ED8\u8BA4 10\uFF09",
+  descIdle: "\u65E0\u6D3B\u52A8\u81EA\u52A8\u9000\u51FA\u8BED\u97F3\u6A21\u5F0F\u7684\u5206\u949F\u6570\uFF08\u9ED8\u8BA4 10\uFF1B0 = \u7981\u7528\u3002\u6717\u8BFB\u4E0E\u56DE\u5408\u63A8\u8FDB\u90FD\u4F1A\u91CD\u7F6E\u8BA1\u65F6\uFF09",
   descModelHost: "ASR \u6A21\u578B\u4E0B\u8F7D\u6E90\uFF08\u5B98\u65B9\u6E90 / \u56FD\u5185\u955C\u50CF\uFF0C\u6216\u9009\u300C\u81EA\u5B9A\u4E49\u300D\u586B\u4EFB\u610F\u955C\u50CF\uFF09",
   descAutoSend: "\u9759\u97F3\u5230\u70B9\u81EA\u52A8\u53D1\u9001\uFF08\u8FDE\u7EED\u591A\u6BB5\u62FC\u6210\u4E00\u6761\uFF1B\u5173=\u53EA\u8FDB\u8349\u7A3F\uFF1B\u6309\u4F4F Ctrl / hold \u677E\u624B\u4ECD\u53D1\u9001\uFF09",
   descAutoResume: "\u5207\u6362\u56DE\u4E0A\u6B21\u8BED\u97F3\u4F1A\u8BDD\u65F6\u81EA\u52A8\u6062\u590D\u8BED\u97F3\u6A21\u5F0F\uFF08\u9ED8\u8BA4\u5173\uFF0C\u9700\u9EA6\u514B\u98CE\u6743\u9650\u5DF2\u6388\u4E88\uFF1B\u7701\u53BB\u6BCF\u6B21\u5207\u6362\u4F1A\u8BDD\u540E\u91CD\u65B0\u70B9\u9EA6\u514B\u98CE\uFF09",
@@ -1498,7 +1498,7 @@ var en = {
   sev1: "1 medium",
   sev2: "2 low",
   descSilence: "Silence pause before a sentence is committed (default 1500 ms; at least 250 ms of speech required, guards against noise triggers)",
-  descIdle: "Auto-exit voice mode after idle minutes (default 10)",
+  descIdle: "Auto-exit voice mode after this many idle minutes (default 10; 0 = disabled; playback and turn activity reset the timer)",
   descModelHost: "ASR model download source (official source / mirror, or any custom URL)",
   descAutoSend: "Auto-send once quiet (consecutive segments join into one message; off = draft only; Ctrl / hold still sends)",
   descAutoResume: "Auto-resume voice mode when switching back to the last voice session (default off, requires granted mic permission)",
@@ -2730,7 +2730,7 @@ function VoiceSettingsCard({ scope }) {
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "senseVoice", desc: t("descSenseVoice"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: Boolean(value.senseVoice), onChange: (e) => void scope.set("senseVoice", e.target.checked) }) }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "spokenFormat", desc: t("descSpokenFormat"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: Boolean(value.spokenFormat), onChange: (e) => void scope.set("spokenFormat", e.target.checked) }) }),
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "silenceMs", desc: t("descSilence"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField, { score: scope, field: "silenceMs", value: value.silenceMs ?? 1500, min: 500, max: 3e4, step: 100 }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "idleTimeoutMinutes", desc: t("descIdle"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField, { score: scope, field: "idleTimeoutMinutes", value: value.idleTimeoutMinutes ?? 10, min: 1, max: 120, step: 1 }) })
+        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "idleTimeoutMinutes", desc: t("descIdle"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NumberField, { score: scope, field: "idleTimeoutMinutes", value: value.idleTimeoutMinutes ?? 10, min: 0, max: 120, step: 1 }) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: t("secAdaptation"), children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "rewriteEnabled", desc: t("descRewriteEnabled"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", { type: "checkbox", checked: Boolean(value.rewriteEnabled), onChange: (e) => void scope.set("rewriteEnabled", e.target.checked) }) }),
@@ -2802,7 +2802,7 @@ var TELEMETRY_VIEW = [
   { stage: "first-tts-chunk", key: "telFirstChunk" },
   { stage: "first-audio-played", key: "telFirstPlayed" }
 ];
-var BUILD_TAG = "6864c90";
+var BUILD_TAG = "accca16";
 var TELEMETRY_FLAG = "dsh-voice-mode-adaptation.telemetry";
 var telemetryEnabled = typeof localStorage !== "undefined" && localStorage.getItem(TELEMETRY_FLAG) === "1";
 console.log("[dsh-voice] build=" + BUILD_TAG);
@@ -3095,6 +3095,7 @@ function createAudioEngine(setUi, onPlayed, onPlaybackRef, onAllPlayed) {
     }
   };
 }
+var activityPing = null;
 function createVoiceBus(basePath = BASE_PATH2, ctx) {
   let activeSessionId = null;
   const DEFAULT_BOOT = {
@@ -3294,6 +3295,7 @@ function createVoiceBus(basePath = BASE_PATH2, ctx) {
       try {
         const frame = JSON.parse(e.data);
         frame.sessionId = frame.sessionId ?? "";
+        if (frame.sessionId === activeSessionId) activityPing?.();
         for (const fn of audioListeners) {
           try {
             fn(frame);
@@ -3308,6 +3310,7 @@ function createVoiceBus(basePath = BASE_PATH2, ctx) {
         const ev = JSON.parse(e.data);
         if (ev.sessionId === activeSessionId && ev.state) {
           ui.turn = ev.state;
+          activityPing?.();
           notify();
         }
       } catch {
@@ -3618,12 +3621,21 @@ function MicButton({
   };
   const resetIdle = () => {
     clearIdle();
-    const idleMs = (bootNow().idleTimeoutMinutes > 0 ? bootNow().idleTimeoutMinutes : 10) * 60 * 1e3;
+    const minutes = bootNow().idleTimeoutMinutes;
+    if (!(minutes > 0)) return;
     idleTimerRef.current = setTimeout(() => {
       const sid = sidRef.current;
       if (localRef.current === "on" && sid) void exitModeRef.current("idle");
-    }, idleMs);
+    }, minutes * 60 * 1e3);
   };
+  const resetIdleRef = (0, import_react2.useRef)(resetIdle);
+  resetIdleRef.current = resetIdle;
+  (0, import_react2.useEffect)(() => {
+    activityPing = () => resetIdleRef.current();
+    return () => {
+      activityPing = null;
+    };
+  }, []);
   (0, import_react2.useEffect)(() => {
     return bus.subscribe(() => {
       const sid = sidRef.current;
