@@ -562,6 +562,13 @@ function createAudioEngine(
   }
 }
 
+/**
+ * 「可感知活动」回调：由语音模式组件注册为 resetIdle()。
+ * 只要还在朗读（收到音频帧）或回合在推进，空闲自动退出就不应触发——
+ * 否则「只听不说」的用户会被空闲超时误踢出语音模式。
+ */
+let activityPing: (() => void) | null = null
+
 function createVoiceBus(basePath: string = BASE_PATH, ctx?: any): VoiceBus {
   let activeSessionId: string | null = null
   const DEFAULT_BOOT: VoiceBootConfig = {
@@ -813,6 +820,8 @@ function createVoiceBus(basePath: string = BASE_PATH, ctx?: any): VoiceBus {
       try {
         const frame = JSON.parse(e.data) as TtsChunkFrame
         frame.sessionId = frame.sessionId ?? ''
+        // 朗读活动也算「不空闲」：只要还在出音频，空闲自动退出就不该触发。
+        if (frame.sessionId === activeSessionId) activityPing?.()
         for (const fn of audioListeners) {
           try {
             fn(frame)
@@ -830,6 +839,7 @@ function createVoiceBus(basePath: string = BASE_PATH, ctx?: any): VoiceBus {
         const ev = JSON.parse(e.data) as { sessionId?: string; state?: VoiceUiState['turn'] }
         if (ev.sessionId === activeSessionId && ev.state) {
           ui.turn = ev.state
+          activityPing?.()
           notify()
         }
       } catch {
@@ -1235,12 +1245,23 @@ export function MicButton({
   }
   const resetIdle = (): void => {
     clearIdle()
-    const idleMs = (bootNow().idleTimeoutMinutes > 0 ? bootNow().idleTimeoutMinutes : 10) * 60 * 1000
+    const minutes = bootNow().idleTimeoutMinutes
+    // 0（或负）= 禁用空闲自动退出；只有真正「什么都不发生」的分钟数才计时。
+    if (!(minutes > 0)) return
     idleTimerRef.current = setTimeout(() => {
       const sid = sidRef.current
       if (localRef.current === 'on' && sid) void exitModeRef.current('idle')
-    }, idleMs)
+    }, minutes * 60 * 1000)
   }
+  // 把「朗读 / 回合推进」接到空闲计时器：只听不说的用户不会因超时被踢出。
+  const resetIdleRef = useRef(resetIdle)
+  resetIdleRef.current = resetIdle
+  useEffect(() => {
+    activityPing = () => resetIdleRef.current()
+    return () => {
+      activityPing = null
+    }
+  }, [])
 
   // host 广播：被抢占/他会话让出 -> 自动退出（Q11）
   useEffect(() => {

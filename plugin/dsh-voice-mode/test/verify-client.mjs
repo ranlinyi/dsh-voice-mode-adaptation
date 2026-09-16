@@ -257,5 +257,14 @@ t('lib/client.js 含 P1-1 按句拼帧（PlayFrame Uint8Array + 丢帧完整性�
   const src = read('lib/client.js')
   assert.ok(src.includes('curChunkCount'), 'client bundle missing chunk-count integrity check')
 })
+t('lib/client.js 含朗读/回合活动重置空闲计时（只听不说不会被误退出）', () => {
+  const src = read('lib/client.js')
+  assert.ok(src.includes('activityPing?.()'), 'client bundle missing playback activity ping')
+  assert.ok(src.includes('activityPing = () => resetIdleRef.current()'), 'client bundle missing activity ping registration')
+})
+t('lib/client.js 空闲超时支持 0 = 禁用', () => {
+  const src = read('lib/client.js')
+  assert.ok(src.includes('if (!(minutes > 0)) return;'), 'client bundle missing idle-disable guard')
+})
 
 console.log(`\nverify-client：${passed} 项通过`)
