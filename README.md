@@ -166,6 +166,7 @@ Edge 免费端点**不支持任何音素级 SSML**，多音字只能靠文本替
 | 外放时总被自己打断 | <code>bargeInMode</code> 改为 <code>manual</code>，或戴耳机 |
 | 公式没走模型 | 检查 <code>mathMode</code>、<code>rewriteEnabled</code> 与 Key |
 | 语音模式进不去 | 检查插件 <code>enabled</code>；多标签页确认当前为活动会话 |
+| 长时间后被自动退出语音模式 | 空闲超时：**朗读与回合活动现在都会重置计时**；把「空闲超时」设为 <code>0</code> 可完全禁用（只听不说的场景推荐） |
 
 > **已知限制**：Edge 免费端点不支持音素级 SSML，多音字只能走文本替代表；需要精确纠音可切 **Azure** 引擎（见上文）。Safari / iOS 需 HTTPS 或 localhost。
 
