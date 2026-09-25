@@ -11,47 +11,38 @@
 [![dsh-plugin](https://img.shields.io/badge/dsh--plugin-voice-brightgreen?style=flat-square)](https://github.com/topics/dsh-plugin)
 [![fork of dsh-voice-mode](https://img.shields.io/badge/fork%20of-dsh--voice--mode-blue?style=flat-square)](https://github.com/qishuilalala/dsh-voice-mode)
 
-DeepSeek Harness 语音双工对话模式（fork 版）：会话内一键进入 → 边说边出字的流式识别 → 停顿自动发送 → 最终答复按句流式朗读 + 实时字幕，开口即可打断（真 barge-in）。识别在本地推理、无需 API Key；本 fork 额外提供**可选的「语音改编站」**，处理公式 / 表格 / 代码 / 脚注等非普通文本。
+DeepSeek Harness **纯语音朗读**（fork 版）：每条 AI 回复后有一个朗读键（只读该条），输入框旁是**朗读总开关**（开启后每轮新回复自动朗读，新回合立即打断上一回合没读完的部分）。本 fork 还提供**可选的「语音改编站」**，处理公式 / 表格 / 代码等非普通文本。
 
-> **Full-duplex voice mode for DeepSeek Harness** — streamed ASR to an editable draft, sentence-by-sentence read-aloud with live captions, and speaking interrupts playback and the running turn.
+> **Read-aloud for DeepSeek Harness** — one Read button per assistant reply plus an auto read-aloud master switch; a new reply interrupts the previous unfinished one.
 
-![dsh-voice-mode 全双工语音对话](https://raw.githubusercontent.com/qishuilalala/dsh-voice-mode/HEAD/assets/hero-banner.png)
+![dsh-voice-mode-adaptation](assets/hero-banner.png)
 
-![语音模式：实时字幕与状态条](https://raw.githubusercontent.com/qishuilalala/dsh-voice-mode/HEAD/assets/screenshot-voice.png)
+![界面示意（概念图 · 非真实截图）](assets/ui-overview.png)
 
-> **版本说明（0.6.0）**：朗读默认 **Edge 云端**（快速自然），本地 TTS（VITS / Kokoro）可选（隐私优先）+ HTTP 安全加固 + 模型 SHA256 固定为合入核心；Kokoro 新增**模型精度可选**（`int8` 默认 109MB / `fp32` 音质更好 311MB）；`wakeWord`（唤醒词）与 `toolBeep`（工具提示音）已完整接入；早期 fork 的 `asrModel`（双语 paraformer）与 `punctuate`（神经标点）已移除——SenseVoice 定稿本身已带标点，流式识别固定为 zipformer2。静音断句默认 1500 毫秒。
+> **版本说明（0.9.0-tts-only.1）**：本 fork 已**移除全部语音输入**（ASR / 麦克风 / 唤醒词 / 打断 / AEC）及对应设置、端点与模型，只保留语音朗读。朗读引擎：Edge 云端（默认）/ 本地 VITS / Kokoro（中英混读，`int8` 109MB / `fp32` 311MB）/ Azure 付费云端（SSML 音素）。可选「语音改编站」默认关闭、零外发。
 
 ## Fork 增强（本仓库新增）
 
 本仓库在上游基础上加入了大量增强，核心如下（完整清单见 git 历史与迭代记录）：
 
-- **朗读默认 Edge 云端；本地 TTS 可选（隐私优先）**：选本地则回复文本不出本机——
-  - 本地 VITS（`sherpa-onnx-vits-zh-ll`，纯中文，5 说话人）；
-  - 本地 Kokoro（**中英混读**，103 音色；`int8` 默认约 109MB / 可选 `fp32` 约 311MB 音质更好），经 `sherpa-onnx-node` **原生 addon** 运行（无 WASM 内存上限，连续合成不崩）；
-  - Edge 云端朗读保留为可选（设置 `ttsEngine: edge`）；设置面板「朗读引擎」热切换。
-- **Kokoro 音色全量 103 个**（F0 实测标定性别），四个常用男声置顶带编号；音色面板用 **下拉列表 + ◀▶ 步进**切换；
-- **增量传输**：partial 只传新增 0.9 秒，长段按住说话松手**秒出定稿**（不再整段重传重解码）；
-- **交互增强**：输入框旁**模式切换按钮**（持续聆听 ⇄ 按住说话，保存到设置）；按住说模式下**按住才录、不按住不打断**；
-- **长段支持**：持续聆听连续多段自动拼成一条消息（内部按 30s 分块识别，跨块累积拼接），静音断句默认 1500 毫秒；按住说停顿不断句；
-- **朗读稳定性**：打断即终止在途合成释放 CPU；句间不再有 3-5 秒停顿；长朗读不触发空闲下线；
-- **安全加固**：会话存在性校验 / 回环+Origin 校验 / 全端点限流 / **ASR+TTS 全模型 SHA256 固定** / 下载域名白名单 / 重定向守卫。
-
-> ⚠️ 上文截图与 `assets/demo.gif` 为**上游旧版界面**（单按钮时期）；当前界面在语音按钮旁多一颗「模式切换」按钮。
+- **纯朗读形态（本 fork 的核心形态）**：每条 AI 回复后一个**朗读键**（只读该条）；输入框旁一个**朗读总开关**（开启后每轮新回复自动朗读，**新回合立即打断上一回合**）；
+- **朗读引擎可切换**：Edge 云端（默认）/ 本地 VITS（纯中文）/ 本地 Kokoro（**中英混读**，103 音色，`int8` 109MB / `fp32` 311MB）/ Azure 付费云端（SSML 音素）；「朗读引擎 / 音色 / 语速 / 模型精度」即时生效；
+- **语音改编站（可选）**：公式 / 表格 / 代码 → 口播稿；行内 + 行间混合公式、化学式与物理单位确定性读法；默认关闭、零外发；
+- **多音字与停顿**：用户多音字词表（等字数同音替换）+ 段落/标题停顿；
+- **安全加固**：回环 + Origin 校验 / 全端点限流 / 本地模型 SHA256 固定 / 下载域名白名单 / 重定向守卫；
+- **全版本兼容**：同一份代码跑 dsh 0.1.1-rc.2 → 0.1.5-rc.2（`npm run check:anchors`、`npm run verify:dual`）。
 
 ## 功能
 
-- **语音模式**：输入框工具排麦克风按钮或全局快捷键 `Ctrl+Shift+V` 进入/退出；全局单活（同一时刻仅一个会话处于语音模式，切换会话自动让出）
-- **两种交互模式（输入框旁按钮或设置可切换，切换即持久化）**：
-  - `toggle`（默认）持续聆听：RMS VAD 分段 → zipformer2 流式识别（边说边出字，实时字幕预览）→ 静音约 1500 毫秒断句进草稿，连续多段拼成一条消息，再静音约 1500 毫秒（合计约 3 秒）自动发送；按住 `Ctrl` 强制立即发送
-  - `hold` 按住说话：短按进入/退出，**按住麦克风按钮说话、松手即发**（滑出取消、`Esc`/失焦放弃本段）；按住期间停顿不断句（上限 10 分钟）；`Ctrl` 按住即录、松开即发
-- **唤醒词（可选，默认关）**：设置 `wakeWord` 后进入待机态，说出唤醒词才开始识别（如「你好小D」）
-- **输出链路**：只朗读最终答复的 `text-delta`（reasoning/工具调用不读），按句流式朗读（默认 Edge 云端；可切本地 VITS/Kokoro，中英混读选 Kokoro）+ 右下角实时字幕浮层；工具调用触发提示音；全文照常写入聊天记录；口语化提示词（设置 `spokenFormat`，默认开）让回复为自然短句、不带 Markdown 排版符号
-- **开口打断（barge-in）**：服务端 Silero VAD 帧级检测 + 回声门控（echoGateDb）三档灵敏度 → 本地静音 + host 合成队列作废 + 正在运行的回合取消（保留半截并自然续入新消息）；朗读中自动切超灵敏档
-- **模型懒加载与进度**：首次使用自动下载识别/合成模型（`.part` 断点续传），状态条实时显示进度；可用 `npm run prefetch` 预下载
-- **设置**：设置 → Plugins → 插件配置 → 语音模式（voice-mode），可调朗读引擎/音色/语速/打断灵敏度/静音停顿/空闲超时/模型镜像/自动发送/交互模式/唤醒词/口语化提示词；**音色可试听**（按当前音色+语速即时合成预览，自定义 ShortName 亦可）
+- **朗读总开关**：输入框工具排的朗读按钮（原麦克风位置），点击进入/退出**自动朗读**；全局单活（同一时刻至多一个会话自动朗读，切换会话自动让出）
+- **消息朗读键**：每条 AI 回复的操作行（与复制/点赞同排）一个朗读键，点一下只朗读该条；点旧消息会先停掉当前朗读
+- **新回合打断**：AI 开始新一轮回复时，host 立即 `queue.cancel(sessionId)`（弃积压 + 中止在途合成 + epoch++），客户端按帧里的 `gen` 变化 `engine.skip()` 停掉旧回合已调度的音频，改读新回合
+- **输出链路**：只朗读最终答复的 `text-delta`（reasoning / 工具调用不读），按句流式朗读 + 输入框上方字幕状态条（可停止）；全文照常写入聊天记录
+- **语音改编站（可选）**：公式 / 表格 / 代码 → 口播稿；含公式整句一次出稿；段落停顿；多音字词表
+- **模型懒加载与进度**：本地引擎首次使用自动下载模型（`.part` 断点续传 + SHA256 校验），设置面板实时显示进度；可用 `npm run prefetch` 预下载
+- **设置**：设置 → Plugins → 插件配置 → 语音改编站（voice-mode-adaptation），可调朗读引擎 / 音色 / 语速 / 模型精度 / 改编站细则；**音色可试听**（按当前音色 + 语速即时合成预览，自定义 ShortName 亦可）
 - **界面语言**：跟随浏览器语言（中文 / English；切换后刷新页面生效）
-- **容错**：麦克风被拒红点提示、模型下载失败可见提示、TTS 连接失败状态条提示（自动退避重试）、提交失败文字留在草稿、SSE 断线自动重连
-- **空闲退出**：10 分钟无活动自动退出并释放麦克风（**正在朗读计为活动**，长朗读不会中途下线）
+- **容错**：TTS 连接失败状态提示、模型下载失败可见提示、SSE 断线自动重连
 
 ## 安装
 

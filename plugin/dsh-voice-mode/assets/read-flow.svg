@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="Noto Sans CJK SC, Sarasa UI SC, system-ui, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#8b949e"/></marker>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f85149"/></marker>
+  </defs>
+  <rect width="1200" height="800" fill="#0d1117"/>
+  <text x="600" y="44" fill="#e6edf3" font-size="26" font-weight="800" text-anchor="middle">朗读链路 · 新回合打断上一回合</text>
+
+  <rect x="420" y="72" width="360" height="70" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="600" y="104" fill="#58a6ff" font-size="18" font-weight="700" text-anchor="middle">AI 回复流 · llm/stream</text>
+  <text x="600" y="128" fill="#8b949e" font-size="14" text-anchor="middle">只取 text-delta；reasoning / 工具调用不读</text>
+
+  <rect x="90" y="200" width="470" height="96" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="325" y="234" fill="#3fb950" font-size="18" font-weight="700" text-anchor="middle">消息朗读键 · POST /speak</text>
+  <text x="325" y="260" fill="#8b949e" font-size="14" text-anchor="middle">只朗读被点的那一条回复（一次性）</text>
+  <text x="325" y="282" fill="#8b949e" font-size="14" text-anchor="middle">点旧消息 = 先 cancel 当前朗读</text>
+
+  <rect x="640" y="200" width="470" height="96" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="875" y="234" fill="#58a6ff" font-size="18" font-weight="700" text-anchor="middle">朗读总开关 · POST /read</text>
+  <text x="875" y="260" fill="#8b949e" font-size="14" text-anchor="middle">开启后每轮新回复自动朗读</text>
+  <text x="875" y="282" fill="#8b949e" font-size="14" text-anchor="middle">全局单活；切换会话自动让出</text>
+
+  <rect x="410" y="344" width="380" height="90" rx="12" fill="#161b22" stroke="#a371f7" stroke-width="1.5"/>
+  <text x="600" y="378" fill="#a371f7" font-size="18" font-weight="700" text-anchor="middle">SpeechAdapter（语音改编站 · 可选）</text>
+  <text x="600" y="404" fill="#8b949e" font-size="14" text-anchor="middle">公式 / 表格 / 代码 → 口播稿</text>
+  <text x="600" y="424" fill="#8b949e" font-size="14" text-anchor="middle">正文清洗 + 分句（关闭时等同原路径）</text>
+
+  <rect x="410" y="474" width="380" height="80" rx="12" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="600" y="506" fill="#d29922" font-size="18" font-weight="700" text-anchor="middle">TtsQueue（逐会话队列 · epoch）</text>
+  <text x="600" y="532" fill="#8b949e" font-size="14" text-anchor="middle">Edge / 本地 VITS / Kokoro / Azure · 逐句合成</text>
+
+  <rect x="410" y="594" width="380" height="76" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="600" y="624" fill="#58a6ff" font-size="18" font-weight="700" text-anchor="middle">SSE audio 帧</text>
+  <text x="600" y="650" fill="#8b949e" font-size="14" text-anchor="middle">gen · sentenceId · chunkId · final</text>
+
+  <rect x="410" y="710" width="380" height="66" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="600" y="748" fill="#3fb950" font-size="18" font-weight="700" text-anchor="middle">Web Audio 逐句播放 + 字幕</text>
+
+  <rect x="880" y="344" width="290" height="240" rx="12" fill="#f85149" fill-opacity="0.08" stroke="#f85149" stroke-width="1.8"/>
+  <text x="900" y="380" fill="#ff7b72" font-size="19" font-weight="800">新回合开始</text>
+  <text x="900" y="412" fill="#c9d1d9" font-size="14">host: queue.cancel(sid)</text>
+  <text x="900" y="438" fill="#c9d1d9" font-size="14">epoch++（弃积压 + 中止在途）</text>
+  <text x="900" y="464" fill="#c9d1d9" font-size="14">帧 gen 随之变化</text>
+  <text x="900" y="490" fill="#c9d1d9" font-size="14">client: engine.skip()</text>
+  <text x="900" y="516" fill="#c9d1d9" font-size="14">停掉上一回合未读完的音频</text>
+  <text x="900" y="552" fill="#8b949e" font-size="13">随后从新回合第一句重新读</text>
+
+  <line x1="780" y1="140" x2="1025" y2="140" stroke="#f85149" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+  <line x1="1025" y1="140" x2="1025" y2="338" stroke="#f85149" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ar)"/>
+
+  <line x1="600" y1="142" x2="600" y2="196" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="325" y1="296" x2="470" y2="340" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="875" y1="296" x2="730" y2="340" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="600" y1="434" x2="600" y2="470" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="600" y1="554" x2="600" y2="590" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="600" y1="670" x2="600" y2="706" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+
+  <text x="40" y="782" fill="#8b949e" font-size="14">aborted 回合不 flush 尾部半句；屏幕 Markdown 渲染完全不受影响。</text>
+</svg>

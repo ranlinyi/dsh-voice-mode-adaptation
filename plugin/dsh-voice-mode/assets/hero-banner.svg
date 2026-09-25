@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" font-family="Noto Sans CJK SC, Sarasa UI SC, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1117"/>
+      <stop offset="1" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="1" stop-color="#3fb950"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" fill="url(#bg)"/>
+  <circle cx="1080" cy="50" r="210" fill="#1f6feb" opacity="0.10"/>
+  <circle cx="150" cy="410" r="190" fill="#3fb950" opacity="0.08"/>
+  <rect x="60" y="58" width="9" height="150" rx="4" fill="url(#accent)"/>
+  <text x="94" y="106" fill="#e6edf3" font-size="44" font-weight="800">dsh-voice-mode-adaptation</text>
+  <text x="96" y="152" fill="#8b949e" font-size="23">纯语音朗读 · 让朗读读懂公式 / 表格 / 代码</text>
+  <g font-size="18" font-weight="600">
+    <rect x="94" y="190" width="214" height="44" rx="22" fill="#1f6feb" fill-opacity="0.16" stroke="#1f6feb" stroke-opacity="0.55"/>
+    <text x="201" y="218" fill="#79c0ff" text-anchor="middle">每条回复一个朗读键</text>
+    <rect x="322" y="190" width="184" height="44" rx="22" fill="#3fb950" fill-opacity="0.16" stroke="#3fb950" stroke-opacity="0.55"/>
+    <text x="414" y="218" fill="#56d364" text-anchor="middle">总开关自动朗读</text>
+    <rect x="520" y="190" width="214" height="44" rx="22" fill="#a371f7" fill-opacity="0.16" stroke="#a371f7" stroke-opacity="0.55"/>
+    <text x="627" y="218" fill="#c297ff" text-anchor="middle">新回合打断上一回合</text>
+  </g>
+  <g font-size="17" font-weight="600">
+    <rect x="94" y="252" width="150" height="40" rx="20" fill="#f85149" fill-opacity="0.14" stroke="#f85149" stroke-opacity="0.55"/>
+    <text x="169" y="278" fill="#ff7b72" text-anchor="middle">无语音输入</text>
+    <rect x="258" y="252" width="322" height="40" rx="20" fill="#d29922" fill-opacity="0.14" stroke="#d29922" stroke-opacity="0.55"/>
+    <text x="419" y="278" fill="#e3b341" text-anchor="middle">公式 / 表格 / 代码 → 口播稿（可选）</text>
+  </g>
+  <g transform="translate(902,118) scale(2.3)">
+    <path d="M0 30h22l36-30v100l-36-30H0z" fill="#58a6ff"/>
+    <g fill="none" stroke="#3fb950" stroke-width="8" stroke-linecap="round">
+      <path d="M76 26a40 40 0 0 1 0 38"/>
+      <path d="M98 10a66 66 0 0 1 0 70"/>
+    </g>
+  </g>
+</svg>

@@ -1,79 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, system-ui, sans-serif" font-size="14" viewBox="0 0 960 640">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 780" width="1160" height="780" font-family="Noto Sans CJK SC, Sarasa UI SC, system-ui, sans-serif">
   <defs>
-    <marker id="arr" markerHeight="8" markerWidth="8" orient="auto" refX="7" refY="4">
-      <path fill="#8b949e" d="M0,0 L8,4 L0,8 z"/>
-    </marker>
-    <marker id="arrR" markerHeight="8" markerWidth="8" orient="auto" refX="7" refY="4">
-      <path fill="#f85149" d="M0,0 L8,4 L0,8 z"/>
-    </marker>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#8b949e"/></marker>
+    <marker id="ag" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#3fb950"/></marker>
+    <marker id="ab" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#58a6ff"/></marker>
   </defs>
-  <rect width="960" height="640" fill="#0d1117"/>
-  <text x="480" y="30" fill="#e6edf3" font-size="20" font-weight="700" text-anchor="middle">dsh-voice-mode — 语音双工数据流</text>
+  <rect width="1160" height="780" fill="#0d1117"/>
+  <text x="580" y="42" fill="#e6edf3" font-size="26" font-weight="800" text-anchor="middle">纯语音朗读 · 架构总览</text>
 
-  <!-- 左列：浏览器侧 -->
-  <rect width="200" height="56" x="30" y="70" fill="#161b22" stroke="#58a6ff" stroke-width="1.5" rx="10"/>
-  <text x="130" y="92" fill="#58a6ff" font-weight="700" text-anchor="middle">麦克风 Mic</text>
-  <text x="130" y="112" fill="#8b949e" font-size="12" text-anchor="middle">16kHz 单声道 · AEC 回声消除</text>
+  <text x="70" y="88" fill="#58a6ff" font-size="18" font-weight="700">浏览器（client half）</text>
+  <text x="630" y="88" fill="#3fb950" font-size="18" font-weight="700">宿主（host half）</text>
 
-  <rect width="200" height="70" x="30" y="165" fill="#161b22" stroke="#58a6ff" stroke-width="1.5" rx="10"/>
-  <text x="130" y="189" fill="#58a6ff" font-weight="700" text-anchor="middle">浏览器 VAD 分段</text>
-  <text x="130" y="209" fill="#8b949e" font-size="12" text-anchor="middle">静音 700ms 断句 / 按住说门控</text>
-  <text x="130" y="227" fill="#8b949e" font-size="12" text-anchor="middle">增量传输（每 0.9s 只传新增）</text>
+  <rect x="70" y="110" width="430" height="66" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="285" y="140" fill="#58a6ff" font-size="17" font-weight="700" text-anchor="middle">朗读总开关 ReadToggleButton</text>
+  <text x="285" y="162" fill="#8b949e" font-size="13" text-anchor="middle">conversation.input.right</text>
 
-  <rect width="200" height="56" x="30" y="285" fill="#161b22" stroke="#3fb950" stroke-width="1.5" rx="10"/>
-  <text x="130" y="309" fill="#3fb950" font-weight="700" text-anchor="middle">草稿 → 自动发送</text>
-  <text x="130" y="329" fill="#8b949e" font-size="12" text-anchor="middle">autoSend / 按住说松手发送</text>
+  <rect x="70" y="192" width="430" height="66" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="285" y="222" fill="#58a6ff" font-size="17" font-weight="700" text-anchor="middle">消息朗读键 ReadMessageButton</text>
+  <text x="285" y="244" fill="#8b949e" font-size="13" text-anchor="middle">conversation.chat.assistant-actions（每条回复）</text>
 
-  <rect width="200" height="70" x="30" y="405" fill="#161b22" stroke="#3fb950" stroke-width="1.5" rx="10"/>
-  <text x="130" y="429" fill="#3fb950" font-weight="700" text-anchor="middle">播放 + 字幕浮层</text>
-  <text x="130" y="449" fill="#8b949e" font-size="12" text-anchor="middle">SSE 音频帧（WAV/MP3）</text>
-  <text x="130" y="467" fill="#8b949e" font-size="12" text-anchor="middle">逐段顺序 · 世代链防重播</text>
+  <rect x="70" y="274" width="430" height="66" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="285" y="304" fill="#58a6ff" font-size="17" font-weight="700" text-anchor="middle">朗读状态条 ReadingStatusBar</text>
+  <text x="285" y="326" fill="#8b949e" font-size="13" text-anchor="middle">字幕 + 停止（conversation.input.dock）</text>
 
-  <!-- 中列：host 侧 -->
-  <rect width="290" height="60" x="330" y="70" fill="#161b22" stroke="#58a6ff" stroke-width="1.5" rx="10"/>
-  <text x="475" y="94" fill="#58a6ff" font-weight="700" text-anchor="middle">zipformer2 流式识别</text>
-  <text x="475" y="114" fill="#8b949e" font-size="12" text-anchor="middle">host 本地 WASM · 启动预热 · SHA256 校验</text>
+  <rect x="70" y="372" width="430" height="86" rx="12" fill="#161b22" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="285" y="404" fill="#e6edf3" font-size="17" font-weight="700" text-anchor="middle">EventSource /stream</text>
+  <text x="285" y="428" fill="#8b949e" font-size="13" text-anchor="middle">read（自动朗读归属） · audio · tts-error</text>
 
-  <rect width="290" height="56" x="330" y="165" fill="#161b22" stroke="#d29922" stroke-width="1.5" rx="10"/>
-  <text x="475" y="189" fill="#d29922" font-weight="700" text-anchor="middle">SenseVoice 定稿</text>
-  <text x="475" y="207" fill="#8b949e" font-size="12" text-anchor="middle">带标点 · 数字归一化</text>
+  <rect x="70" y="474" width="430" height="100" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="285" y="506" fill="#3fb950" font-size="17" font-weight="700" text-anchor="middle">Web Audio 播放引擎</text>
+  <text x="285" y="530" fill="#8b949e" font-size="13" text-anchor="middle">按句拼帧 → 解码 → 链式调度（句间无缝）</text>
+  <text x="285" y="554" fill="#8b949e" font-size="13" text-anchor="middle">帧 gen 变化 → engine.skip() 停旧播新</text>
 
-  <rect width="290" height="56" x="330" y="255" fill="#161b22" stroke="#a371f7" stroke-width="1.5" rx="10"/>
-  <text x="475" y="279" fill="#a371f7" font-weight="700" text-anchor="middle">llm/stream 无损 tap → 分句</text>
-  <text x="475" y="297" fill="#8b949e" font-size="12" text-anchor="middle">text-delta 过滤 · markdown 剥离</text>
+  <rect x="70" y="590" width="430" height="66" rx="12" fill="#161b22" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="285" y="620" fill="#e6edf3" font-size="17" font-weight="700" text-anchor="middle">仅播放当前查看会话</text>
+  <text x="285" y="642" fill="#8b949e" font-size="13" text-anchor="middle">切换会话即停播</text>
 
-  <rect width="290" height="56" x="330" y="345" fill="#161b22" stroke="#a371f7" stroke-width="1.5" rx="10"/>
-  <text x="475" y="369" fill="#a371f7" font-weight="700" text-anchor="middle">TTS 队列（epoch 打断）</text>
-  <text x="475" y="387" fill="#8b949e" font-size="12" text-anchor="middle">打断即杀在途合成 · 积压作废</text>
+  <rect x="630" y="110" width="460" height="86" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="860" y="142" fill="#3fb950" font-size="17" font-weight="700" text-anchor="middle">HTTP 端点（回环 + Origin + 限流）</text>
+  <text x="860" y="168" fill="#8b949e" font-size="13" text-anchor="middle">/read · /speak · /cancel · /stream · /config</text>
+  <text x="860" y="186" fill="#8b949e" font-size="13" text-anchor="middle">/preview · /voices · /models/{status,download,clean}</text>
 
-  <rect width="290" height="100" x="330" y="435" fill="#161b22" stroke="#3fb950" stroke-width="1.5" rx="10"/>
-  <text x="475" y="459" fill="#3fb950" font-weight="700" text-anchor="middle">朗读引擎 TTS</text>
-  <text x="475" y="481" fill="#8b949e" font-size="12" text-anchor="middle">Edge 云端（默认，322 音色）</text>
-  <text x="475" y="501" fill="#8b949e" font-size="12" text-anchor="middle">VITS 本地 · 纯中文（WASM）</text>
-  <text x="475" y="521" fill="#8b949e" font-size="12" text-anchor="middle">Kokoro 本地 · 中英（int8 109MB / fp32 311MB）</text>
+  <rect x="630" y="212" width="460" height="96" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="860" y="244" fill="#58a6ff" font-size="17" font-weight="700" text-anchor="middle">llm/stream 无损 tap</text>
+  <text x="860" y="268" fill="#8b949e" font-size="13" text-anchor="middle">仅自动朗读会话被观察，其余直达</text>
+  <text x="860" y="290" fill="#8b949e" font-size="13" text-anchor="middle">新回合先 queue.cancel(sid)（需求 2）</text>
 
-  <!-- 右列：安全面 -->
-  <rect width="240" height="200" x="690" y="70" fill="#161b22" stroke="#30363d" stroke-width="1" rx="10"/>
-  <text x="810" y="98" fill="#e6edf3" font-weight="700" text-anchor="middle">安全面（四层）</text>
-  <text x="710" y="126" fill="#8b949e" font-size="12">① 会话存在性校验</text>
-  <text x="710" y="146" fill="#8b949e" font-size="12">② 回环 + Origin 校验</text>
-  <text x="710" y="166" fill="#8b949e" font-size="12">③ 全端点限流</text>
-  <text x="710" y="186" fill="#8b949e" font-size="12">④ 模型 SHA256 + 域名白名单</text>
-  <text x="710" y="214" fill="#8b949e" font-size="12">打断：VAD 帧级检测 + 回声门控</text>
-  <text x="710" y="234" fill="#8b949e" font-size="12">模式：持续聆听 ⇄ 按住说</text>
-  <text x="710" y="254" fill="#8b949e" font-size="12">空闲：朗读计为活动</text>
+  <rect x="630" y="324" width="460" height="90" rx="12" fill="#161b22" stroke="#a371f7" stroke-width="1.5"/>
+  <text x="860" y="356" fill="#a371f7" font-size="17" font-weight="700" text-anchor="middle">SpeechAdapter（语音改编站 · 可选）</text>
+  <text x="860" y="380" fill="#8b949e" font-size="13" text-anchor="middle">公式 / 表格 / 代码 → 口播稿</text>
+  <text x="860" y="400" fill="#8b949e" font-size="13" text-anchor="middle">关闭时完全退化为「原文 → 清洗 → 分句」</text>
 
-  <!-- 数据流连线 -->
-  <line x1="130" y1="126" x2="130" y2="163" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="230" y1="190" x2="326" y2="100" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="475" y1="130" x2="475" y2="163" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="330" y1="193" x2="232" y2="313" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="230" y1="313" x2="326" y2="283" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="475" y1="311" x2="475" y2="343" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="475" y1="401" x2="475" y2="433" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="330" y1="485" x2="232" y2="440" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="630" y="430" width="460" height="84" rx="12" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="860" y="462" fill="#d29922" font-size="17" font-weight="700" text-anchor="middle">TtsQueue：逐会话队列 + epoch</text>
+  <text x="860" y="486" fill="#8b949e" font-size="13" text-anchor="middle">cancel → epoch++；帧携带 gen</text>
 
-  <!-- 打断链路（红色） -->
-  <path d="M130,475 L130,600 L475,600 L475,403" fill="none" stroke="#f85149" stroke-width="1.5" marker-end="url(#arrR)"/>
-  <text x="300" y="592" fill="#f85149" font-size="12" text-anchor="middle">说话打断：本地静音 + 队列作废 + 回合取消</text>
+  <rect x="630" y="530" width="460" height="70" rx="12" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+  <text x="860" y="562" fill="#d29922" font-size="17" font-weight="700" text-anchor="middle">TTS 引擎：Edge / VITS / Kokoro / Azure</text>
+  <text x="860" y="584" fill="#8b949e" font-size="13" text-anchor="middle">音色 / 语速设置即时生效</text>
+
+  <rect x="630" y="616" width="460" height="70" rx="12" fill="#161b22" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="860" y="648" fill="#e6edf3" font-size="17" font-weight="700" text-anchor="middle">models.ts：懒下载 + 断点续传 + SHA256</text>
+  <text x="860" y="670" fill="#8b949e" font-size="13" text-anchor="middle">下载域名白名单 + 校验失败 fail-loud</text>
+
+  <line x1="500" y1="300" x2="626" y2="300" stroke="#3fb950" stroke-width="2" marker-end="url(#ag)"/>
+  <text x="563" y="292" fill="#3fb950" font-size="13" text-anchor="middle">POST /read</text>
+  <text x="563" y="318" fill="#3fb950" font-size="13" text-anchor="middle">/speak · /cancel</text>
+
+  <line x1="626" y1="420" x2="500" y2="420" stroke="#58a6ff" stroke-width="2" marker-end="url(#ab)"/>
+  <text x="563" y="412" fill="#58a6ff" font-size="13" text-anchor="middle">SSE audio 帧</text>
+  <text x="563" y="438" fill="#58a6ff" font-size="13" text-anchor="middle">read · tts-error</text>
+
+  <line x1="860" y1="196" x2="860" y2="208" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="860" y1="308" x2="860" y2="320" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="860" y1="414" x2="860" y2="426" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="860" y1="514" x2="860" y2="526" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+  <line x1="860" y1="600" x2="860" y2="612" stroke="#8b949e" stroke-width="2" marker-end="url(#a)"/>
+
+  <text x="40" y="746" fill="#8b949e" font-size="14">纯朗读版 v0.9.0-tts-only.1：无语音输入、无 ASR、无录音；屏幕 Markdown / LaTeX 渲染完全不受影响。</text>
 </svg>

@@ -1,7 +1,6 @@
 > [!IMPORTANT]
-> **Read-aloud only (v0.9.0-tts-only.1, 2026-09-25)**: this fork has **removed all voice input (ASR, microphone, wake word, barge-in)** and keeps **speech reading only**.
-> Each assistant reply gets a Read button (reads just that reply); the button beside the composer is the **auto read-aloud master switch**.
-> Any text below about "voice mode / streaming ASR / hold to talk / barge-in" is **pre-refactor history and no longer valid**; see `CONTEXT.md` and `HANDOFF-纯朗读改造-20260925.md`.
+> **Read-aloud only (v0.9.0-tts-only.1)**: all voice input (ASR, microphone, wake word, barge-in) was removed; this plugin only reads assistant replies aloud.
+> Each reply gets a Read button; the button beside the composer is the auto read-aloud master switch. See `CONTEXT.md` for the current design.
 
 # dsh-voice-mode
 
@@ -9,40 +8,38 @@
 [![License](https://img.shields.io/github/license/qishuilalala/dsh-voice-mode?style=flat-square)](https://github.com/qishuilalala/dsh-voice-mode/blob/main/plugin/dsh-voice-mode/LICENSE)
 [![dsh-plugin](https://img.shields.io/badge/dsh--plugin-voice-brightgreen?style=flat-square)](https://github.com/topics/dsh-plugin)
 
-> Full-duplex voice conversation mode for DeepSeek Harness (dsh): speak, get a
-> spoken answer. Streamed zipformer2 ASR → editable draft → auto send → the
-> final reply is read out sentence-by-sentence via Edge TTS, and your voice
-> interrupts playback and the running turn. No API key.
+> Read-aloud for DeepSeek Harness (dsh): a Read button after every assistant
+> reply, plus an auto read-aloud master switch that reads each new reply and
+> interrupts the previous unfinished one. No voice input.
 >
-> 中文说明见 [README.md](./README.md)。
+> 中文说明见 [README.md](./README.md).
 
-> **Version note (0.6.0)**: Edge cloud TTS by default (fast & natural); local TTS (VITS / Kokoro, privacy-first) optional + HTTP hardening + model SHA256 pinning form the merged core; Kokoro adds a model-precision choice (`int8` default 109 MB / `fp32` better quality 311 MB); `wakeWord` (wake word) and `toolBeep` (tool-call beep) are fully wired; the early fork's `asrModel` (bilingual paraformer) and `punctuate` (neural punctuation) were removed — SenseVoice finalization already adds punctuation, and streaming ASR is fixed to zipformer2. Silence split defaults to 1500 ms.
+![dsh-voice-mode-adaptation](assets/hero-banner.png)
+
+![UI overview (concept image)](assets/ui-overview.png)
+
+> **Version note (0.9.0-tts-only.1)**: all voice input (ASR / microphone / wake word / barge-in / AEC) and its settings, endpoints and models were removed; only read-aloud remains. Engines: Edge cloud (default) / local VITS / Kokoro (zh+en; `int8` 109 MB / `fp32` 311 MB) / Azure cloud (SSML phonemes). The optional speech adaptation station is off by default and sends nothing.
 
 ## Fork enhancements (this repo)
 
-- **Edge cloud TTS by default; local TTS optional (privacy-first)**: local VITS (Chinese) and local Kokoro (zh+en, 103 voices; `int8` default ~109 MB / `fp32` ~311 MB for better quality; native `sherpa-onnx-node` addon, no WASM memory limits) run in an isolated child process;
-- **103 Kokoro voices** (F0-measured gender labels, 4 favourite male voices pinned), browsed with a ◀▶ stepper;
-- **Delta transport**: partials upload only the new 0.9 s — long push-to-talk segments finalize in seconds;
-- **Interaction**: a mode-switch button next to the mic (continuous ⇄ hold, persisted); hold mode records only while held;
-- **Long segments**: continuous listening stitches consecutive segments into one message (internally chunked at 30 s and concatenated across chunks); 1500 ms silence split by default; hold keeps pauses from splitting;
-- **Hardening**: session-existence check, loopback + Origin guards, per-endpoint rate limits, model SHA256 pinning, download-host allowlist.
-
-> ⚠️ The screenshots below (and `assets/demo.gif`) show the **upstream legacy single-button UI**; the current UI adds a mode-switch button next to the mic.
+- **Read-aloud shape**: one Read button per assistant reply, plus an auto read-aloud master switch; a new reply interrupts the previous unfinished one;
+- **Switchable engines**: Edge cloud (default) / local VITS (Chinese) / local Kokoro (zh+en, 103 voices; `int8` / `fp32`) / Azure cloud (SSML phonemes); engine / voice / rate / model precision apply live;
+- **Speech adaptation station (optional)**: formulas / tables / code → spoken scripts; default off, zero egress;
+- **Pronunciation list + paragraph pauses**;
+- **Hardening**: loopback + Origin guards, per-endpoint rate limits, local model SHA256 pinning, download-host allowlist;
+- **Version compatibility**: one codebase for dsh 0.1.1-rc.2 → 0.1.5-rc.2 (`npm run check:anchors`, `npm run verify:dual`).
 
 ## Features
 
 
-- **Voice mode**: toggle with the microphone button in the input toolbar or the global shortcut `Ctrl+Shift+V`; globally single-active (only one session is in voice mode at a time; switching sessions yields automatically)
-- **Two interaction modes (switchable in settings, plus a mode-switch button beside the mic)**:
-  - `toggle` (default) continuous listening: RMS VAD segmentation → streaming zipformer2 ASR (words appear as you speak, live caption preview) → automatic sentence split after 1500 ms of silence into the draft, consecutive segments joined into one message, then auto-sent after ~1500 ms more of silence (≈3 s total); hold `Ctrl` to force an immediate send
-  - `hold` push-to-talk: short tap to enter/exit, **hold the mic button to talk, release to send** (swipe up to cancel, `Esc`/blur abandons the segment; pauses do not split while held, up to 10 min); hold `Ctrl` to record-by-keyboard, release to send
-- **Wake word (optional, off by default)**: after setting `wakeWord`, entering voice mode starts in standby, and recognition only begins once the wake word is spoken (e.g. `你好小D`), preventing accidental triggers
-- **Output pipeline**: only the final answer's `text-delta` is read (reasoning/tool calls are skipped), streamed sentence-by-sentence (Edge cloud by default; local VITS / Kokoro, int8/fp32, optional) with a live caption overlay at the bottom-right; tool calls trigger a beep; the full text is still written to the chat; in voice mode a spoken-format system prompt is injected (short natural sentences, no Markdown decoration), and the reader side strips markers as well for a smoother listening experience
-- **Barge-in**: three sensitivity levels of voice-onset detection → local mute + host synth queue invalidation (epoch) + running turn cancellation (the half-finished part is kept and naturally flows into your new message)
-- **Lazy model download with progress**: the zipformer2 Chinese streaming model (~160 MB, `.part` resumable) is downloaded on first use with live progress in the status bar; `npm run prefetch` can pre-download it
-- **Resilience**: mic-denied red hint, visible model-download failure, TTS unreachable status hint (auto retry), failed submit keeps the text in the draft, SSE auto-reconnect
-- **Settings**: Settings → Plugins → voice-mode, with voice / rate / interrupt sensitivity / silence pause / idle timeout / model mirror / auto send / interaction mode / wake word; **voices are previewable** (the "试听/Preview" button synthesizes and plays the current voice at the current rate instantly, no need to enter voice mode; custom ShortNames are previewable too)
-- **Idle exit**: auto-exit and mic release after 10 minutes of inactivity
+- **Auto read-aloud master switch**: the Read button in the composer toolbar (where the mic used to be) toggles continuous reading for the current session; globally single-active
+- **Per-reply Read button**: one Read button per assistant message (next to copy/like), reads just that reply; clicking an older one stops the current reading first
+- **New-reply interrupt**: when a new reply starts, the host cancels the session's synth queue (drop backlog, abort in-flight, epoch++), and the client sees the frame `gen` change and calls `engine.skip()` to stop the previous turn's already-scheduled audio
+- **Output pipeline**: only the final answer's `text-delta` is read (reasoning / tool calls are skipped), streamed sentence-by-sentence with a caption status bar above the composer (with a Stop button)
+- **Speech adaptation station (optional)**: formulas / tables / code → spoken scripts; whole-sentence output for inline math; paragraph pauses; pronunciation list
+- **Lazy model download with progress**: local engines download models on first use (`.part` resumable + SHA256); live progress in the settings panel; `npm run prefetch` pre-downloads
+- **Settings**: Settings → Plugins → voice-mode-adaptation, with engine / voice / rate / model precision / adaptation options; **voices are previewable**
+- **Resilience**: TTS unreachable hint, visible model-download failure, SSE auto-reconnect
 
 ## Interaction gestures
 
@@ -183,7 +180,7 @@ You can also edit the `voice-mode:` section of `~/.dsh/settings.yaml` directly (
 
 ## How it works
 
-![architecture](https://raw.githubusercontent.com/qishuilalala/dsh-voice-mode/HEAD/plugin/dsh-voice-mode/assets/architecture.svg)
+![architecture](assets/architecture.png)
 
 ```
 input:  mic ──RMS VAD (1500 ms silence split)──▶ POST /voice-mode/asr (f32 PCM, 16k, incremental)
