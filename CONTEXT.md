@@ -25,7 +25,7 @@ TTS 默认 Edge 云端；本地 VITS / Kokoro 可选。语音改编站（公式/
   llm/stream tap（仅该会话、无 purpose）
     → 新回合：queue.cancel(sessionId)   // 弃积压 + 中止在途合成 + epoch++
     → SpeechAdapter.feed(text-delta) → 分句 → TtsQueue.enqueue
-  → SSE 'audio' 帧只发给「播放所有者」标签页（含 gen/sentenceId/chunkId/final）
+  → SSE 'audio' 帧广播（含 gen/sentenceId/chunkId/final）；client 按 ownerTabId 自行门禁
     → client 按句拼帧 → 播放
 
 手动朗读：POST /speak {sessionId, text, tabId}
@@ -42,9 +42,10 @@ HTTP：/read（开关）/speak（单条）/cancel（停）/stream（SSE）/confi
 - **新回合打断旧回合**：host `queue.cancel` 提升 **epoch**；epoch 作为帧的 `gen` 下发；client 见 `gen` 变化即 `engine.skip()`（停掉已调度旧音频）+ 清拼帧缓冲。sentenceId 跨 cancel 单调递增，client 拒绝线仍有效。
 - **手动朗读也是一次 cancel+新 gen**：点旧消息立即打断当前朗读。
 - **只播当前查看会话**：client 的 `currentSessionId` 由组件挂载时登记；切换会话即停播。
-- **单标签页出声（多重声音根治）**：`/stream` 带每 tab 稳定 `tabId`；host 只把 `audio`/`tts-error`
-  发给 `readerTabId`（`/read` 或 `/speak` 的调用者）；所有者断开时把所有权移交给仍在线的一个 tab。
-  client 另有单实例 `dispose`（`globalThis.__dshvmaReader__`）与帧指纹去重（`audioFrameSeen`）兜底。
+- **单标签页出声（多重声音根治）**：`/read`、`/speak` 的调用者成为 `readerTabId` 并随 `read` 事件广播；
+  `audio` 帧仍广播，各 client 仅在 `ownerTabId === 自己 TAB_ID` 时播放（`null` 不拦，兼容旧 host）。
+  切回某标签页（focus/可见）会自动接管播放权；所有者断开时 host 移交所有权。
+  另有单实例 `dispose`（`globalThis.__dshvmaReader__`）与帧指纹去重（`audioFrameSeen`）兜底。
 - **本地 TTS 模型**：懒下载 + `.part` 断点续传 + SHA256（models.ts）；事件 `model-progress`/`model-error`。
 - **屏幕归屏幕**：只改送 TTS 的文本，Markdown 渲染链路一行未动。
 - **改编站**：默认关（`rewriteEnabled=false`）；关时完全退化为「原文→清洗→分句」。

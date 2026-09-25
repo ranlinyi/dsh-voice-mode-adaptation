@@ -89,6 +89,8 @@ interface PlayFrame {
 interface ReaderState {
   /** host 当前自动朗读会话（SSE 'read' 广播）。 */
   autoRead: string | null
+  /** 播放所有者标签页 id：只有等于本 tab 的 TAB_ID 时才播放（多标签页防重）。 */
+  ownerTabId: string | null
   playing: boolean
   caption: string | null
   ttsNotice: string | null
@@ -258,7 +260,7 @@ function createAudioEngine(
 
 function createReader(): Reader {
   const listeners = new Set<(s: ReaderState) => void>()
-  const state: ReaderState = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null }
+  const state: ReaderState = { autoRead: null, ownerTabId: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null }
   let source: EventSource | null = null
   let currentSessionId: string | null = null
   const notify = (): void => {
@@ -306,8 +308,9 @@ function createReader(): Reader {
     })
     source.addEventListener('read', (e: MessageEvent<string>) => {
       try {
-        const data = JSON.parse(e.data) as { active?: string | null }
+        const data = JSON.parse(e.data) as { active?: string | null; ownerTabId?: string | null }
         state.autoRead = data.active ?? null
+        state.ownerTabId = data.ownerTabId ?? null
         notify()
       } catch {
         // ignore malformed frame
@@ -341,6 +344,9 @@ function createReader(): Reader {
   const audioListeners = new Set<(f: TtsChunkFrame) => void>()
   audioListeners.add((frame) => {
     if (frame.sessionId !== currentSessionId) return
+    // 播放所有者门禁（多标签页防重）：host 广播 ownerTabId，只有所有者出声；
+    // ownerTabId 为 null（尚无所有者 / 旧 host）时不拦，保证兼容。
+    if (state.ownerTabId !== null && state.ownerTabId !== TAB_ID) return
     const rejectLine = rejectSeqUpTo.get(frame.sessionId)
     if (rejectLine !== undefined && frame.sentenceId <= rejectLine) return
     // 去重兜底：同一 (gen,sentenceId,chunkId,final) 只处理一次（防两个 reader 重复出声）。
@@ -406,6 +412,24 @@ function createReader(): Reader {
 
   connect()
 
+  /**
+   * 用户切回/聚焦本标签页时接管播放权：多标签页下「你正在看哪个 tab，就哪个 tab 出声」。
+   * 只在自动朗读开启、且当前所有者不是本 tab 时触发，避免无谓请求。
+   */
+  const reclaimOwner = (): void => {
+    if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return
+    const sid = state.autoRead
+    if (!sid || state.ownerTabId === TAB_ID) return
+    setUi({ ownerTabId: TAB_ID })
+    void fetch(location.origin + BASE_PATH + '/read', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ sessionId: sid, on: true, tabId: TAB_ID }),
+    }).catch(() => undefined)
+  }
+  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', reclaimOwner)
+  if (typeof window !== 'undefined') window.addEventListener('focus', reclaimOwner)
+
   return {
     get state() {
       return state
@@ -425,15 +449,18 @@ function createReader(): Reader {
     },
     async enter(sessionId) {
       doSkipAudio(sessionId)
+      // 乐观认领播放权：点击即由本 tab 出声（host 广播最终以 ownerTabId 校正）。
+      setUi({ ownerTabId: TAB_ID })
       try {
         const res = await fetch(location.origin + BASE_PATH + '/read', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ sessionId, on: true, tabId: TAB_ID }),
         })
-        const out = (await res.json()) as { active?: string | null; error?: string }
+        const out = (await res.json()) as { active?: string | null; ownerTabId?: string | null; error?: string }
         if (!res.ok) return { ok: false, error: out.error ?? t('readFail') }
         state.autoRead = out.active ?? null
+        state.ownerTabId = out.ownerTabId ?? TAB_ID
         notify()
         return { ok: true }
       } catch {
@@ -450,6 +477,7 @@ function createReader(): Reader {
         })
         const out = (await res.json()) as { active?: string | null }
         state.autoRead = out.active ?? null
+        state.ownerTabId = null
         notify()
       } catch {
         // SSE 广播最终会纠正
@@ -457,8 +485,8 @@ function createReader(): Reader {
     },
     async speak(sessionId, text, key) {
       doSkipAudio(sessionId)
-      // 点击即高亮本条（点击反馈）；失败或播完由 setUi/onAllPlayed 清除。
-      setUi({ notice: null, speakingKey: key ?? null })
+      // 点击即认领播放权 + 高亮本条（点击反馈）；失败或播完由 setUi/onAllPlayed 清除。
+      setUi({ notice: null, speakingKey: key ?? null, ownerTabId: TAB_ID })
       try {
         const res = await fetch(location.origin + BASE_PATH + '/speak', {
           method: 'POST',
@@ -491,6 +519,8 @@ function createReader(): Reader {
         // ignore
       }
       source = null
+      if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', reclaimOwner)
+      if (typeof window !== 'undefined') window.removeEventListener('focus', reclaimOwner)
       doSkipAudio()
       listeners.clear()
     },

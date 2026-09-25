@@ -15298,15 +15298,11 @@ function apply(ctx, config) {
       }
     }
   };
-  const sendToReader = (event, payload) => {
-    if (readerTabId === null) return;
-    for (const c of sseClients) {
-      if (c.tabId !== readerTabId) continue;
-      try {
-        c.send(event, payload);
-      } catch {
-      }
-    }
+  const resolveReaderTab = (tabId) => {
+    const ids = [];
+    for (const c of sseClients) if (c.tabId !== null) ids.push(c.tabId);
+    if (tabId && ids.includes(tabId)) return tabId;
+    return ids.length > 0 ? ids[ids.length - 1] : null;
   };
   const settingsScope = ctx.settings.register(
     NS_VOICE_MODE,
@@ -15432,10 +15428,10 @@ function apply(ctx, config) {
   let activeKokoroModel = vset.kokoroModel;
   const queue = new TtsQueue({
     engine: makeEngine(engineKind),
-    onError: (sessionId) => sendToReader("tts-error", { sessionId })
+    onError: (sessionId) => broadcast("tts-error", { sessionId })
   });
   queue.updateVoice(vset.voice, vset.rate);
-  const unsubscribe = queue.subscribe((frame) => sendToReader("audio", frame));
+  const unsubscribe = queue.subscribe((frame) => broadcast("audio", frame));
   ctx.effect(() => unsubscribe);
   ctx.effect(() => () => void queue.close());
   ctx.effect(
@@ -15675,7 +15671,7 @@ function apply(ctx, config) {
             }
             const previous4 = autoReadSession;
             autoReadSession = sessionId;
-            if (tabId) readerTabId = tabId;
+            readerTabId = resolveReaderTab(tabId);
             queue.cancel(sessionId);
             if (previous4 && previous4 !== sessionId) queue.cancel(previous4);
             broadcast("read", { active: autoReadSession, ownerTabId: readerTabId });
@@ -15734,7 +15730,7 @@ function apply(ctx, config) {
             respondJson(res, 429, { error: "rate limited" });
             return;
           }
-          if (tabId) readerTabId = tabId;
+          readerTabId = resolveReaderTab(tabId);
           queue.cancel(sessionId);
           const adapter = new SpeechAdapter({
             config: speechConfig,

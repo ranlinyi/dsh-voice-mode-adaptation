@@ -125,12 +125,14 @@ t('build 产物与源码时间戳对齐（lib 不早于 src）', () => {
     assert.ok(statSync(join(root, f)).mtimeMs >= newestSrc - 500, f + ' 早于源码（需 node build.mjs）')
   }
 })
-t('多标签页防重：音频只发给播放所有者 + 单实例/帧去重兜底', () => {
+t('多标签页防重：广播 ownerTabId + 客户端按 tabId 门禁 + 单实例/帧去重兜底', () => {
   const h = read('lib/index.js')
-  assert.ok(h.includes('readerTabId'), 'host missing readerTabId owner routing')
-  assert.ok(h.includes('sendToReader'), 'host missing sendToReader')
+  assert.ok(h.includes('readerTabId'), 'host missing readerTabId owner')
+  assert.ok(h.includes('resolveReaderTab'), 'host missing resolveReaderTab')
+  assert.ok(h.includes('ownerTabId'), 'host missing ownerTabId broadcast')
   const c = read('lib/client.js')
   assert.ok(c.includes('dshvma-tabId'), 'client missing per-tab id')
+  assert.ok(c.includes('ownerTabId'), 'client missing owner gate')
   assert.ok(c.includes('audioFrameSeen'), 'client missing frame dedup')
   assert.ok(c.includes('__dshvmaReader__'), 'client missing singleton dispose guard')
 })

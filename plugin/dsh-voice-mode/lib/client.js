@@ -1233,7 +1233,7 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "settingsScope"];
-var BUILD_TAG = "b80192c";
+var BUILD_TAG = "8fa4ff5";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {
@@ -1396,7 +1396,7 @@ function createAudioEngine(setUi, onAllPlayed) {
 }
 function createReader() {
   const listeners = /* @__PURE__ */ new Set();
-  const state = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null };
+  const state = { autoRead: null, ownerTabId: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null };
   let source = null;
   let currentSessionId = null;
   const notify = () => {
@@ -1440,6 +1440,7 @@ function createReader() {
       try {
         const data = JSON.parse(e.data);
         state.autoRead = data.active ?? null;
+        state.ownerTabId = data.ownerTabId ?? null;
         notify();
       } catch {
       }
@@ -1468,6 +1469,7 @@ function createReader() {
   const audioListeners = /* @__PURE__ */ new Set();
   audioListeners.add((frame) => {
     if (frame.sessionId !== currentSessionId) return;
+    if (state.ownerTabId !== null && state.ownerTabId !== TAB_ID) return;
     const rejectLine = rejectSeqUpTo.get(frame.sessionId);
     if (rejectLine !== void 0 && frame.sentenceId <= rejectLine) return;
     const dedupKey = frame.sessionId + "#" + (frame.gen ?? 0) + "#" + frame.sentenceId + "#" + frame.chunkId + "#" + (frame.final ? 1 : 0);
@@ -1528,6 +1530,19 @@ function createReader() {
     curChunkCount += 1;
   });
   connect();
+  const reclaimOwner = () => {
+    if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+    const sid = state.autoRead;
+    if (!sid || state.ownerTabId === TAB_ID) return;
+    setUi({ ownerTabId: TAB_ID });
+    void fetch(location.origin + BASE_PATH2 + "/read", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ sessionId: sid, on: true, tabId: TAB_ID })
+    }).catch(() => void 0);
+  };
+  if (typeof document !== "undefined") document.addEventListener("visibilitychange", reclaimOwner);
+  if (typeof window !== "undefined") window.addEventListener("focus", reclaimOwner);
   return {
     get state() {
       return state;
@@ -1547,6 +1562,7 @@ function createReader() {
     },
     async enter(sessionId) {
       doSkipAudio(sessionId);
+      setUi({ ownerTabId: TAB_ID });
       try {
         const res = await fetch(location.origin + BASE_PATH2 + "/read", {
           method: "POST",
@@ -1556,6 +1572,7 @@ function createReader() {
         const out = await res.json();
         if (!res.ok) return { ok: false, error: out.error ?? t("readFail") };
         state.autoRead = out.active ?? null;
+        state.ownerTabId = out.ownerTabId ?? TAB_ID;
         notify();
         return { ok: true };
       } catch {
@@ -1572,13 +1589,14 @@ function createReader() {
         });
         const out = await res.json();
         state.autoRead = out.active ?? null;
+        state.ownerTabId = null;
         notify();
       } catch {
       }
     },
     async speak(sessionId, text, key) {
       doSkipAudio(sessionId);
-      setUi({ notice: null, speakingKey: key ?? null });
+      setUi({ notice: null, speakingKey: key ?? null, ownerTabId: TAB_ID });
       try {
         const res = await fetch(location.origin + BASE_PATH2 + "/speak", {
           method: "POST",
@@ -1610,6 +1628,8 @@ function createReader() {
       } catch {
       }
       source = null;
+      if (typeof document !== "undefined") document.removeEventListener("visibilitychange", reclaimOwner);
+      if (typeof window !== "undefined") window.removeEventListener("focus", reclaimOwner);
       doSkipAudio();
       listeners.clear();
     }
