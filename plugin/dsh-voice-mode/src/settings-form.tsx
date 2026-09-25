@@ -53,20 +53,7 @@ const FIELD_LABELS: Record<string, string> = {
   kokoroModel: 'Kokoro 模型精度',
   voice: '音色',
   rate: '语速',
-  interruptLevel: '打断灵敏度',
-  bargeInMode: '打断方式',
-  echoGateDb: '回声门控',
-  mode: '交互模式',
-  shortcut: '快捷键',
-  wakeWord: '唤醒词',
-  toolBeep: '工具提示音',
-  autoSend: '自动发送',
-  autoResume: '自动恢复',
-  senseVoice: '定稿重译',
   spokenFormat: '排版与公式提示词',
-  silenceMs: '静音停顿',
-  idleTimeoutMinutes: '空闲超时',
-  modelHost: '模型镜像',
   rewriteEnabled: '改编站总开关',
   rewriteBaseUrl: '改写端点',
   rewriteApiKeyRef: '密钥凭据引用',
@@ -851,11 +838,8 @@ function SegGroup({
   )
 }
 
-/** 模型状态载荷（/voice-mode-adaptation/models/status 返回）。 */
+/** 引擎状态载荷（/voice-mode-adaptation/models/status 返回）。 */
 interface ModelsStatusPayload {
-  asr: { repo: string; ready: boolean; files: Array<{ name: string; exists: boolean; size: number }>; failLatchMs: number }
-  vad: { repo: string; ready: boolean; size: number; failLatchMs: number }
-  sense: { repo: string; ready: boolean; size: number; failLatchMs: number; enabled: boolean }
   tts: {
     engine: 'edge' | 'vits' | 'kokoro' | 'azure'
     ready: boolean
@@ -864,7 +848,6 @@ interface ModelsStatusPayload {
     progress?: { file: string; percent: number }
     local?: { repo: string; ready: boolean; loading: boolean; error?: string; files: Array<{ name: string; exists: boolean; size: number }> }
   }
-  progress: { file: string; percent: number } | null
 }
 
 const fmtMB = (b: number): string => (b >= 1048576 ? `${(b / 1048576).toFixed(0)}MB` : b > 0 ? `${Math.round(b / 1024)}KB` : '–')
@@ -966,118 +949,6 @@ function EngineStatusInline(): React.ReactElement {
   )
 }
 
-/** 设置面板「语音模型」实时状态：3s 轮询进度/就绪/失败退避 + 重试按钮。 */
-function ModelStatusView(): React.ReactElement {
-  const [st, setSt] = useState<ModelsStatusPayload | null>(null)
-  const [retrying, setRetrying] = useState<string | null>(null)
-  useEffect(() => {
-    let alive = true
-    const poll = async (): Promise<void> => {
-      try {
-        const res = await fetch(`${location.origin}${BASE_PATH}/models/status`)
-        if (res.ok && alive) setSt((await res.json()) as ModelsStatusPayload)
-      } catch {
-        // 轮询失败静默（下次再试）
-      }
-    }
-    void poll()
-    const timer = setInterval(() => void poll(), 3000)
-    return () => {
-      alive = false
-      clearInterval(timer)
-    }
-  }, [])
-  const retry = (kind: string): void => {
-    setRetrying(kind)
-    void fetch(`${location.origin}${BASE_PATH}/models/retry`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ kind }),
-    })
-      .catch(() => undefined)
-      .finally(() => {
-        setTimeout(() => setRetrying(null), 2000)
-      })
-  }
-  const mkRow = (
-    label: string,
-    info: { ready: boolean; size: number; failLatchMs?: number; disabledText?: string },
-    key: string,
-    progressFor: ModelsStatusPayload['progress'],
-  ): React.ReactElement => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-      <span style={{ width: 92, flexShrink: 0, fontSize: 12, color: t.label }}>{label}</span>
-      <span style={{ flex: 1, minWidth: 0 }}>
-        {info.disabledText ? (
-          <span style={{ fontSize: 12, color: t.term }}>{info.disabledText}</span>
-        ) : info.ready ? (
-          <span style={{ fontSize: 12, color: 'var(--dsw-alias-state-success-primary)', fontWeight: 600 }}>{tr('modelsReady')}</span>
-        ) : progressFor && progressFor.file ? (
-          <span style={{ fontSize: 12, color: t.term }}>
-            {tr('modelsDownloading').replace('{file}', progressFor.file).replace('{percent}', String(progressFor.percent))}
-            <span style={{ display: 'block', height: 4, borderRadius: 99, background: t.border, marginTop: 4, overflow: 'hidden' }}>
-              <span style={{ display: 'block', height: '100%', width: `${progressFor.percent}%`, background: 'var(--dsw-alias-brand-primary)', transition: 'width .3s' }} />
-            </span>
-          </span>
-        ) : info.failLatchMs !== undefined && info.failLatchMs > 0 ? (
-          <span style={{ fontSize: 12, color: 'var(--dsw-alias-state-error-primary)' }}>{tr('modelsFail').replace('{sec}', String(Math.ceil(info.failLatchMs / 1000)))}</span>
-        ) : (
-          <span style={{ fontSize: 12, color: t.term }}>{fmtMB(info.size)}{tr('modelsMissing')}</span>
-        )}
-      </span>
-      <button
-        type="button"
-        disabled={retrying === key || info.ready || !!info.disabledText}
-        onClick={() => retry(key)}
-        style={{
-          font: 'inherit',
-          fontSize: 12,
-          cursor: info.ready ? 'default' : 'pointer',
-          color: info.ready ? t.term : t.label,
-          background: 'var(--dsw-alias-bg-layer-2)',
-          border: `1px solid ${t.border}`,
-          borderRadius: 8,
-          padding: '3px 10px',
-          opacity: info.ready || info.disabledText ? 0.5 : 1,
-          flexShrink: 0,
-        }}
-        title={tr('modelsRetryHint')}
-      >
-        {retrying === key ? tr('modelsRetrying') : tr('modelsRetry')}
-      </button>
-    </div>
-  )
-  const anyDownloading = !!st?.progress
-  return (
-    <div style={{ marginTop: 4 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 0' }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: t.label }}>{tr('modelsTitle')}</span>
-        {anyDownloading && st?.progress && (
-          <span style={{ fontSize: 12, color: t.term }}>{st.progress.file} {st.progress.percent}%</span>
-        )}
-      </div>
-      {mkRow(
-        tr('modelStreamingAsr'),
-        { ready: !!st?.asr.ready, size: st?.asr.files.reduce((a, f) => a + f.size, 0) ?? 0, failLatchMs: st?.asr.failLatchMs ?? 0 },
-        'asr',
-        anyDownloading ? st.progress : null,
-      )}
-      {mkRow(tr('modelVad'), { ready: !!st?.vad.ready, size: st?.vad.size ?? 0, failLatchMs: st?.vad.failLatchMs ?? 0 }, 'vad', anyDownloading ? st.progress : null)}
-      {mkRow(
-        tr('modelSense'),
-        {
-          ready: !!st?.sense.ready,
-          size: st?.sense.size ?? 0,
-          failLatchMs: st?.sense.enabled ? (st?.sense.failLatchMs ?? 0) : 0,
-          disabledText: st?.sense.enabled ? undefined : tr('modelsDisabled'),
-        },
-        'sense',
-        anyDownloading ? st.progress : null,
-      )}
-      <div style={{ fontSize: 12, color: t.term, lineHeight: '18px', padding: '4px 0 8px' }}>{tr('modelsHint')}</div>
-    </div>
-  )
-}
 
 export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.ReactElement {
   const [snap, setSnap] = useState(() => scope.getSnapshot())
@@ -1221,75 +1092,8 @@ export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.
             <Row name="rate" desc={tr('descRate')}>
               <NumberField score={scope} field="rate" value={value.rate ?? 1} min={0.5} max={2} step={0.1} />
             </Row>
-            </Section>
-            <Section title={tr('secInterrupt')}>
-            <Row name="interruptLevel" desc={tr('descInterrupt')}>
-              <SegGroup
-                score={scope}
-                field="interruptLevel"
-                value={value.interruptLevel}
-                options={[
-                  { v: 0, label: tr('sev0') },
-                  { v: 1, label: tr('sev1') },
-                  { v: 2, label: tr('sev2') },
-                ]}
-              />
-            </Row>
-            <Row name="bargeInMode" desc={tr('descBargeIn')}>
-              <SegGroup
-                score={scope}
-                field="bargeInMode"
-                value={value.bargeInMode}
-                options={[
-                  { v: 'auto', label: tr('bargeInAuto') },
-                  { v: 'manual', label: tr('bargeInManual') },
-                ]}
-              />
-            </Row>
-            <Row name="echoGateDb" desc={tr('descEchoGate')}>
-              <NumberField score={scope} field="echoGateDb" value={value.echoGateDb ?? 6} min={3} max={12} step={1} />
-            </Row>
-            </Section>
-            <Section title={tr('secInteraction')}>
-            <Row name="mode" desc={tr('descMode')}>
-              <SegGroup
-                score={scope}
-                field="mode"
-                value={value.mode}
-                options={[
-                  { v: 'toggle', label: tr('modeToggle') },
-                  { v: 'hold', label: tr('modeHold') },
-                ]}
-              />
-            </Row>
-            <Row name="shortcut" desc={tr('descShortcut')}>
-              <TextField score={scope} field="shortcut" value={value.shortcut ?? 'Ctrl+Shift+V'} placeholder="Ctrl+Shift+V" />
-            </Row>
-            <Row name="wakeWord" desc={tr('descWakeWord')}>
-              <TextField score={scope} field="wakeWord" value={value.wakeWord ?? ''} placeholder={tr('wakePlaceholder')} />
-            </Row>
-            <Row name="toolBeep" desc={tr('descToolBeep')}>
-              <input type="checkbox" checked={Boolean(value.toolBeep)} onChange={(e) => void scope.set('toolBeep', e.target.checked)} />
-            </Row>
-            <Row name="autoSend" desc={tr('descAutoSend')}>
-              <input type="checkbox" checked={Boolean(value.autoSend)} onChange={(e) => void scope.set('autoSend', e.target.checked)} />
-            </Row>
-            <Row name="autoResume" desc={tr('descAutoResume')}>
-              <input type="checkbox" checked={Boolean(value.autoResume)} onChange={(e) => void scope.set('autoResume', e.target.checked)} />
-            </Row>
-            </Section>
-            <Section title={tr('secRecognition')}>
-            <Row name="senseVoice" desc={tr('descSenseVoice')}>
-              <input type="checkbox" checked={Boolean(value.senseVoice)} onChange={(e) => void scope.set('senseVoice', e.target.checked)} />
-            </Row>
             <Row name="spokenFormat" desc={tr('descSpokenFormat')}>
               <input type="checkbox" checked={Boolean(value.spokenFormat)} onChange={(e) => void scope.set('spokenFormat', e.target.checked)} />
-            </Row>
-            <Row name="silenceMs" desc={tr('descSilence')}>
-              <NumberField score={scope} field="silenceMs" value={value.silenceMs ?? 1500} min={500} max={30000} step={100} />
-            </Row>
-            <Row name="idleTimeoutMinutes" desc={tr('descIdle')}>
-              <NumberField score={scope} field="idleTimeoutMinutes" value={value.idleTimeoutMinutes ?? 10} min={0} max={120} step={1} />
             </Row>
             </Section>
             <Section title={tr('secAdaptation')}>
@@ -1368,15 +1172,9 @@ export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.
             </Row>
             <TokenUsageInline />
             </Section>
-            <Section title={tr('secModel')}>
-            <Row name="modelHost" desc={tr('descModelHost')}>
-              <SelectField score={scope} field="modelHost" value={value.modelHost ?? ''} options={HOST_OPTIONS} placeholder="https://..." />
-            </Row>
-            </Section>
             <div style={{ fontSize: 12, color: t.term, lineHeight: '18px', padding: '4px 0 8px' }}>
               {tr('settingsEffectiveNote')}
             </div>
-            <ModelStatusView />
           </div>
         </div>
       )}

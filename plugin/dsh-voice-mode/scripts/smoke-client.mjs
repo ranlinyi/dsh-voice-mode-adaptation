@@ -2,7 +2,7 @@
 /**
  * client 冒烟（防回归 I-3 的客户端部分）：用 headless chromium 打开 dsh web，
  * 走完首次引导流程（关 Internal Testing Notice / workspace 配置 / 选 workspace），
- * 等待 voice-mode-adaptation 麦克风按钮 [data-dshvm="mic"] 渲染，并断言 console 无 error。
+ * 等待 voice-mode-adaptation 麦克风按钮 [data-dshvm="read-toggle"] 渲染，并断言 console 无 error。
  *
  * 用法：node scripts/smoke-client.mjs <dsh-url> [--allow-console-error=regex,...]
  *   dsh-url：boot 后含 token 的完整 URL（如 http://127.0.0.1:3120/?token=xxx）。
@@ -107,7 +107,7 @@ try {
   // 2.5) 新建会话。mic 按钮在输入区里，而输入区要有「当前会话」才渲染；当前会话存在浏览器
   //      localStorage 的 dsh.sessions.current，headless 全新启动没有，页面停在
   //      「选择一个工作区开始」。点「新会话」按正常用户路径建一个即可。
-  if (!(await page.$('[data-dshvm="mic"]'))) {
+  if (!(await page.$('[data-dshvm="read-toggle"]'))) {
     const started = await clickAny(/^新会话$|^new session$|新建会话/)
     if (started) {
       console.log(`  已新建会话: ${started}`)
@@ -127,8 +127,8 @@ try {
   //      - 有会话却无 mic  → FAIL（这才是真回归）
   let micOk = false
   try {
-    await page.waitForSelector('[data-dshvm="mic"]', { timeout: 30000 })
-    console.log('  ✓ mic 按钮 [data-dshvm="mic"] 渲染')
+    await page.waitForSelector('[data-dshvm="read-toggle"]', { timeout: 30000 })
+    console.log('  ✓ mic 按钮 [data-dshvm="read-toggle"] 渲染')
     micOk = true
   } catch {
     micOk = false

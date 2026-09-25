@@ -12,12 +12,12 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..')
 const tests = [
   ['segmenter 单测', ['node', 'test/segmenter.test.mjs']],
-  ['aec 单测', ['node', 'test/aec.test.mjs']],
+  ['block-router 单测', ['node', 'test/block-router.test.mjs']],
+  ['math 单测', ['node', 'test/math.test.mjs']],
+  ['azure-ssml 单测', ['node', 'test/azure-ssml.test.mjs']],
+  ['rewriter 单测', ['node', 'test/rewriter.test.mjs']],
+  ['speech-adapter 单测', ['node', 'test/speech-adapter.test.mjs']],
   ['下载完整性 单测', ['node', 'test/download.test.mjs']],
-  ['语义端点 单测', ['node', 'test/endpoint.test.mjs']],
-  ['重采样 单测', ['node', 'test/resample.test.mjs']],
-  ['SenseVoice worker 协议 单测', ['node', 'test/sense-worker.test.mjs']],
-  ['打断检测路由 单测', ['node', 'test/detect-route.test.mjs']],
   ['清单/产物自检', ['node', 'test/verify-client.mjs']],
 ]
 let failed = 0

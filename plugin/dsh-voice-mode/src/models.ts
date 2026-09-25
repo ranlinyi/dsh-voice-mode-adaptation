@@ -125,7 +125,7 @@ export async function ensureModelFile(opts: EnsureModelOptions): Promise<boolean
   // 不删 .part：保留断点续传进度。慢网络（如 310MB Kokoro 主模型 @ ~250KB/s）
   // 单次请求无法下载完，删掉会让每次预览都从头开始、永远不完成。
   // 仅在校验失败（downloadVerified 内部 SHA 不匹配）时才清 .part——那里已处理。
-  broadcast('asr-error', { file: spec.file, reason: 'checksum_or_download_failed', detail: lastError })
+  broadcast('model-error', { file: spec.file, reason: 'checksum_or_download_failed', detail: lastError })
   return false
 }
 
@@ -181,7 +181,7 @@ async function downloadVerified(opts: {
             await new Promise<void>((r) => sink.once('drain', r))
           }
           if (total > 0) {
-            broadcast('asr-progress', {
+            broadcast('model-progress', {
               file: spec.file,
               percent: Math.min(100, Math.round((received / total) * 100)),
             })
@@ -293,7 +293,7 @@ export async function ensureModelTree(opts: {
       }
       if (ok) {
         done++
-        broadcast('asr-progress', { file: rel, percent: Math.round((done / tree.length) * 100) })
+        broadcast('model-progress', { file: rel, percent: Math.round((done / tree.length) * 100) })
       } else {
         allOk = false
       }

@@ -243,10 +243,10 @@ export function kokoroSpec(model: KokoroModel): EngineSpec {
  */
 export function createSherpaLocalEngine(options: LocalEngineOptions): TtsEngine {
   const { cacheDir, modelHost, allowCustomHost, broadcast } = options
-  /** 当前模型下载进度（ensureModelFile/Tree 以 asr-progress 广播时更新，供设置面板轮询展示）。 */
+  /** 当前模型下载进度（ensureModelFile/Tree 以 model-progress 广播时更新，供设置面板轮询展示）。 */
   let downloadProgress: { file: string; percent: number } | null = null
   const trackedBroadcast = (event: string, payload: unknown): void => {
-    if (event === 'asr-progress' && payload && typeof payload === 'object') {
+    if (event === 'model-progress' && payload && typeof payload === 'object') {
       const pr = payload as { file?: unknown; percent?: unknown }
       if (typeof pr.file === 'string' && typeof pr.percent === 'number') {
         downloadProgress = { file: pr.file, percent: Math.min(100, Math.max(0, pr.percent)) }

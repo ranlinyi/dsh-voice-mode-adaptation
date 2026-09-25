@@ -70,6 +70,8 @@ export interface TtsEngineStatus {
 /** TTS 分块帧（P1-1）：单 chunk 合成场景下 chunkId 固定 0，final=true 帧携带字幕文本。 */
 export interface TtsChunkFrame {
   sessionId: string
+  /** 队列世代：cancel() 递增。客户端据此在新回合开始时停掉旧回合已调度的音频。 */
+  gen: number
   /** 句序号（句级不变；客户端按句拼帧）。 */
   sentenceId: number
   /** chunk 序号（句内递增；单 chunk 场景恒为 0）。 */
@@ -405,10 +407,12 @@ export class TtsQueue {
         q.errorNotified = false // 有帧成功：复位不可达提示
         q.backoff = 0 // 成功后退避清零，防下次失败时退避窗口无限递增
         const sentenceId = q.seq++
+        const gen = q.epoch
         const mime = this.engine.mime
         // 单 chunk（整句音频）+ final 帧（字幕文本）：客户端按句拼帧后解码起播。
         const dataFrame: TtsChunkFrame = {
           sessionId,
+          gen,
           sentenceId,
           chunkId: 0,
           final: false,
@@ -424,6 +428,7 @@ export class TtsQueue {
         }
         const finalFrame: TtsChunkFrame = {
           sessionId,
+          gen,
           sentenceId,
           chunkId: 1,
           final: true,

@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **纯朗读版（v0.9.0-tts-only.1，2026-09-25）**：本 fork 已**移除全部语音输入（ASR、麦克风、唤醒词、打断）**，只保留**语音朗读**。
+> 每条 AI 回复后有一个朗读键（只读该条）；输入框旁的按钮是**朗读总开关**（按一下自动朗读，AI 每轮新回复自动读，新回复会立即打断上一条没读完的部分）。
+> 下文若仍描述「语音模式 / 流式识别 / 按住说话 / 开口打断」，均为**改造前的历史内容，已作废**；以 `CONTEXT.md` 与 `HANDOFF-纯朗读改造-20260925.md` 为准。
+
 # dsh-voice-mode-adaptation
 
 > **本仓库是 [dsh-voice-mode](https://github.com/qishuilalala/dsh-voice-mode)（MIT）的 fork**，新增**可选的「语音改编站」**：让朗读读懂**数学公式、表格、代码、脚注**等**非普通文本**；改编站默认关闭，不开时**零 API Key、零外发**，与原版一致。安装见 **[语音改编站 · Quick Start](../../QUICKSTART-adaptation.md)**。

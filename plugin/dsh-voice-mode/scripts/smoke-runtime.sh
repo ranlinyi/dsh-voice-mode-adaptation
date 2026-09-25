@@ -120,7 +120,7 @@ check() {  # name, url, expect_substr
 BASE="http://127.0.0.1:$PORT"
 check "/voice-mode-adaptation"           "$BASE/voice-mode-adaptation"            '"ok":true'
 check "/voice-mode-adaptation/config"    "$BASE/voice-mode-adaptation/config"     'ttsEngine'
-check "/voice-mode-adaptation/models/status" "$BASE/voice-mode-adaptation/models/status" 'asr'
+check "/voice-mode-adaptation/models/status" "$BASE/voice-mode-adaptation/models/status" 'tts'
 
 # 客户端冒烟（mic 按钮 + console 0 error）：需要 playwright-core + chromium
 if node -e "require.resolve('playwright-core')" >/dev/null 2>&1; then

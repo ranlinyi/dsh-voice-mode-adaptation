@@ -64,32 +64,6 @@ await buildAtomically({
   logLevel: 'info',
 })
 
-// --- SenseVoice 定稿解码 worker（P4-1 离主线程）：独立 ESM，主线程 new Worker 加载 ---
-await build({
-  entryPoints: ['src/sense-worker.ts'],
-  outfile: 'lib/sense-worker.mjs',
-  bundle: true,
-  format: 'esm',
-  platform: 'node',
-  external: [
-    'sherpa-onnx',
-    'node:*',
-  ],
-  logLevel: 'info',
-})
-
-// --- AudioWorklet（客户端采集）：独立 IIFE 字符串，经 define 注入 client bundle，
-//     运行时用 Blob URL 交给 audioCtx.audioWorklet.addModule 加载（浏览器仅服务 client.js）。 ---
-const workletBuild = await build({
-  entryPoints: ['src/audio-worklet.ts'],
-  bundle: true,
-  write: false,
-  format: 'iife',
-  platform: 'browser',
-  logLevel: 'info',
-})
-const AUDIO_WORKLET_SOURCE = workletBuild.outputFiles[0].text
-
 // --- 本地 TTS 合成子进程（child_process.fork，CJS 以获得 IPC 通道）---
 await buildAtomically({
   entryPoints: ['src/tts-vits-worker.ts'],
@@ -114,7 +88,6 @@ await buildAtomically({
   external: PLATFORM_EXTERNALS,
   define: {
     __BUILD_TAG__: JSON.stringify(BUILD_TAG),
-    __AUDIO_WORKLET__: JSON.stringify(AUDIO_WORKLET_SOURCE),
   },
   banner: {
     js:
@@ -127,4 +100,4 @@ await buildAtomically({
   logLevel: 'info',
 })
 
-console.log('[dsh-voice-mode-adaptation] build done: lib/index.js (host) + lib/sense-worker.mjs + lib/tts-vits-worker.cjs + lib/client.js (browser)')
+console.log('[dsh-voice-mode-adaptation] build done: lib/index.js (host) + lib/tts-vits-worker.cjs + lib/client.js (browser)')

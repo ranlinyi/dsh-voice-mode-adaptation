@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 /**
  * dsh-voice-mode-adaptation 模型预下载（prefetch）：安装后、首次使用前预热
- * ASR（zipformer2 ~160MB / VAD ~2MB / SenseVoice ~228MB）与本地 TTS
- * （vits-zh-ll ~130MB / kokoro int8 ~109MB）模型缓存，全部带 SHA256 校验
- * （与运行时 src/asr-host.ts / src/tts-local.ts 清单一致）。
+ * 本地 TTS（vits-zh-ll ~130MB / kokoro int8 ~109MB / kokoro fp32 ~311MB）
+ * 模型缓存，全部带 SHA256 校验（与运行时 src/tts-local.ts 清单一致）。
  *
  * 用法：node scripts/prefetch.mjs [--cache-dir <path>]
  */
@@ -13,23 +12,8 @@ import { mkdir, rename, stat, unlink } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-// ---- 与 src/asr-host.ts / src/tts-local.ts 同步的模型常量（改动时需一致）----
+// ---- 与 src/tts-local.ts 同步的模型常量（改动时需一致）----
 const MODELS = {
-  'csukuangfj/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30': {
-    'encoder.int8.onnx': '5ac51e27981bb4dab01bb9be4958453ba50c3b61c063ddda0eab23fd3671aa4f',
-    'decoder.onnx': '06522ad63cec0fdf6809f4e1db9bb4f7d710c34582e3b35db62ac60eccafac7e',
-    'joiner.int8.onnx': 'b34584dc6f561089e1d747fedebb3765f2caa72c927ef54d7ca55e5ae40a814b',
-    'tokens.txt': '6193c7ea1c96d0d9a1e9652789b40d13a8a913b434a5451e93158f5a09fd6652',
-  },
-  // VAD（Silero 端点检测）
-  'csukuangfj/vad': {
-    'silero_vad.onnx': 'a35ebf52fd3ce5f1469b2a36158dba761bc47b973ea3382b3186ca15b1f5af28',
-  },
-  // SenseVoice（定稿重译，带标点 + 数字归一化）
-  'csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17': {
-    'model.int8.onnx': 'c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51',
-    'tokens.txt': 'f449eb28dc567533d7fa59be34e2abca8784f771850c78a47fb731a31429a1dc',
-  },
   'csukuangfj/sherpa-onnx-vits-zh-ll': {
     'model.onnx': '6c349bdd73dc928234dd7bc86929748bba32cd5264d32d915bf7b7aa0595965b',
     'lexicon.txt': 'b3a82f16b286c424953dea3686039e7ab465fa8e15d87ef8abd0ec69175beb21',

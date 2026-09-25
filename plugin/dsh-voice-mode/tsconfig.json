@@ -18,9 +18,7 @@
     ]
   },
   "include": [
-    "src/ambient.d.ts",
     "src/index.ts",
-    "src/asr-host.ts",
     "src/tts-queue.ts",
     "src/segmenter.ts",
     "src/block-router.ts",
@@ -30,7 +28,6 @@
   ],
   "exclude": [
     "src/client.tsx",
-    "src/asr.ts",
     "node_modules"
   ]
 }

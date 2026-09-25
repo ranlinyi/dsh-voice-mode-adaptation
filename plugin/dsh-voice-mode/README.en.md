@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Read-aloud only (v0.9.0-tts-only.1, 2026-09-25)**: this fork has **removed all voice input (ASR, microphone, wake word, barge-in)** and keeps **speech reading only**.
+> Each assistant reply gets a Read button (reads just that reply); the button beside the composer is the **auto read-aloud master switch**.
+> Any text below about "voice mode / streaming ASR / hold to talk / barge-in" is **pre-refactor history and no longer valid**; see `CONTEXT.md` and `HANDOFF-纯朗读改造-20260925.md`.
+
 # dsh-voice-mode
 
 [![npm version](https://img.shields.io/npm/v/dsh-voice-mode?style=flat-square)](https://www.npmjs.com/package/dsh-voice-mode)

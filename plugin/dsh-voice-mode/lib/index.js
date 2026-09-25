@@ -121,974 +121,9 @@ var require_extend = __commonJS({
 
 // src/index.ts
 import z from "@deepseek-ai/schemastery";
-import { join as join4 } from "node:path";
+import { join as join3 } from "node:path";
 import { homedir } from "node:os";
 import { rm } from "node:fs/promises";
-
-// src/asr-host.ts
-import { statSync } from "node:fs";
-import { stat as stat2 } from "node:fs/promises";
-import { join as join2 } from "node:path";
-import { fileURLToPath } from "node:url";
-import { Worker } from "node:worker_threads";
-
-// src/sense-worker.ts
-import { parentPort, workerData } from "node:worker_threads";
-function createSenseWorkerClient(worker) {
-  let counter = 0;
-  const pending = /* @__PURE__ */ new Map();
-  let dead = false;
-  const deathFns = /* @__PURE__ */ new Set();
-  const die = () => {
-    if (dead) return;
-    dead = true;
-    for (const fn of deathFns) {
-      try {
-        fn();
-      } catch {
-      }
-    }
-  };
-  worker.on?.("message", (msg) => {
-    const p = pending.get(msg?.id);
-    if (!p) return;
-    pending.delete(msg.id);
-    if (!msg.ok) {
-      p.resolve(null);
-      return;
-    }
-    p.resolve(p.op === "create" ? true : msg.text ?? "");
-  });
-  worker.on?.("error", (e) => {
-    die();
-    const err = new Error("sense worker error: " + String(e?.message ?? e));
-    for (const [, p] of pending) p.reject(err);
-    pending.clear();
-  });
-  worker.on?.("exit", () => {
-    die();
-    const err = new Error("sense worker exited");
-    for (const [, p] of pending) p.reject(err);
-    pending.clear();
-  });
-  const request = (op, samples) => {
-    if (dead) return Promise.reject(new Error("sense worker dead"));
-    const id = counter++;
-    return new Promise((resolve, reject) => {
-      pending.set(id, { op, resolve, reject });
-      const msg = { id, op };
-      if (samples) msg.samples = samples;
-      try {
-        worker.postMessage(msg);
-      } catch (e) {
-        pending.delete(id);
-        reject(e instanceof Error ? e : new Error(String(e)));
-      }
-    });
-  };
-  return {
-    request,
-    onDeath(fn) {
-      deathFns.add(fn);
-    },
-    terminate: async () => {
-      dead = true;
-      const err = new Error("sense worker terminated");
-      for (const [, p] of pending) p.reject(err);
-      pending.clear();
-      try {
-        await worker.terminate?.();
-      } catch {
-      }
-    }
-  };
-}
-function startSenseWorker(data) {
-  const port = parentPort;
-  if (!port) return;
-  let recognizer = null;
-  let sherpa = null;
-  port.on("message", async (msg) => {
-    try {
-      if (msg.op === "create" || msg.op === "decode") {
-        if (!sherpa) {
-          sherpa = await import(data.sherpaModule);
-        }
-        if (!recognizer) {
-          recognizer = sherpa.createOfflineRecognizer({
-            featConfig: { sampleRate: 16e3, featureDim: 80 },
-            modelConfig: {
-              senseVoice: {
-                model: data.modelDir + "/model.int8.onnx",
-                language: "auto",
-                useInverseTextNormalization: 1
-              },
-              tokens: data.modelDir + "/tokens.txt",
-              provider: "cpu",
-              debug: 0
-            }
-          });
-        }
-        if (msg.op === "decode" && msg.samples) {
-          const stream = recognizer.createStream();
-          try {
-            stream.acceptWaveform(16e3, msg.samples);
-            recognizer.decode(stream);
-            const text5 = recognizer.getResult(stream).text.trim();
-            port.postMessage({ id: msg.id, ok: true, text: text5 });
-          } finally {
-            try {
-              stream.free();
-            } catch {
-            }
-          }
-          return;
-        }
-        port.postMessage({ id: msg.id, ok: true, text: "" });
-        return;
-      }
-      port.postMessage({ id: msg.id, ok: false, error: "unknown op: " + msg.op });
-    } catch (e) {
-      port.postMessage({ id: msg.id, ok: false, error: String(e) });
-    }
-  });
-}
-if (parentPort) {
-  startSenseWorker(workerData);
-}
-
-// src/asr-host.ts
-import sherpa_onnx from "sherpa-onnx";
-
-// src/models.ts
-import { createHash } from "node:crypto";
-import { createWriteStream } from "node:fs";
-import { mkdir, rename, stat, unlink } from "node:fs/promises";
-import { join } from "node:path";
-var HOST_PRIMARY = "https://huggingface.co";
-var HOST_FALLBACK = "https://hf-mirror.com";
-var ALLOWED_MODEL_HOSTNAMES = ["huggingface.co", "hf.co", "hf-mirror.com"];
-function validateModelHost(raw, allowCustomHost) {
-  if (!raw) return null;
-  let u;
-  try {
-    u = new URL(raw);
-  } catch {
-    return null;
-  }
-  if (u.protocol !== "https:") return null;
-  const hostname = u.hostname.toLowerCase();
-  if (!ALLOWED_MODEL_HOSTNAMES.includes(hostname) && !allowCustomHost) {
-    return null;
-  }
-  return `${u.protocol}//${u.hostname}${u.port ? `:${u.port}` : ""}`;
-}
-function redirectHostAllowed(finalUrl, allowCustomHost) {
-  try {
-    const u = new URL(finalUrl);
-    if (u.protocol !== "https:") return false;
-    const hostname = u.hostname.toLowerCase();
-    if (allowCustomHost) return true;
-    return hostname === "huggingface.co" || hostname.endsWith(".huggingface.co") || hostname === "hf.co" || hostname.endsWith(".hf.co") || hostname === "hf-mirror.com" || hostname.endsWith(".hf-mirror.com");
-  } catch {
-    return false;
-  }
-}
-async function sha256OfFile(path2) {
-  const hash = createHash("sha256");
-  const { createReadStream } = await import("node:fs");
-  await new Promise((resolve, reject) => {
-    const stream = createReadStream(path2);
-    stream.on("data", (c) => hash.update(c));
-    stream.on("error", reject);
-    stream.on("end", () => resolve());
-  });
-  return hash.digest("hex");
-}
-async function ensureModelFile(opts) {
-  const { repo, repoDir, spec, primaryHost, allowCustomHost, broadcast } = opts;
-  const localPath = join(repoDir, spec.file);
-  const partPath = `${localPath}.part`;
-  if ((await stat(localPath).catch(() => null))?.isFile()) {
-    const ok3 = await sha256OfFile(localPath).catch(() => "") === spec.sha256;
-    if (ok3) return true;
-    await unlink(localPath).catch(() => void 0);
-  }
-  await mkdir(join(repoDir, spec.file.includes("/") ? spec.file.slice(0, spec.file.lastIndexOf("/")) : ""), {
-    recursive: true
-  }).catch(() => void 0);
-  const hosts = [...new Set([primaryHost, HOST_PRIMARY, HOST_FALLBACK].filter(Boolean))];
-  let lastError = "no upstream reachable";
-  for (const host of hosts) {
-    try {
-      const done = await downloadVerified({ ...opts, host, partPath, localPath });
-      if (done) return true;
-    } catch (e) {
-      lastError = String(e);
-    }
-  }
-  broadcast("asr-error", { file: spec.file, reason: "checksum_or_download_failed", detail: lastError });
-  return false;
-}
-async function downloadVerified(opts) {
-  const { repo, spec, host, allowCustomHost, partPath, localPath, broadcast } = opts;
-  const url = `${host}/${repo}/resolve/main/${spec.file}`;
-  const partSt = await stat(partPath).catch(() => null);
-  const resumeFrom = partSt?.isFile() ? partSt.size : 0;
-  const headers = { "user-agent": "dsh-voice-mode-adaptation" };
-  if (resumeFrom > 0) headers.range = `bytes=${resumeFrom}-`;
-  const res = await fetch(url, { headers, redirect: "follow" });
-  if (!redirectHostAllowed(res.url, allowCustomHost)) return false;
-  if (res.status === 416) {
-    if (await sha256OfFile(partPath).catch(() => "") === spec.sha256) {
-      await rename(partPath, localPath);
-      return true;
-    }
-    await unlink(partPath).catch(() => void 0);
-    return false;
-  }
-  if (res.status !== 200 && res.status !== 206) return false;
-  const resume = res.status === 206 ? resumeFrom : 0;
-  const total = Number(res.headers.get("content-length") ?? 0) + resume;
-  const src = res.body;
-  if (!src) return false;
-  const sink = createWriteStream(partPath, resume > 0 ? { flags: "a" } : {});
-  const reader = src.getReader();
-  let received = resume;
-  await new Promise((resolve, reject) => {
-    sink.on("error", (e) => reject(e));
-    sink.on("finish", () => resolve());
-    void (async () => {
-      try {
-        for (; ; ) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          received += value.byteLength;
-          if (!sink.write(value)) {
-            await new Promise((r) => sink.once("drain", r));
-          }
-          if (total > 0) {
-            broadcast("asr-progress", {
-              file: spec.file,
-              percent: Math.min(100, Math.round(received / total * 100))
-            });
-          }
-        }
-        sink.end();
-      } catch (e) {
-        sink.destroy(e);
-        reject(e);
-      }
-    })();
-  });
-  const actual = await sha256OfFile(partPath).catch(() => "");
-  if (actual !== spec.sha256) {
-    await unlink(partPath).catch(() => void 0);
-    return false;
-  }
-  await rename(partPath, localPath);
-  return true;
-}
-async function ensureModelTree(opts) {
-  const { repo, repoDir, subdir, primaryHost, allowCustomHost, broadcast } = opts;
-  const hosts = [...new Set([primaryHost, HOST_PRIMARY, HOST_FALLBACK].filter(Boolean))];
-  const subRoot = join(repoDir, subdir);
-  await mkdir(subRoot, { recursive: true }).catch(() => void 0);
-  let tree = [];
-  for (const host of hosts) {
-    try {
-      const res = await fetch(host + "/api/models/" + repo + "?blobs=true", { headers: { "user-agent": "dsh-voice-mode-adaptation" } });
-      if (res.ok) {
-        const j = await res.json();
-        tree = (j.siblings ?? []).map((s) => s.rfilename ?? "").filter((f) => f.startsWith(subdir + "/") && f.length > 0);
-        if (tree.length > 0) break;
-      }
-    } catch {
-    }
-  }
-  if (tree.length === 0) return false;
-  let allOk = true;
-  let done = 0;
-  const queue = [...tree];
-  const worker = async () => {
-    for (; ; ) {
-      const rel = queue.shift();
-      if (rel === void 0) return;
-      const localPath = join(repoDir, rel);
-      const partPath = localPath + ".part";
-      if ((await stat(localPath).catch(() => null))?.isFile() && (await stat(localPath)).size > 0) {
-        done++;
-        continue;
-      }
-      await mkdir(join(repoDir, rel.slice(0, rel.lastIndexOf("/"))), { recursive: true }).catch(() => void 0);
-      let ok3 = false;
-      for (const host of hosts) {
-        try {
-          const url = host + "/" + repo + "/resolve/main/" + encodeURIComponent(rel);
-          const res = await fetch(url, { headers: { "user-agent": "dsh-voice-mode-adaptation" }, redirect: "follow" });
-          if (!redirectHostAllowed(res.url, allowCustomHost)) continue;
-          if (res.status !== 200) continue;
-          const sink = createWriteStream(partPath);
-          const reader = res.body?.getReader();
-          if (!reader) continue;
-          let size = 0;
-          await new Promise((resolve, reject) => {
-            sink.on("error", reject);
-            sink.on("finish", resolve);
-            void (async () => {
-              try {
-                for (; ; ) {
-                  const r = await reader.read();
-                  if (r.done) break;
-                  size += r.value.byteLength;
-                  if (!sink.write(r.value)) await new Promise((r2) => sink.once("drain", r2));
-                }
-                sink.end();
-              } catch (e) {
-                sink.destroy(e);
-                reject(e);
-              }
-            })();
-          });
-          if (size > 0) {
-            await rename(partPath, localPath);
-            ok3 = true;
-            break;
-          }
-        } catch {
-        }
-      }
-      if (ok3) {
-        done++;
-        broadcast("asr-progress", { file: rel, percent: Math.round(done / tree.length * 100) });
-      } else {
-        allOk = false;
-      }
-    }
-  };
-  await Promise.all(Array.from({ length: 8 }, () => worker()));
-  return allOk;
-}
-
-// src/asr-host.ts
-var { createOnlineRecognizer, createVad } = sherpa_onnx;
-var MODEL_REPO = "csukuangfj/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30";
-var MODEL_FILES = [
-  { file: "encoder.int8.onnx", sha256: "5ac51e27981bb4dab01bb9be4958453ba50c3b61c063ddda0eab23fd3671aa4f" },
-  { file: "decoder.onnx", sha256: "06522ad63cec0fdf6809f4e1db9bb4f7d710c34582e3b35db62ac60eccafac7e" },
-  { file: "joiner.int8.onnx", sha256: "b34584dc6f561089e1d747fedebb3765f2caa72c927ef54d7ca55e5ae40a814b" },
-  { file: "tokens.txt", sha256: "6193c7ea1c96d0d9a1e9652789b40d13a8a913b434a5451e93158f5a09fd6652" }
-];
-var VAD_REPO = "csukuangfj/vad";
-var VAD_FILES = [
-  { file: "silero_vad.onnx", sha256: "a35ebf52fd3ce5f1469b2a36158dba761bc47b973ea3382b3186ca15b1f5af28" }
-];
-var SENSE_REPO = "csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17";
-var SENSE_FILES = [
-  { file: "model.int8.onnx", sha256: "c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51" },
-  { file: "tokens.txt", sha256: "f449eb28dc567533d7fa59be34e2abca8784f771850c78a47fb731a31429a1dc" }
-];
-function pcmToSamples(buf) {
-  if (buf.length % 4 !== 0) return null;
-  return new Float32Array(buf.buffer, buf.byteOffset, buf.length / 4);
-}
-var MAX_ASR_BYTES = 4 * 1024 * 1024;
-var SEGMENT_IDLE_MS = 9e4;
-var VAD_CONTINUE_RMS = 0.02;
-var CONFIRM_CONJUNCTION_MS = 800;
-var CONFIRM_LONG_SENTENCE_MS = 350;
-var CONFIRM_LONG_SENTENCE_S = 8;
-var CONFIRM_MIN_MS = 400;
-var CONJUNCTION_TAIL = /(然后|还有|以及|并且|而且|此外|再说|接着|然后呢|比方说|比如说|比如|例如|等等|或者|或是|还有呢)$/;
-function endpointConfirmMs(text5, spokenMs) {
-  const tail = text5.trimEnd();
-  if (CONJUNCTION_TAIL.test(tail)) return CONFIRM_CONJUNCTION_MS;
-  if (spokenMs > CONFIRM_LONG_SENTENCE_S * 1e3) return CONFIRM_LONG_SENTENCE_MS;
-  return 0;
-}
-function rmsOf(samples) {
-  if (samples.length === 0) return 0;
-  let sum = 0;
-  for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
-  return Math.sqrt(sum / samples.length);
-}
-function createAsrRuntime(options) {
-  const { cacheDir, modelHost, broadcast, senseVoice, silenceMs, allowCustomHost } = options;
-  let lastProgress = null;
-  const localBroadcast = (event, payload) => {
-    if (event === "asr-progress") lastProgress = payload;
-    broadcast(event, payload);
-  };
-  const repoDir = join2(cacheDir, MODEL_REPO);
-  const vadDir = join2(cacheDir, VAD_REPO);
-  const senseDir = join2(cacheDir, SENSE_REPO);
-  const normalizedModelHost = () => validateModelHost(modelHost(), allowCustomHost) ?? HOST_PRIMARY;
-  const segments = /* @__PURE__ */ new Map();
-  const finalized = /* @__PURE__ */ new Map();
-  const finalizing = /* @__PURE__ */ new Map();
-  const resetGen = /* @__PURE__ */ new Map();
-  let recognizer = null;
-  let modelsReady = false;
-  let modelsLoading = null;
-  let asrFailAt = 0;
-  const ensureModels = async () => {
-    if (modelsReady) return true;
-    if (Date.now() < asrFailAt) return false;
-    if (!modelsLoading) {
-      modelsLoading = (async () => {
-        for (const f of MODEL_FILES) {
-          if (!await ensureModelFile({ repo: MODEL_REPO, repoDir, spec: f, primaryHost: normalizedModelHost(), allowCustomHost, broadcast: localBroadcast })) {
-            asrFailAt = Date.now() + 6e4;
-            broadcast("asr-error", { file: f.file });
-            return false;
-          }
-        }
-        modelsReady = true;
-        broadcast("asr-ready", {});
-        return true;
-      })().finally(() => {
-        modelsLoading = null;
-      });
-    }
-    return modelsLoading;
-  };
-  const getRecognizer = async () => {
-    if (!await ensureModels()) return null;
-    if (recognizer) return recognizer;
-    const t = (f) => join2(repoDir, f);
-    recognizer = createOnlineRecognizer({
-      modelConfig: {
-        transducer: {
-          encoder: t("encoder.int8.onnx"),
-          decoder: t("decoder.onnx"),
-          joiner: t("joiner.int8.onnx")
-        },
-        tokens: t("tokens.txt"),
-        numThreads: 4,
-        provider: "cpu",
-        debug: 0
-      },
-      decodingMethod: "greedy_search"
-    });
-    return recognizer;
-  };
-  let vadModelReady = false;
-  let vadLoading = null;
-  let vadFailAt = 0;
-  const ensureVadModel = async () => {
-    if (vadModelReady) return join2(vadDir, VAD_FILES[0].file);
-    if (Date.now() < vadFailAt) return null;
-    if (!vadLoading) {
-      vadLoading = (async () => {
-        for (const f of VAD_FILES) {
-          if (!await ensureModelFile({ repo: VAD_REPO, repoDir: vadDir, spec: f, primaryHost: normalizedModelHost(), allowCustomHost, broadcast: localBroadcast })) {
-            vadFailAt = Date.now() + 6e4;
-            return null;
-          }
-        }
-        vadModelReady = true;
-        return join2(vadDir, VAD_FILES[0].file);
-      })().finally(() => {
-        vadLoading = null;
-      });
-    }
-    return vadLoading;
-  };
-  const newVad = (vadPath, threshold = 0.5, minSilenceDuration = 0.5) => createVad({
-    sileroVad: {
-      model: vadPath,
-      threshold,
-      minSilenceDuration,
-      minSpeechDuration: 0.25,
-      maxSpeechDuration: 20,
-      windowSize: 512
-    },
-    sampleRate: 16e3,
-    numThreads: 1,
-    provider: "cpu",
-    debug: 0,
-    bufferSizeInSeconds: 30
-  });
-  const ensureSessionVad = async (seg) => {
-    if (seg.vad) return seg.vad;
-    const vadPath = await ensureVadModel();
-    if (!vadPath) return null;
-    seg.vad = newVad(vadPath, 0.5, silenceMs() / 1e3);
-    return seg.vad;
-  };
-  const detectVads = /* @__PURE__ */ new Map();
-  const detectVadLastUse = /* @__PURE__ */ new Map();
-  const ensureDetectVad = async (sessionId) => {
-    const existing = detectVads.get(sessionId);
-    if (existing) return existing;
-    const vadPath = await ensureVadModel();
-    if (!vadPath) return null;
-    const vad = newVad(vadPath, 0.35);
-    detectVads.set(sessionId, vad);
-    return vad;
-  };
-  let senseModelReady = false;
-  let senseLoading = null;
-  let senseFailAt = 0;
-  const ensureSenseModel = async () => {
-    if (senseModelReady) return join2(senseDir, SENSE_FILES[0].file);
-    if (Date.now() < senseFailAt) return null;
-    if (!senseLoading) {
-      senseLoading = (async () => {
-        for (const f of SENSE_FILES) {
-          if (!await ensureModelFile({ repo: SENSE_REPO, repoDir: senseDir, spec: f, primaryHost: normalizedModelHost(), allowCustomHost, broadcast: localBroadcast })) {
-            senseFailAt = Date.now() + 6e4;
-            return null;
-          }
-        }
-        senseModelReady = true;
-        return join2(senseDir, SENSE_FILES[0].file);
-      })().finally(() => {
-        senseLoading = null;
-      });
-    }
-    return senseLoading;
-  };
-  let senseWorker = null;
-  let senseWorkerSyncing = null;
-  const getSenseWorker = async () => {
-    if (!senseVoice()) return null;
-    if (senseWorker) return senseWorker;
-    if (senseWorkerSyncing) return senseWorkerSyncing;
-    senseWorkerSyncing = (async () => {
-      const sensePath = await ensureSenseModel();
-      if (!sensePath) return null;
-      try {
-        const workerPath = fileURLToPath(new URL("./sense-worker.mjs", import.meta.url));
-        const w = new Worker(workerPath, {
-          workerData: { sherpaModule: "sherpa-onnx", modelDir: senseDir }
-        });
-        const client = createSenseWorkerClient(w);
-        client.onDeath(() => {
-          senseWorker = null;
-          senseWorkerSyncing = null;
-        });
-        if (!await client.request("create")) {
-          await client.terminate();
-          return null;
-        }
-        senseWorker = client;
-        return client;
-      } catch (e) {
-        console.warn("[dsh-voice-mode-adaptation] SenseVoice worker init failed: " + String(e));
-        return null;
-      }
-    })().finally(() => {
-      if (!senseWorker) senseWorkerSyncing = null;
-    });
-    return senseWorkerSyncing;
-  };
-  const senseTranscribe = async (allSamples) => {
-    try {
-      const worker = await getSenseWorker();
-      if (!worker) return null;
-      const total = allSamples.reduce((acc, c) => acc + c.length, 0);
-      if (total === 0) return null;
-      const buf = new Float32Array(total);
-      let off = 0;
-      for (const c of allSamples) {
-        buf.set(c, off);
-        off += c.length;
-      }
-      return await worker.request("decode", buf);
-    } catch (e) {
-      console.warn("[dsh-voice-mode-adaptation] SenseVoice re-transcribe failed: " + String(e));
-      return null;
-    }
-  };
-  const feed = async (sessionId, samples, final, offset = 0, epoch = 0) => {
-    const rec = await getRecognizer();
-    if (!rec) return { text: "", loading: true };
-    if (!final && senseVoice()) {
-      void getSenseWorker().catch(() => {
-      });
-    }
-    let finMap = finalized.get(sessionId);
-    const myGen = resetGen.get(sessionId) ?? 0;
-    const cached = finMap?.get(epoch);
-    if (cached !== void 0) return { text: cached };
-    let sessSegs = segments.get(sessionId);
-    if (!sessSegs) {
-      sessSegs = /* @__PURE__ */ new Map();
-      segments.set(sessionId, sessSegs);
-    }
-    let seg = sessSegs.get(epoch);
-    if (!seg) {
-      if (samples.length === 0 && final) return { text: "" };
-      seg = { stream: rec.createStream(), fed: 0, vad: null, pendingEndpoint: null, lastText: "", allSamples: [], lastActivity: Date.now() };
-      sessSegs.set(epoch, seg);
-    }
-    seg.lastActivity = Date.now();
-    let endpoint = false;
-    let text5 = "";
-    let isSpeech;
-    if (offset + samples.length > seg.fed) {
-      const skip = Math.max(seg.fed - offset, 0);
-      const inc = samples.subarray(skip);
-      seg.stream.acceptWaveform(rec.config.featConfig.sampleRate, inc);
-      seg.fed = offset + samples.length;
-      if (seg.fed <= rec.config.featConfig.sampleRate * 60) seg.allSamples.push(inc);
-      while (rec.isReady(seg.stream)) rec.decode(seg.stream);
-      text5 = rec.getResult(seg.stream).text;
-      seg.lastText = text5;
-      if (!final) {
-        const vad = await ensureSessionVad(seg);
-        if (vad) {
-          if (seg.pendingEndpoint) {
-            const now = Date.now();
-            const rms = rmsOf(inc);
-            if (rms > VAD_CONTINUE_RMS) {
-              seg.pendingEndpoint = null;
-            } else if (now - seg.pendingEndpoint.at >= CONFIRM_MIN_MS && text5 === seg.pendingEndpoint.textAtPending) {
-              seg.pendingEndpoint = null;
-              endpoint = true;
-            } else if (now - seg.pendingEndpoint.at >= seg.pendingEndpoint.confirmMs) {
-              seg.pendingEndpoint = null;
-              endpoint = true;
-            }
-          }
-          vad.acceptWaveform(inc);
-          isSpeech = vad.isDetected();
-          if (!vad.isEmpty()) {
-            let spokenMs = 0;
-            while (!vad.isEmpty()) {
-              const sp = vad.front();
-              spokenMs = sp.samples.length / 16e3 * 1e3;
-              vad.pop();
-            }
-            const confirmMs = endpointConfirmMs(seg.lastText, spokenMs);
-            if (confirmMs <= 0) {
-              endpoint = true;
-            } else {
-              seg.pendingEndpoint = { at: Date.now(), confirmMs, textAtPending: seg.lastText };
-            }
-          }
-        }
-      }
-    }
-    if (!final) return { text: text5, endpoint, isSpeech };
-    const inflightMap = finalizing.get(sessionId);
-    const inflightP = inflightMap?.get(epoch);
-    if (inflightP) return { text: await inflightP };
-    sessSegs.delete(epoch);
-    if (sessSegs.size === 0) segments.delete(sessionId);
-    const finalizeP = (async () => {
-      const all2 = seg.allSamples;
-      const senseP = all2.length > 0 ? Promise.race([
-        senseTranscribe(all2),
-        new Promise((resolve) => setTimeout(() => resolve(null), 1e4))
-      ]) : Promise.resolve(null);
-      const pad = new Float32Array(rec.config.featConfig.sampleRate / 2);
-      seg.stream.acceptWaveform(rec.config.featConfig.sampleRate, pad);
-      while (rec.isReady(seg.stream)) rec.decode(seg.stream);
-      const settled = rec.getResult(seg.stream).text;
-      try {
-        seg.vad?.free?.();
-      } catch {
-      }
-      seg.stream.free();
-      const sense = await senseP;
-      return (sense && sense.trim() ? sense : settled) || "";
-    })().then((finalText) => {
-      if ((resetGen.get(sessionId) ?? 0) !== myGen) return finalText;
-      let fm = finalized.get(sessionId);
-      if (!fm) {
-        fm = /* @__PURE__ */ new Map();
-        finalized.set(sessionId, fm);
-      }
-      fm.set(epoch, finalText);
-      if (fm.size > 32) {
-        const first = fm.keys().next().value;
-        if (first !== void 0) fm.delete(first);
-      }
-      const ff = finalizing.get(sessionId);
-      ff?.delete(epoch);
-      if (ff && ff.size === 0) finalizing.delete(sessionId);
-      return finalText;
-    }).catch((e) => {
-      const ff = finalizing.get(sessionId);
-      ff?.delete(epoch);
-      if (ff && ff.size === 0) finalizing.delete(sessionId);
-      console.warn("[dsh-voice-mode-adaptation] finalize failed: " + String(e));
-      return "";
-    });
-    if (!inflightMap) {
-      finalizing.set(sessionId, /* @__PURE__ */ new Map());
-    }
-    finalizing.get(sessionId).set(epoch, finalizeP);
-    return { text: await finalizeP };
-  };
-  const sweep = () => {
-    const now = Date.now();
-    for (const [sid, sessSegs] of segments) {
-      for (const [epoch, s] of sessSegs) {
-        if (now - s.lastActivity > SEGMENT_IDLE_MS) {
-          try {
-            s.vad?.free?.();
-          } catch {
-          }
-          try {
-            s.stream.free();
-          } catch {
-          }
-          sessSegs.delete(epoch);
-        }
-      }
-      if (sessSegs.size === 0) {
-        segments.delete(sid);
-        finalized.delete(sid);
-      }
-    }
-    for (const [sid, at] of detectVadLastUse) {
-      if (now - at > SEGMENT_IDLE_MS) {
-        try {
-          detectVads.get(sid)?.free?.();
-        } catch {
-        }
-        detectVads.delete(sid);
-        detectVadLastUse.delete(sid);
-      }
-    }
-  };
-  const sweepTimer = setInterval(sweep, 3e4);
-  return {
-    feed,
-    detect: async (sessionId, samples) => {
-      const vad = await ensureDetectVad(sessionId);
-      if (!vad) return { isSpeech: false };
-      detectVadLastUse.set(sessionId, Date.now());
-      if (samples.length > 0) vad.acceptWaveform(samples);
-      const speech = vad.isDetected();
-      while (!vad.isEmpty()) vad.pop();
-      return { isSpeech: speech };
-    },
-    reset: (sessionId) => {
-      const sessSegs = segments.get(sessionId);
-      if (sessSegs) {
-        for (const [, s] of sessSegs) {
-          try {
-            s.vad?.free?.();
-          } catch {
-          }
-          try {
-            s.stream.free();
-          } catch {
-          }
-        }
-        segments.delete(sessionId);
-      }
-      finalized.delete(sessionId);
-      resetGen.set(sessionId, (resetGen.get(sessionId) ?? 0) + 1);
-      finalizing.delete(sessionId);
-      const dv = detectVads.get(sessionId);
-      if (dv) {
-        try {
-          dv.free?.();
-        } catch {
-        }
-        detectVads.delete(sessionId);
-      }
-      detectVadLastUse.delete(sessionId);
-    },
-    dispose: () => {
-      clearInterval(sweepTimer);
-      let w = senseWorker;
-      senseWorker = null;
-      senseWorkerSyncing = null;
-      if (w) void w.terminate();
-      for (const [, sessSegs] of segments) {
-        for (const [, s] of sessSegs) {
-          try {
-            s.vad?.free?.();
-          } catch {
-          }
-          try {
-            s.stream.free();
-          } catch {
-          }
-        }
-      }
-      segments.clear();
-      finalized.clear();
-      finalizing.clear();
-      resetGen.clear();
-      try {
-        recognizer?.free?.();
-      } catch {
-      }
-      recognizer = null;
-      for (const [, dv] of detectVads) {
-        try {
-          dv.free?.();
-        } catch {
-        }
-      }
-      detectVads.clear();
-      detectVadLastUse.clear();
-    },
-    warmup: () => {
-      void getRecognizer().catch(() => void 0);
-      void ensureVadModel().catch(() => void 0);
-      if (senseVoice()) void getSenseWorker().catch(() => void 0);
-    },
-    modelStatus: () => {
-      const statFile = async (dir, repo, name2) => {
-        const st = await stat2(join2(dir, repo, name2)).catch(() => null);
-        return { exists: !!st?.isFile(), size: st?.size ?? 0 };
-      };
-      const asrFiles = MODEL_FILES.map((n) => ({
-        name: n.file,
-        exists: (() => {
-          try {
-            return statSync(join2(repoDir, n.file)).isFile();
-          } catch {
-            return false;
-          }
-        })(),
-        size: (() => {
-          try {
-            return statSync(join2(repoDir, n.file)).size;
-          } catch {
-            return 0;
-          }
-        })()
-      }));
-      const vadSize = (() => {
-        try {
-          return statSync(join2(vadDir, VAD_FILES[0].file)).size;
-        } catch {
-          return 0;
-        }
-      })();
-      const senseSize = (() => {
-        try {
-          return statSync(join2(senseDir, SENSE_FILES[0].file)).size;
-        } catch {
-          return 0;
-        }
-      })();
-      return {
-        // ready 语义 = 文件可用（exists），而非进程内是否已实例化——
-        // 重启后文件齐全却显示「未下载」会误导用户（体验修复）。
-        asr: {
-          repo: MODEL_REPO,
-          ready: asrFiles.every((f) => f.exists),
-          files: asrFiles,
-          failLatchMs: Math.max(0, asrFailAt - Date.now())
-        },
-        vad: {
-          repo: VAD_REPO,
-          ready: vadSize > 0,
-          size: vadSize,
-          failLatchMs: Math.max(0, vadFailAt - Date.now())
-        },
-        sense: {
-          repo: SENSE_REPO,
-          ready: senseSize > 0,
-          size: senseSize,
-          failLatchMs: Math.max(0, senseFailAt - Date.now()),
-          enabled: senseVoice()
-        },
-        progress: lastProgress
-      };
-    },
-    retryModel: async (kind) => {
-      if (kind === "vad") {
-        vadFailAt = 0;
-        return !!await ensureVadModel();
-      }
-      if (kind === "sense") {
-        if (!senseVoice()) return false;
-        senseFailAt = 0;
-        return !!await ensureSenseModel();
-      }
-      if (modelsReady) return true;
-      asrFailAt = 0;
-      return await ensureModels();
-    }
-  };
-}
-var respondJson = (res, status, payload) => {
-  res.writeHead(status, { "content-type": "application/json" });
-  res.end(JSON.stringify(payload));
-};
-function handleAsrRequest(asr, activeSessionId, req, res) {
-  const chunks = [];
-  let received = 0;
-  let tooLarge = false;
-  req.on("data", (c) => {
-    if (tooLarge) return;
-    received += c.length;
-    if (received > MAX_ASR_BYTES) {
-      tooLarge = true;
-      respondJson(res, 413, { error: "pcm payload too large" });
-      return;
-    }
-    chunks.push(c);
-  });
-  req.on("end", () => {
-    if (tooLarge) return;
-    const url = new URL(req.url ?? "/", "http://localhost");
-    const sessionId = url.searchParams.get("sessionId") ?? "";
-    const final = url.searchParams.get("final") === "1";
-    const reset = url.searchParams.get("reset") === "1";
-    const epochParam = url.searchParams.get("epoch");
-    const epochN = Number(epochParam);
-    const epochOK = epochParam === null || Number.isFinite(epochN) && epochN >= 0 && Number.isInteger(epochN);
-    const offsetParam = url.searchParams.get("offset");
-    const offsetOK = offsetParam === null || Number.isFinite(Number(offsetParam)) && Number(offsetParam) >= 0 && Number(offsetParam) <= MAX_ASR_BYTES / 4;
-    if (!offsetOK) {
-      respondJson(res, 400, { error: "invalid offset" });
-      return;
-    }
-    if (!epochOK) {
-      respondJson(res, 400, { error: "invalid epoch" });
-      return;
-    }
-    const epoch = epochParam === null ? 0 : Math.floor(epochN);
-    const offset = offsetParam === null ? 0 : Math.floor(Number(offsetParam));
-    if (!sessionId || sessionId !== activeSessionId) {
-      respondJson(res, 403, { error: "not the active voice session" });
-      return;
-    }
-    if (reset) {
-      asr.reset(sessionId);
-      respondJson(res, 200, { ok: true });
-      return;
-    }
-    const raw = Buffer.concat(chunks);
-    const samples = raw.length === 0 ? final ? new Float32Array(0) : null : pcmToSamples(raw);
-    if (!samples) {
-      respondJson(res, 400, { error: "invalid pcm payload" });
-      return;
-    }
-    if (url.searchParams.get("vadOnly") === "1") {
-      void asr.detect(sessionId, samples).then((out) => {
-        respondJson(res, 200, { isSpeech: out.isSpeech });
-      }).catch((e) => {
-        respondJson(res, 500, { error: String(e) });
-      });
-      return;
-    }
-    void asr.feed(sessionId, samples, final, offset, epoch).then((out) => {
-      if (out.loading) {
-        respondJson(res, 202, { loading: true });
-        return;
-      }
-      const body = { text: out.text };
-      if (out.endpoint) body.endpoint = true;
-      if (out.isSpeech !== void 0) body.isSpeech = out.isSpeech;
-      respondJson(res, 200, body);
-    }).catch((e) => {
-      respondJson(res, 500, { error: String(e) });
-    });
-  });
-}
 
 // node_modules/bail/index.js
 function bail(error) {
@@ -1366,7 +401,7 @@ import { default as default2 } from "node:path";
 import { default as default3 } from "node:process";
 
 // node_modules/vfile/lib/minurl.js
-import { fileURLToPath as fileURLToPath2 } from "node:url";
+import { fileURLToPath } from "node:url";
 
 // node_modules/vfile/lib/minurl.shared.js
 function isUrl(fileUrlOrPath) {
@@ -1489,9 +524,9 @@ var VFile = class {
    * @returns {undefined}
    *   Nothing.
    */
-  set dirname(dirname2) {
+  set dirname(dirname) {
     assertPath(this.basename, "dirname");
-    this.path = default2.join(dirname2 || "", this.basename);
+    this.path = default2.join(dirname || "", this.basename);
   }
   /**
    * Get the extname (including dot) (example: `'.js'`).
@@ -1550,7 +585,7 @@ var VFile = class {
    */
   set path(path2) {
     if (isUrl(path2)) {
-      path2 = fileURLToPath2(path2);
+      path2 = fileURLToPath(path2);
     }
     assertNonEmpty(path2, "path");
     if (this.path !== path2) {
@@ -15362,9 +14397,11 @@ var TtsQueue = class {
         q.errorNotified = false;
         q.backoff = 0;
         const sentenceId = q.seq++;
+        const gen = q.epoch;
         const mime = this.engine.mime;
         const dataFrame = {
           sessionId,
+          gen,
           sentenceId,
           chunkId: 0,
           final: false,
@@ -15379,6 +14416,7 @@ var TtsQueue = class {
         }
         const finalFrame = {
           sessionId,
+          gen,
           sentenceId,
           chunkId: 1,
           final: true,
@@ -15418,9 +14456,221 @@ var TtsQueue = class {
 
 // src/tts-local.ts
 import { fork } from "node:child_process";
-import { fileURLToPath as fileURLToPath3 } from "node:url";
-import { join as join3 } from "node:path";
-import { statSync as statSync2 } from "node:fs";
+import { fileURLToPath as fileURLToPath2 } from "node:url";
+import { join as join2 } from "node:path";
+import { statSync } from "node:fs";
+
+// src/models.ts
+import { createHash } from "node:crypto";
+import { createWriteStream } from "node:fs";
+import { mkdir, rename, stat, unlink } from "node:fs/promises";
+import { join } from "node:path";
+var HOST_PRIMARY = "https://huggingface.co";
+var HOST_FALLBACK = "https://hf-mirror.com";
+var ALLOWED_MODEL_HOSTNAMES = ["huggingface.co", "hf.co", "hf-mirror.com"];
+function validateModelHost(raw, allowCustomHost) {
+  if (!raw) return null;
+  let u;
+  try {
+    u = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (u.protocol !== "https:") return null;
+  const hostname = u.hostname.toLowerCase();
+  if (!ALLOWED_MODEL_HOSTNAMES.includes(hostname) && !allowCustomHost) {
+    return null;
+  }
+  return `${u.protocol}//${u.hostname}${u.port ? `:${u.port}` : ""}`;
+}
+function redirectHostAllowed(finalUrl, allowCustomHost) {
+  try {
+    const u = new URL(finalUrl);
+    if (u.protocol !== "https:") return false;
+    const hostname = u.hostname.toLowerCase();
+    if (allowCustomHost) return true;
+    return hostname === "huggingface.co" || hostname.endsWith(".huggingface.co") || hostname === "hf.co" || hostname.endsWith(".hf.co") || hostname === "hf-mirror.com" || hostname.endsWith(".hf-mirror.com");
+  } catch {
+    return false;
+  }
+}
+async function sha256OfFile(path2) {
+  const hash = createHash("sha256");
+  const { createReadStream } = await import("node:fs");
+  await new Promise((resolve, reject) => {
+    const stream = createReadStream(path2);
+    stream.on("data", (c) => hash.update(c));
+    stream.on("error", reject);
+    stream.on("end", () => resolve());
+  });
+  return hash.digest("hex");
+}
+async function ensureModelFile(opts) {
+  const { repo, repoDir, spec, primaryHost, allowCustomHost, broadcast } = opts;
+  const localPath = join(repoDir, spec.file);
+  const partPath = `${localPath}.part`;
+  if ((await stat(localPath).catch(() => null))?.isFile()) {
+    const ok3 = await sha256OfFile(localPath).catch(() => "") === spec.sha256;
+    if (ok3) return true;
+    await unlink(localPath).catch(() => void 0);
+  }
+  await mkdir(join(repoDir, spec.file.includes("/") ? spec.file.slice(0, spec.file.lastIndexOf("/")) : ""), {
+    recursive: true
+  }).catch(() => void 0);
+  const hosts = [...new Set([primaryHost, HOST_PRIMARY, HOST_FALLBACK].filter(Boolean))];
+  let lastError = "no upstream reachable";
+  for (const host of hosts) {
+    try {
+      const done = await downloadVerified({ ...opts, host, partPath, localPath });
+      if (done) return true;
+    } catch (e) {
+      lastError = String(e);
+    }
+  }
+  broadcast("model-error", { file: spec.file, reason: "checksum_or_download_failed", detail: lastError });
+  return false;
+}
+async function downloadVerified(opts) {
+  const { repo, spec, host, allowCustomHost, partPath, localPath, broadcast } = opts;
+  const url = `${host}/${repo}/resolve/main/${spec.file}`;
+  const partSt = await stat(partPath).catch(() => null);
+  const resumeFrom = partSt?.isFile() ? partSt.size : 0;
+  const headers = { "user-agent": "dsh-voice-mode-adaptation" };
+  if (resumeFrom > 0) headers.range = `bytes=${resumeFrom}-`;
+  const res = await fetch(url, { headers, redirect: "follow" });
+  if (!redirectHostAllowed(res.url, allowCustomHost)) return false;
+  if (res.status === 416) {
+    if (await sha256OfFile(partPath).catch(() => "") === spec.sha256) {
+      await rename(partPath, localPath);
+      return true;
+    }
+    await unlink(partPath).catch(() => void 0);
+    return false;
+  }
+  if (res.status !== 200 && res.status !== 206) return false;
+  const resume = res.status === 206 ? resumeFrom : 0;
+  const total = Number(res.headers.get("content-length") ?? 0) + resume;
+  const src = res.body;
+  if (!src) return false;
+  const sink = createWriteStream(partPath, resume > 0 ? { flags: "a" } : {});
+  const reader = src.getReader();
+  let received = resume;
+  await new Promise((resolve, reject) => {
+    sink.on("error", (e) => reject(e));
+    sink.on("finish", () => resolve());
+    void (async () => {
+      try {
+        for (; ; ) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          received += value.byteLength;
+          if (!sink.write(value)) {
+            await new Promise((r) => sink.once("drain", r));
+          }
+          if (total > 0) {
+            broadcast("model-progress", {
+              file: spec.file,
+              percent: Math.min(100, Math.round(received / total * 100))
+            });
+          }
+        }
+        sink.end();
+      } catch (e) {
+        sink.destroy(e);
+        reject(e);
+      }
+    })();
+  });
+  const actual = await sha256OfFile(partPath).catch(() => "");
+  if (actual !== spec.sha256) {
+    await unlink(partPath).catch(() => void 0);
+    return false;
+  }
+  await rename(partPath, localPath);
+  return true;
+}
+async function ensureModelTree(opts) {
+  const { repo, repoDir, subdir, primaryHost, allowCustomHost, broadcast } = opts;
+  const hosts = [...new Set([primaryHost, HOST_PRIMARY, HOST_FALLBACK].filter(Boolean))];
+  const subRoot = join(repoDir, subdir);
+  await mkdir(subRoot, { recursive: true }).catch(() => void 0);
+  let tree = [];
+  for (const host of hosts) {
+    try {
+      const res = await fetch(host + "/api/models/" + repo + "?blobs=true", { headers: { "user-agent": "dsh-voice-mode-adaptation" } });
+      if (res.ok) {
+        const j = await res.json();
+        tree = (j.siblings ?? []).map((s) => s.rfilename ?? "").filter((f) => f.startsWith(subdir + "/") && f.length > 0);
+        if (tree.length > 0) break;
+      }
+    } catch {
+    }
+  }
+  if (tree.length === 0) return false;
+  let allOk = true;
+  let done = 0;
+  const queue = [...tree];
+  const worker = async () => {
+    for (; ; ) {
+      const rel = queue.shift();
+      if (rel === void 0) return;
+      const localPath = join(repoDir, rel);
+      const partPath = localPath + ".part";
+      if ((await stat(localPath).catch(() => null))?.isFile() && (await stat(localPath)).size > 0) {
+        done++;
+        continue;
+      }
+      await mkdir(join(repoDir, rel.slice(0, rel.lastIndexOf("/"))), { recursive: true }).catch(() => void 0);
+      let ok3 = false;
+      for (const host of hosts) {
+        try {
+          const url = host + "/" + repo + "/resolve/main/" + encodeURIComponent(rel);
+          const res = await fetch(url, { headers: { "user-agent": "dsh-voice-mode-adaptation" }, redirect: "follow" });
+          if (!redirectHostAllowed(res.url, allowCustomHost)) continue;
+          if (res.status !== 200) continue;
+          const sink = createWriteStream(partPath);
+          const reader = res.body?.getReader();
+          if (!reader) continue;
+          let size = 0;
+          await new Promise((resolve, reject) => {
+            sink.on("error", reject);
+            sink.on("finish", resolve);
+            void (async () => {
+              try {
+                for (; ; ) {
+                  const r = await reader.read();
+                  if (r.done) break;
+                  size += r.value.byteLength;
+                  if (!sink.write(r.value)) await new Promise((r2) => sink.once("drain", r2));
+                }
+                sink.end();
+              } catch (e) {
+                sink.destroy(e);
+                reject(e);
+              }
+            })();
+          });
+          if (size > 0) {
+            await rename(partPath, localPath);
+            ok3 = true;
+            break;
+          }
+        } catch {
+        }
+      }
+      if (ok3) {
+        done++;
+        broadcast("model-progress", { file: rel, percent: Math.round(done / tree.length * 100) });
+      } else {
+        allOk = false;
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, () => worker()));
+  return allOk;
+}
+
+// src/tts-local.ts
 var TTS_MODEL_REPO = "csukuangfj/sherpa-onnx-vits-zh-ll";
 var KOKORO_MODEL_DIR_INT8 = "csukuangfj/kokoro-int8-multi-lang-v1_1";
 var KOKORO_MODEL_DIR_FP32 = "csukuangfj/kokoro-multi-lang-v1_1";
@@ -15618,12 +14868,12 @@ function pcmToWav(pcm, sampleRate) {
 var VITS_SPEC = {
   files: TTS_MODEL_FILES,
   workerPaths: (dir) => ({
-    model: join3(dir, "model.onnx"),
-    lexicon: join3(dir, "lexicon.txt"),
-    tokens: join3(dir, "tokens.txt"),
-    date: join3(dir, "date.fst"),
-    phone: join3(dir, "phone.fst"),
-    number: join3(dir, "number.fst")
+    model: join2(dir, "model.onnx"),
+    lexicon: join2(dir, "lexicon.txt"),
+    tokens: join2(dir, "tokens.txt"),
+    date: join2(dir, "date.fst"),
+    phone: join2(dir, "phone.fst"),
+    number: join2(dir, "number.fst")
   }),
   defaultVoice: "suyingxue",
   toSid: voiceToSid
@@ -15639,14 +14889,14 @@ var KOKORO_SHARED_FILES = [
   { file: "phone-zh.fst", sha256: "1ac2b6fa56b1442320c4de7db08353bab8963a2b57f365eebcdd3a2d3562f8d7" }
 ];
 var kokoroWorkerPaths = (dir, modelFile) => ({
-  model: join3(dir, modelFile),
-  voices: join3(dir, "voices.bin"),
-  tokens: join3(dir, "tokens.txt"),
-  dataDir: join3(dir, "espeak-ng-data"),
-  lexicon: [join3(dir, "lexicon-us-en.txt"), join3(dir, "lexicon-zh.txt")].join(","),
-  date: join3(dir, "date-zh.fst"),
-  phone: join3(dir, "phone-zh.fst"),
-  number: join3(dir, "number-zh.fst"),
+  model: join2(dir, modelFile),
+  voices: join2(dir, "voices.bin"),
+  tokens: join2(dir, "tokens.txt"),
+  dataDir: join2(dir, "espeak-ng-data"),
+  lexicon: [join2(dir, "lexicon-us-en.txt"), join2(dir, "lexicon-zh.txt")].join(","),
+  date: join2(dir, "date-zh.fst"),
+  phone: join2(dir, "phone-zh.fst"),
+  number: join2(dir, "number-zh.fst"),
   lang: ""
 });
 function kokoroSpec(model) {
@@ -15662,7 +14912,7 @@ function createSherpaLocalEngine(options) {
   const { cacheDir, modelHost, allowCustomHost, broadcast } = options;
   let downloadProgress = null;
   const trackedBroadcast = (event, payload) => {
-    if (event === "asr-progress" && payload && typeof payload === "object") {
+    if (event === "model-progress" && payload && typeof payload === "object") {
       const pr = payload;
       if (typeof pr.file === "string" && typeof pr.percent === "number") {
         downloadProgress = { file: pr.file, percent: Math.min(100, Math.max(0, pr.percent)) };
@@ -15673,8 +14923,8 @@ function createSherpaLocalEngine(options) {
   const kokoroModel = options.model ?? "int8";
   const spec = options.kind === "kokoro" ? kokoroSpec(kokoroModel) : VITS_SPEC;
   const repoName = options.kind === "kokoro" ? kokoroModelDir(kokoroModel) : TTS_MODEL_REPO;
-  const repoDir = join3(cacheDir, repoName);
-  const workerPath = fileURLToPath3(new URL("./tts-vits-worker.cjs", import.meta.url));
+  const repoDir = join2(cacheDir, repoName);
+  const workerPath = fileURLToPath2(new URL("./tts-vits-worker.cjs", import.meta.url));
   let child = null;
   let childInit = false;
   const respawnChild = async () => {
@@ -15799,11 +15049,11 @@ function createSherpaLocalEngine(options) {
     },
     status() {
       const files = spec.files.map((f) => {
-        const p = join3(repoDir, f.file);
+        const p = join2(repoDir, f.file);
         let exists = false;
         let size = 0;
         try {
-          const st = statSync2(p);
+          const st = statSync(p);
           exists = st.isFile();
           size = st.size;
         } catch {
@@ -15929,14 +15179,14 @@ var RateLimiter = class {
 var name = "voice-mode-adaptation";
 var NS_VOICE_MODE = "voice-mode-adaptation";
 var BASE_PATH = "/voice-mode-adaptation";
-var respondJson2 = (res, status, payload) => {
+var respondJson = (res, status, payload) => {
   res.writeHead(status, { "content-type": "application/json" });
   res.end(JSON.stringify(payload));
 };
 var VOICE_SPOKEN_PROMPT = "\u3010\u6392\u7248\u4E0E\u516C\u5F0F\u3011\u8BF7\u4F7F\u7528\u4E0E\u7528\u6237\u76F8\u540C\u7684\u8BED\u8A00\u3001\u4EE5\u6B63\u5E38\u4E25\u8C28\u7684\u4E66\u9762\u98CE\u683C\u4F5C\u7B54\u3002\u5C4F\u5E55\u9605\u8BFB\u4F18\u5148\uFF1A\u8BF7\u5145\u5206\u4F7F\u7528 Markdown \u7ED3\u6784\uFF08\u6807\u9898\u3001\u5217\u8868\u3001\u8868\u683C\u3001\u5F15\u7528\u3001\u884C\u5185\u4EE3\u7801\u4E0E\u4EE3\u7801\u5757\uFF09\u4E0E LaTeX \u516C\u5F0F\uFF08\u884C\u5185 $...$\u3001\u5C55\u793A $$...$$\uFF09\uFF0C\u4E0D\u8981\u4E3A\u4E86\u6717\u8BFB\u800C\u7B80\u5316\u6392\u7248\u3002\u5B57\u9762\u7F8E\u5143\u7B26\u53F7\u5FC5\u987B\u8F6C\u4E49\uFF1A\u5F53 $ \u8868\u793A\u8D27\u5E01\u91D1\u989D\u3001\u73AF\u5883\u53D8\u91CF\u3001Shell \u53D8\u91CF\u7B49\u5B57\u9762\u5B57\u7B26\u65F6\uFF0C\u5199\u6210 \\$\uFF08\u53CD\u659C\u6760\u52A0\u7F8E\u5143\u7B26\u53F7\uFF09\uFF1B\u540C\u4E00\u884C\u5185\u51FA\u73B0\u4E24\u4E2A\u672A\u8F6C\u4E49\u7684 $ \u4F1A\u88AB\u6E32\u67D3\u6210\u884C\u5185\u516C\u5F0F\u3001\u5BFC\u81F4\u5185\u5BB9\u9519\u4E71\uFF1B\u771F\u6B63\u7684\u6570\u5B66\u516C\u5F0F\u4ECD\u7528 $ \u5B9A\u754C\uFF0C\u4E0D\u8981\u8F6C\u4E49\u3002\u6717\u8BFB\u4FA7\u4F1A\u81EA\u884C\u5904\u7406\u6392\u7248\u7B26\u53F7\u4E0E\u516C\u5F0F\uFF0C\u65E0\u9700\u4E3A\u6717\u8BFB\u6539\u53D8\u5199\u4F5C\u65B9\u5F0F\u3002";
 var VOICE_SPOKEN_SECTION = "voice-mode-adaptation:spoken-format";
 var inject = ["webServer", "settings", "sessions"];
-var defaultModelCacheDir = () => process.platform === "win32" ? join4(process.env.LOCALAPPDATA ?? join4(homedir(), "AppData", "Local"), "dsh-voice-mode-adaptation", "models") : join4(homedir(), ".cache", "dsh-voice-mode-adaptation", "models");
+var defaultModelCacheDir = () => process.platform === "win32" ? join3(process.env.LOCALAPPDATA ?? join3(homedir(), "AppData", "Local"), "dsh-voice-mode-adaptation", "models") : join3(homedir(), ".cache", "dsh-voice-mode-adaptation", "models");
 var VOICE_SETTINGS_DEFAULTS = {
   ttsEngine: "edge",
   kokoroModel: "int8",
@@ -15945,20 +15195,7 @@ var VOICE_SETTINGS_DEFAULTS = {
   azurePhonemes: "",
   voice: "zh-CN-XiaoxiaoNeural",
   rate: 1,
-  interruptLevel: 0,
-  silenceMs: 1500,
-  idleTimeoutMinutes: 10,
-  modelHost: "",
-  autoSend: true,
-  autoResume: false,
-  mode: "toggle",
-  bargeInMode: "auto",
-  echoGateDb: 6,
-  shortcut: "Ctrl+Shift+V",
   spokenFormat: false,
-  senseVoice: true,
-  wakeWord: "",
-  toolBeep: false,
   rewriteEnabled: false,
   rewriteBaseUrl: "https://open.bigmodel.cn/api/paas/v4",
   rewriteApiKeyRef: "",
@@ -15993,20 +15230,7 @@ function createVoiceSettingsSchema(defs) {
       "\u6717\u8BFB\u97F3\u8272\uFF08\u6309 ttsEngine \u53D6\u503C\uFF1Avits \u7528\u8BF4\u8BDD\u4EBA\u540D suyingxue/gunian/fushiyu/bingjiao/bazong\uFF1Bkokoro \u7528 0-102 \u7F16\u53F7\u6216\u4E2D\u6587\u540D zf_xiaobei/zf_xiaoni/zf_xiaoxiao/zf_xiaoyi\uFF1Bedge \u7528 Edge ShortName \u5982 zh-CN-XiaoxiaoNeural \u6653\u6653\xB7\u5973\uFF0C\u5B8C\u6574\u6E05\u5355\u89C1 scripts/list-voices.mjs\uFF09"
     ),
     rate: z.number().min(0.5).max(2).default(d.rate).description("\u6717\u8BFB\u8BED\u901F\u500D\u7387\uFF080.5 = \u6162\u901F\uFF0C2.0 = \u5FEB\u901F\uFF0C1.0 = \u6B63\u5E38\uFF09"),
-    interruptLevel: z.union([z.const(0), z.const(1), z.const(2)]).default(d.interruptLevel).description("\u53D1\u58F0\u6253\u65AD\u7075\u654F\u5EA6\uFF1A0 \u9AD8\u95E8\u69DB\uFF08\u5B89\u9759\u73AF\u5883\uFF0C\u9ED8\u8BA4\uFF09/ 1 \u4E2D / 2 \u4F4E\uFF08\u5608\u6742\u73AF\u5883\u66F4\u5BB9\u6613\u6253\u65AD\uFF09"),
-    silenceMs: z.number().min(500).max(3e4).default(d.silenceMs).description("\u8BF4\u5B8C\u6574\u4E00\u53E5\u7684\u9759\u97F3\u505C\u987F\u6BEB\u79D2\u6570\uFF08\u9ED8\u8BA4 1500 \u6BEB\u79D2\uFF0C\u7ED9\u601D\u8003\u505C\u987F\u7559\u7A7A\u95F4\uFF1B\u81F3\u5C11 250ms \u8BED\u97F3\u624D\u5224\u53E5\uFF0C\u9632\u77ED\u4FC3\u566A\u58F0\u8BEF\u89E6\u53D1\uFF09"),
-    idleTimeoutMinutes: z.number().min(0).max(120).default(d.idleTimeoutMinutes).description("\u65E0\u6D3B\u52A8\u81EA\u52A8\u9000\u51FA\u8BED\u97F3\u6A21\u5F0F\u7684\u5206\u949F\u6570\uFF08\u9ED8\u8BA4 10\uFF1B0 = \u7981\u7528\uFF0C\u4E0D\u81EA\u52A8\u9000\u51FA\u3002\u6717\u8BFB\u4E0E\u56DE\u5408\u6D3B\u52A8\u4F1A\u91CD\u7F6E\u8BA1\u65F6\uFF09"),
-    modelHost: z.string().default(d.modelHost).description("ASR \u6A21\u578B\u4E0B\u8F7D\u6E90\uFF08\u7559\u7A7A\u7528\u9ED8\u8BA4\u6E90\uFF1B\u56FD\u5185\u7F51\u7EDC\u53EF\u586B https://hf-mirror.com\uFF09"),
-    autoSend: z.boolean().default(d.autoSend).description("\u9759\u97F3\u5230\u70B9\u81EA\u52A8\u53D1\u9001\uFF08\u8FDE\u7EED\u591A\u6BB5\u62FC\u6210\u4E00\u6761\u6D88\u606F\uFF1B\u5173\u95ED\u5219\u53EA\u8FDB\u8349\u7A3F\u4F9B\u7F16\u8F91\uFF1B\u6309\u4F4F Ctrl / hold \u677E\u624B\u4ECD\u4F1A\u53D1\u9001\uFF09"),
-    autoResume: z.boolean().default(d.autoResume).description("\u5207\u6362\u56DE\u4E0A\u6B21\u8BED\u97F3\u4F1A\u8BDD\u65F6\u81EA\u52A8\u6062\u590D\u8BED\u97F3\u6A21\u5F0F\uFF08\u9ED8\u8BA4\u5173\uFF0C\u9700\u9EA6\u514B\u98CE\u6743\u9650\u5DF2\u6388\u4E88\uFF1B\u5173\u95ED\u5219\u6BCF\u6B21\u5207\u6362\u4F1A\u8BDD\u540E\u9700\u91CD\u65B0\u70B9\u9EA6\u514B\u98CE\uFF09"),
-    mode: z.union([z.const("toggle"), z.const("hold")]).default(d.mode).description("\u4EA4\u4E92\u6A21\u5F0F\uFF1Atoggle \u6301\u7EED\u8046\u542C + \u9759\u97F3\u81EA\u52A8\u65AD\u53E5\uFF08\u9ED8\u8BA4\uFF09\uFF1Bhold \u6309\u4F4F\u8BF4\u8BDD\u3001\u677E\u624B\u53D1\u9001\uFF08\u77ED\u6309\u9000\u51FA\uFF09"),
-    bargeInMode: z.union([z.const("auto"), z.const("manual")]).default(d.bargeInMode).description("\u6253\u65AD\u65B9\u5F0F\uFF1Aauto \u81EA\u52A8\u6253\u65AD\uFF08\u5F00\u53E3\u5373\u6253\u65AD\uFF0C\u8033\u673A/\u5B89\u9759\u73AF\u5883\u63A8\u8350\uFF09\uFF1Bmanual \u624B\u52A8\u6253\u65AD\uFF08\u5916\u653E\u63A8\u8350\u2014\u2014\u5916\u653E\u56DE\u58F0\u4F1A\u8BEF\u89E6\u53D1\u81EA\u52A8\u6253\u65AD\uFF0C\u6539\u6309\u4F4F\u9EA6\u514B\u98CE/Ctrl \u663E\u5F0F\u6253\u65AD\uFF0C\u6C38\u4E0D\u81EA\u6253\u65AD\uFF09"),
-    echoGateDb: z.number().min(3).max(12).default(d.echoGateDb).description("\u56DE\u58F0\u95E8\u63A7\u9608\u503C\uFF08dB\uFF0C\u9ED8\u8BA4 6\uFF09\uFF1A\u81EA\u52A8\u6253\u65AD\u8981\u6C42\u6B8B\u5DEE\u9AD8\u4E8E\u56DE\u58F0\u5730\u677F\u6B64\u503C\uFF1B\u5916\u653E\u4ECD\u8BEF\u6253\u65AD\u8C03\u5927\uFF088~10\uFF09\uFF0C\u592A\u96BE\u6253\u65AD\u8C03\u5C0F\uFF083~4\uFF09"),
-    shortcut: z.string().default(d.shortcut).description("\u8FDB\u5165/\u9000\u51FA\u8BED\u97F3\u6A21\u5F0F\u7684\u5FEB\u6377\u952E\uFF08\u5F62\u5982 Ctrl+Shift+V\uFF0C\u4FEE\u9970\u952E Ctrl/Shift/Alt/Meta + \u4E00\u4E2A\u5B57\u6BCD\u952E\uFF1B\u7559\u7A7A\u7981\u7528\u5FEB\u6377\u952E\uFF0C\u7528\u9EA6\u514B\u98CE\u6309\u94AE\uFF09"),
     spokenFormat: z.boolean().default(d.spokenFormat).description("\u8BED\u97F3\u4F1A\u8BDD\u6CE8\u5165\u6392\u7248\u4E0E\u516C\u5F0F\u63D0\u793A\u8BCD\uFF08\u4FDD\u7559\u5B8C\u6574 Markdown \u4E0E LaTeX \u6392\u7248\uFF0C\u5E76\u8981\u6C42\u5B57\u9762\u7F8E\u5143\u7B26\u53F7\u8F6C\u4E49\u4E3A \\$\uFF1B\u9ED8\u8BA4\u5173\uFF0C\u6539\u52A8\u5373\u65F6\u751F\u6548\uFF09"),
-    senseVoice: z.boolean().default(d.senseVoice).description("\u5B9A\u7A3F\u7528 SenseVoice \u91CD\u8BD1\uFF08\u5E26\u6807\u70B9+\u6570\u5B57\u5F52\u4E00\u5316\u3001\u8BC6\u522B\u66F4\u51C6\uFF1B\u9ED8\u8BA4\u5F00\u3002\u5173\u95ED\u53EF\u7701 228MB \u6A21\u578B\uFF0C\u53EA\u8D70\u6D41\u5F0F\u8BC6\u522B\uFF09"),
-    wakeWord: z.string().default(d.wakeWord).description("\u5524\u9192\u8BCD\uFF1A\u5728\u5F85\u673A\u6001\u8BF4\u51FA\u540E\u5F00\u59CB\u8BC6\u522B\uFF08\u9ED8\u8BA4\u5173\uFF1B\u5982\u300C\u4F60\u597D\u5C0FD\u300D\uFF09"),
-    toolBeep: z.boolean().default(d.toolBeep).description('\u5DE5\u5177\u8C03\u7528\u63D0\u793A\u97F3\uFF08\u9ED8\u8BA4\u5173\uFF09\uFF1A\u5F00\u542F\u540E AI \u8C03\u7528\u5DE5\u5177\u65F6"\u6EF4"\u4E00\u58F0\uFF0C\u5173\u95ED\u5219\u5168\u7A0B\u9759\u9ED8'),
     rewriteEnabled: z.boolean().default(d.rewriteEnabled).description("\u8BED\u97F3\u6539\u7F16\u7AD9\u603B\u5F00\u5173\uFF08\u9ED8\u8BA4\u5173\uFF09\uFF1A\u5F00\u542F\u540E\u516C\u5F0F/\u8868\u683C/\u4EE3\u7801\u5148\u6539\u5199\u6210\u53E3\u64AD\u7A3F\u518D\u6717\u8BFB\uFF1B\u6B63\u6587\u6717\u8BFB\u4E0D\u53D7\u5F71\u54CD\uFF0C\u5F00\u542F\u524D\u4E0D\u6539\u52A8\u4EFB\u4F55\u73B0\u6709\u884C\u4E3A"),
     rewriteBaseUrl: z.string().default(d.rewriteBaseUrl).description("\u6539\u5199\u6A21\u578B OpenAI \u517C\u5BB9\u7AEF\u70B9\uFF08\u9ED8\u8BA4\u667A\u8C31 GLM\uFF09\uFF1B\u8BF7\u6C42\u4ECE\u5BBF\u4E3B\u53D1\u51FA\uFF0C\u5BC6\u94A5\u4E0D\u4E0A\u6D4F\u89C8\u5668"),
     rewriteApiKeyRef: z.string().default(d.rewriteApiKeyRef).description("\u6539\u5199\u6A21\u578B\u5BC6\u94A5\u7684\u51ED\u636E\u5F15\u7528\uFF08\u586B\u73AF\u5883\u53D8\u91CF\u540D\uFF0C\u5982 GLM_API_KEY\uFF1B\u5BC6\u94A5\u4E0D\u5199\u5165\u914D\u7F6E\u660E\u6587\uFF09"),
@@ -16036,27 +15260,16 @@ var Config = z.object({
   allowLan: z.boolean().default(false),
   allowCustomModelHost: z.boolean().default(false),
   voice: z.string().default("zh-CN-XiaoxiaoNeural"),
-  rate: z.number().default(1),
-  interruptLevel: z.union([z.const(0), z.const(1), z.const(2)]).default(0),
-  silenceMs: z.number().default(1500),
-  idleTimeoutMinutes: z.number().default(10)
+  rate: z.number().default(1)
 });
 function apply(ctx, config) {
-  let activeVoiceSession = null;
-  let activeTabId = null;
-  let ownerYieldTimer = null;
-  const turnStates = /* @__PURE__ */ new Map();
-  const setTurn = (sessionId, state) => {
-    if (turnStates.get(sessionId) === state) return;
-    turnStates.set(sessionId, state);
-    broadcast("turn", { sessionId, state });
-  };
-  const turnGen = /* @__PURE__ */ new Map();
+  let autoReadSession = null;
+  const streamGen = /* @__PURE__ */ new Map();
   const sessions = ctx.get("sessions");
   const limiter = new RateLimiter();
   const limiterPrune = setInterval(() => limiter.prune(Date.now(), 6e4), 6e4);
   ctx.effect(() => () => clearInterval(limiterPrune));
-  const normalizedModelHost = () => validateModelHost(vset.modelHost, config.allowCustomModelHost) ?? HOST_PRIMARY;
+  const normalizedModelHost = () => validateModelHost(config.modelHost, config.allowCustomModelHost) ?? HOST_PRIMARY;
   const denyNonLoopback = (req, res) => {
     if (!config.allowLan && !isLoopbackRequest(req)) {
       res.statusCode = 403;
@@ -16076,7 +15289,6 @@ function apply(ctx, config) {
     return false;
   };
   const sseClients = /* @__PURE__ */ new Set();
-  const latestConnByTab = /* @__PURE__ */ new Map();
   const broadcast = (event, payload) => {
     for (const c of sseClients) {
       try {
@@ -16092,11 +15304,7 @@ function apply(ctx, config) {
       base: {
         ttsEngine: config.ttsEngine,
         voice: config.voice,
-        rate: config.rate,
-        interruptLevel: config.interruptLevel,
-        silenceMs: config.silenceMs,
-        idleTimeoutMinutes: config.idleTimeoutMinutes,
-        modelHost: config.modelHost
+        rate: config.rate
       }
     }
   );
@@ -16182,18 +15390,6 @@ function apply(ctx, config) {
     blockPauseMs: vset.blockPauseMs,
     wholeSentenceMath: vset.wholeSentenceMath
   });
-  const asr = createAsrRuntime({
-    cacheDir: config.cacheDir,
-    modelHost: () => vset.modelHost,
-    // P4：SenseVoice 定稿重译开关（实时读取，关闭则不下载/不创建模型）。
-    senseVoice: () => vset.senseVoice,
-    // 断句静音阈值（实时读取）：端点 VAD minSilenceDuration 跟随设置。
-    silenceMs: () => vset.silenceMs,
-    allowCustomHost: config.allowCustomModelHost,
-    broadcast
-  });
-  ctx.effect(() => () => asr.dispose());
-  void asr.warmup();
   const makeEngine = (kind) => {
     if (kind === "edge") return new EdgeTtsEngine(config.voice, config.rate);
     if (kind === "azure") {
@@ -16250,25 +15446,11 @@ function apply(ctx, config) {
   );
   const currentVoice = () => vset.voice;
   const currentRate = () => vset.rate;
-  const currentInterrupt = () => vset.interruptLevel;
   const currentEngine = () => engineKind;
-  const yieldActiveSession = (expectedSid) => {
-    ownerYieldTimer = null;
-    const sid = activeVoiceSession;
-    if (!sid) return;
-    if (expectedSid !== void 0 && expectedSid !== sid) return;
-    activeVoiceSession = null;
-    activeTabId = null;
-    queue.cancel(sid);
-    asr.reset(sid);
-    setTurn(sid, "idle");
-    turnStates.delete(sid);
-    broadcast("mode", { active: null, ownerTabId: activeTabId });
-  };
   ctx.on("system-prompt/assemble", (assembly, context, next) => {
     if (!config.enabled || !vset.spokenFormat) return next();
     const agentId = context.agent?.id;
-    if (agentId !== void 0 && agentId === activeVoiceSession) {
+    if (agentId !== void 0 && agentId === autoReadSession) {
       assembly.sections.push({ name: VOICE_SPOKEN_SECTION, text: VOICE_SPOKEN_PROMPT });
     }
     return next();
@@ -16277,19 +15459,11 @@ function apply(ctx, config) {
     const rawSessionId = options.sessionId;
     if (!config.enabled || rawSessionId === void 0 || options.purpose !== void 0) return next();
     const sessionId = rawSessionId;
-    if (activeVoiceSession !== sessionId) return next();
-    const gen = (turnGen.get(sessionId) ?? 0) + 1;
-    turnGen.set(sessionId, gen);
-    return tapActiveStream(
-      sessionId,
-      next(),
-      queue,
-      broadcast,
-      (state) => {
-        if ((turnGen.get(sessionId) ?? 0) === gen) setTurn(sessionId, state);
-      },
-      speechConfig
-    );
+    if (autoReadSession !== sessionId) return next();
+    const gen = (streamGen.get(sessionId) ?? 0) + 1;
+    streamGen.set(sessionId, gen);
+    queue.cancel(sessionId);
+    return tapActiveStream(sessionId, next(), queue, speechConfig);
   });
   const base = BASE_PATH;
   ctx.effect(
@@ -16298,11 +15472,11 @@ function apply(ctx, config) {
       path: base,
       handler: (req, res) => {
         if (denyNonLoopback(req, res)) return;
-        respondJson2(res, 200, {
+        respondJson(res, 200, {
           ok: true,
           name: "dsh-voice-mode-adaptation",
           enabled: config.enabled,
-          active: activeVoiceSession,
+          autoRead: autoReadSession,
           // 被拒绝的替代表行 / 放行规则行 / Azure 拼音表行：给用户可见反馈，而不是静默忽略。
           pronunciationErrors,
           guardErrors: guardAllow.errors,
@@ -16317,27 +15491,15 @@ function apply(ctx, config) {
       path: `${base}/config`,
       handler: (req, res) => {
         if (denyNonLoopback(req, res)) return;
-        respondJson2(res, 200, {
+        respondJson(res, 200, {
           basePath: base,
           rate: currentRate(),
           voice: currentVoice(),
-          senseVoice: vset.senseVoice,
-          interruptLevel: currentInterrupt(),
-          silenceMs: vset.silenceMs,
-          idleTimeoutMinutes: vset.idleTimeoutMinutes,
-          modelHost: vset.modelHost,
-          autoSend: vset.autoSend,
-          autoResume: vset.autoResume,
-          mode: vset.mode,
-          bargeInMode: vset.bargeInMode,
-          echoGateDb: vset.echoGateDb,
-          shortcut: vset.shortcut,
-          wakeWord: vset.wakeWord,
-          toolBeep: vset.toolBeep,
           cacheDir: config.cacheDir,
           ttsEngine: currentEngine(),
           audioMime: queue.mime,
-          allowLan: config.allowLan
+          allowLan: config.allowLan,
+          autoRead: autoReadSession
         });
       }
     })
@@ -16356,7 +15518,7 @@ function apply(ctx, config) {
           return;
         }
         if (!config.enabled) {
-          respondJson2(res, 403, { error: "voice mode disabled" });
+          respondJson(res, 403, { error: "voice mode disabled" });
           return;
         }
         collectBody(req, res, MAX_JSON_BODY, async (body) => {
@@ -16371,11 +15533,11 @@ function apply(ctx, config) {
           } catch {
           }
           if (voice.length > 128) {
-            respondJson2(res, 400, { error: "voice too long" });
+            respondJson(res, 400, { error: "voice too long" });
             return;
           }
           if (!voice) {
-            respondJson2(res, 400, { error: "voice required" });
+            respondJson(res, 400, { error: "voice required" });
             return;
           }
           const sample = currentEngine() === "kokoro" ? "\u4F60\u597D\uFF0C\u6B22\u8FCE\u4F7F\u7528\u8BED\u97F3\u6A21\u5F0F\u3002Hello, welcome to voice mode." : currentEngine() === "vits" || voice.startsWith("zh-") ? "\u4F60\u597D\uFF0C\u6B22\u8FCE\u4F7F\u7528\u8BED\u97F3\u6A21\u5F0F\u3002" : "Hello, welcome to voice mode.";
@@ -16384,7 +15546,7 @@ function apply(ctx, config) {
             buf = await queue.synthesize(sample, { voice, rate });
           } catch (e) {
             console.warn(`[dsh-voice-mode-adaptation] preview synthesis failed: ${String(e)}`);
-            respondJson2(res, 502, { error: "\u9884\u89C8\u5408\u6210\u5931\u8D25\uFF1A\u8BF7\u68C0\u67E5\u7F51\u7EDC\u6216\u97F3\u8272\u540D\uFF08ShortName\uFF09\u662F\u5426\u6B63\u786E" });
+            respondJson(res, 502, { error: "\u9884\u89C8\u5408\u6210\u5931\u8D25\uFF1A\u8BF7\u68C0\u67E5\u7F51\u7EDC\u6216\u97F3\u8272\u540D\uFF08ShortName\uFF09\u662F\u5426\u6B63\u786E" });
             return;
           }
           res.writeHead(200, { "content-type": queue.mime, "cache-control": "no-store" });
@@ -16401,11 +15563,11 @@ function apply(ctx, config) {
         if (denyNonLoopback(req, res)) return;
         if (denyCrossOrigin(req, res)) return;
         if (req.method !== "POST") {
-          respondJson2(res, 405, { error: "POST only" });
+          respondJson(res, 405, { error: "POST only" });
           return;
         }
         if (!limiter.hit("rewrite-key:" + (req.socket.remoteAddress ?? "unknown"), 10, 6e4)) {
-          respondJson2(res, 429, { error: "rate limited" });
+          respondJson(res, 429, { error: "rate limited" });
           return;
         }
         collectBody(req, res, MAX_JSON_BODY, async (body) => {
@@ -16418,24 +15580,24 @@ function apply(ctx, config) {
           } catch {
           }
           if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(ref)) {
-            respondJson2(res, 400, { error: "invalid ref (use an env-var name like GLM_API_KEY)" });
+            respondJson(res, 400, { error: "invalid ref (use an env-var name like GLM_API_KEY)" });
             return;
           }
           const creds = ctx.get("credentials");
           if (!creds || typeof creds.set !== "function") {
-            respondJson2(res, 501, { error: "credentials service unavailable" });
+            respondJson(res, 501, { error: "credentials service unavailable" });
             return;
           }
           try {
             if (!value.trim()) {
               if (typeof creds.unset === "function") await creds.unset(ref);
-              respondJson2(res, 200, { ok: true, ref, cleared: true });
+              respondJson(res, 200, { ok: true, ref, cleared: true });
               return;
             }
             await creds.set(ref, value);
-            respondJson2(res, 200, { ok: true, ref });
+            respondJson(res, 200, { ok: true, ref });
           } catch (e) {
-            respondJson2(res, 500, { error: "store failed: " + String(e?.message ?? e) });
+            respondJson(res, 500, { error: "store failed: " + String(e?.message ?? e) });
           }
         });
       }
@@ -16450,90 +15612,119 @@ function apply(ctx, config) {
         if (denyCrossOrigin(req, res)) return;
         if (req.method === "POST") {
           if (!limiter.hit("usage-reset:" + (req.socket.remoteAddress ?? "unknown"), 10, 6e4)) {
-            respondJson2(res, 429, { error: "rate limited" });
+            respondJson(res, 429, { error: "rate limited" });
             return;
           }
           resetRewriteUsage();
-          respondJson2(res, 200, { ok: true, ...rewriteUsage() });
+          respondJson(res, 200, { ok: true, ...rewriteUsage() });
           return;
         }
-        respondJson2(res, 200, rewriteUsage());
+        respondJson(res, 200, rewriteUsage());
       }
     })
   );
   ctx.effect(
     () => ctx.webServer.register({
       kind: "exact",
-      path: `${base}/toggle`,
+      path: `${base}/read`,
       handler: (req, res) => {
         if (denyNonLoopback(req, res)) return;
         if (denyCrossOrigin(req, res)) return;
         collectBody(req, res, MAX_JSON_BODY, (body) => {
           let sessionId;
           let on;
-          let tabId;
           try {
             const parsed = JSON.parse(body || "{}");
             sessionId = parsed.sessionId;
             on = parsed.on;
-            tabId = typeof parsed.tabId === "string" && parsed.tabId.length <= 64 ? parsed.tabId : void 0;
           } catch {
           }
           if (!sessionId) {
-            respondJson2(res, 400, { error: "sessionId required" });
+            respondJson(res, 400, { error: "sessionId required" });
             return;
           }
           if (on !== void 0 && typeof on !== "boolean") {
-            respondJson2(res, 400, { error: "invalid on" });
+            respondJson(res, 400, { error: "invalid on" });
             return;
           }
-          if (!limiter.hit(`toggle:${sessionId}`, 2, 2e3)) {
-            res.statusCode = 429;
-            res.setHeader("content-type", "application/json");
-            res.end(JSON.stringify({ error: "rate limited" }));
+          if (!limiter.hit(`read:${sessionId}`, 2, 2e3)) {
+            respondJson(res, 429, { error: "rate limited" });
             return;
           }
           if (on === true) {
             if (!config.enabled) {
-              respondJson2(res, 403, { error: "voice mode disabled" });
+              respondJson(res, 403, { error: "read-aloud disabled" });
               return;
             }
             if (sessions && !sessions.get(sessionId)) {
-              respondJson2(res, 403, { error: "unknown session" });
+              respondJson(res, 403, { error: "unknown session" });
               return;
             }
-            asr.reset(sessionId);
+            const previous4 = autoReadSession;
+            autoReadSession = sessionId;
             queue.cancel(sessionId);
-            const previous4 = activeVoiceSession;
-            activeVoiceSession = sessionId;
-            activeTabId = tabId ?? null;
-            if (ownerYieldTimer) {
-              clearTimeout(ownerYieldTimer);
-              ownerYieldTimer = null;
-            }
-            if (previous4 && previous4 !== sessionId) {
-              queue.cancel(previous4);
-              asr.reset(previous4);
-              setTurn(previous4, "idle");
-              turnStates.delete(previous4);
-            }
-            broadcast("mode", { active: activeVoiceSession, ownerTabId: activeTabId });
-          } else {
-            if (activeVoiceSession === sessionId) {
-              activeVoiceSession = null;
-              activeTabId = null;
-              if (ownerYieldTimer) {
-                clearTimeout(ownerYieldTimer);
-                ownerYieldTimer = null;
-              }
-              queue.cancel(sessionId);
-              asr.reset(sessionId);
-              setTurn(sessionId, "idle");
-              turnStates.delete(sessionId);
-              broadcast("mode", { active: null, ownerTabId: null });
-            }
+            if (previous4 && previous4 !== sessionId) queue.cancel(previous4);
+            broadcast("read", { active: autoReadSession });
+          } else if (autoReadSession === sessionId) {
+            autoReadSession = null;
+            queue.cancel(sessionId);
+            broadcast("read", { active: null });
           }
-          respondJson2(res, 200, { active: activeVoiceSession });
+          respondJson(res, 200, { active: autoReadSession });
+        });
+      }
+    })
+  );
+  const MAX_SPEAK_BODY = 512 * 1024;
+  const MAX_SPEAK_CHARS = 2e5;
+  ctx.effect(
+    () => ctx.webServer.register({
+      kind: "exact",
+      path: `${base}/speak`,
+      handler: (req, res) => {
+        if (denyNonLoopback(req, res)) return;
+        if (denyCrossOrigin(req, res)) return;
+        if (!config.enabled) {
+          respondJson(res, 403, { error: "read-aloud disabled" });
+          return;
+        }
+        collectBody(req, res, MAX_SPEAK_BODY, (body) => {
+          let sessionId;
+          let text5 = "";
+          try {
+            const parsed = JSON.parse(body || "{}");
+            sessionId = parsed.sessionId;
+            text5 = typeof parsed.text === "string" ? parsed.text : "";
+          } catch {
+          }
+          if (!sessionId) {
+            respondJson(res, 400, { error: "sessionId required" });
+            return;
+          }
+          if (!text5.trim()) {
+            respondJson(res, 400, { error: "text required" });
+            return;
+          }
+          if (text5.length > MAX_SPEAK_CHARS) {
+            respondJson(res, 413, { error: "text too long" });
+            return;
+          }
+          if (sessions && !sessions.get(sessionId)) {
+            respondJson(res, 403, { error: "unknown session" });
+            return;
+          }
+          if (!limiter.hit(`speak:${sessionId}`, 30, 6e4)) {
+            respondJson(res, 429, { error: "rate limited" });
+            return;
+          }
+          queue.cancel(sessionId);
+          const adapter = new SpeechAdapter({
+            config: speechConfig,
+            onSentence: (s, pauseBeforeMs) => queue.enqueue(sessionId, s, pauseBeforeMs)
+          });
+          adapter.feed(text5);
+          adapter.flush();
+          respondJson(res, 200, { ok: true });
         });
       }
     })
@@ -16544,39 +15735,7 @@ function apply(ctx, config) {
       path: `${base}/models/status`,
       handler: (req, res) => {
         if (denyNonLoopback(req, res)) return;
-        respondJson2(res, 200, { ...asr.modelStatus(), tts: queue.status() });
-      }
-    })
-  );
-  ctx.effect(
-    () => ctx.webServer.register({
-      kind: "exact",
-      path: `${base}/models/retry`,
-      handler: (req, res) => {
-        if (denyNonLoopback(req, res)) return;
-        if (!config.enabled) {
-          respondJson2(res, 403, { error: "voice mode disabled" });
-          return;
-        }
-        collectBody(req, res, MAX_JSON_BODY, (body) => {
-          let kind = "asr";
-          try {
-            const p = JSON.parse(body || "{}");
-            if (p.kind === void 0) {
-            } else if (p.kind === "vad" || p.kind === "sense" || p.kind === "asr") {
-              kind = p.kind;
-            } else {
-              respondJson2(res, 400, { error: "invalid kind" });
-              return;
-            }
-          } catch {
-            respondJson2(res, 400, { error: "invalid json" });
-            return;
-          }
-          void asr.retryModel(kind).then((done) => {
-            respondJson2(res, 200, { ok: done, kind });
-          });
-        });
+        respondJson(res, 200, { tts: queue.status() });
       }
     })
   );
@@ -16588,7 +15747,7 @@ function apply(ctx, config) {
         if (denyNonLoopback(req, res)) return;
         if (denyCrossOrigin(req, res)) return;
         if (!config.enabled) {
-          respondJson2(res, 403, { error: "voice mode disabled" });
+          respondJson(res, 403, { error: "voice mode disabled" });
           return;
         }
         collectBody(req, res, MAX_JSON_BODY, (body) => {
@@ -16597,21 +15756,21 @@ function apply(ctx, config) {
             const p = JSON.parse(body || "{}");
             if (p.engine === "kokoro" || p.engine === "vits") engine = p.engine;
             else {
-              respondJson2(res, 400, { error: "invalid engine" });
+              respondJson(res, 400, { error: "invalid engine" });
               return;
             }
           } catch {
-            respondJson2(res, 400, { error: "invalid json" });
+            respondJson(res, 400, { error: "invalid json" });
             return;
           }
-          const dir = join4(config.cacheDir, engine === "kokoro" ? kokoroModelDir(vset.kokoroModel) : TTS_MODEL_REPO);
+          const dir = join3(config.cacheDir, engine === "kokoro" ? kokoroModelDir(vset.kokoroModel) : TTS_MODEL_REPO);
           void rm(dir, { recursive: true, force: true }).then(() => {
             if (engineKind === engine) {
               queue.setEngine(makeEngine(engine));
               queue.updateVoice(vset.voice, vset.rate);
             }
-            respondJson2(res, 200, { ok: true, engine });
-          }).catch((e) => respondJson2(res, 500, { error: String(e) }));
+            respondJson(res, 200, { ok: true, engine });
+          }).catch((e) => respondJson(res, 500, { error: String(e) }));
         });
       }
     })
@@ -16624,7 +15783,7 @@ function apply(ctx, config) {
         if (denyNonLoopback(req, res)) return;
         if (denyCrossOrigin(req, res)) return;
         if (!config.enabled) {
-          respondJson2(res, 403, { error: "voice mode disabled" });
+          respondJson(res, 403, { error: "voice mode disabled" });
           return;
         }
         collectBody(req, res, MAX_JSON_BODY, (body) => {
@@ -16633,20 +15792,20 @@ function apply(ctx, config) {
             const p = JSON.parse(body || "{}");
             if (p.engine === "kokoro" || p.engine === "vits") engine = p.engine;
             else {
-              respondJson2(res, 400, { error: "invalid engine" });
+              respondJson(res, 400, { error: "invalid engine" });
               return;
             }
           } catch {
-            respondJson2(res, 400, { error: "invalid json" });
+            respondJson(res, 400, { error: "invalid json" });
             return;
           }
           if (engineKind !== engine) {
-            respondJson2(res, 400, { error: "engine not active" });
+            respondJson(res, 400, { error: "engine not active" });
             return;
           }
-          void queue.prepare().then(() => respondJson2(res, 200, { ok: true, engine })).catch((e) => {
+          void queue.prepare().then(() => respondJson(res, 200, { ok: true, engine })).catch((e) => {
             console.warn(`[dsh-voice-mode-adaptation] model download failed: ${String(e)}`);
-            respondJson2(res, 502, { error: "\u6A21\u578B\u4E0B\u8F7D\u5931\u8D25\uFF1A\u8BF7\u68C0\u67E5\u7F51\u7EDC" });
+            respondJson(res, 502, { error: "\u6A21\u578B\u4E0B\u8F7D\u5931\u8D25\uFF1A\u8BF7\u68C0\u67E5\u7F51\u7EDC" });
           });
         });
       }
@@ -16661,37 +15820,10 @@ function apply(ctx, config) {
         if (denyCrossOrigin(req, res)) return;
         try {
           const voices = await listEdgeVoices();
-          respondJson2(res, 200, { voices });
+          respondJson(res, 200, { voices });
         } catch (e) {
-          respondJson2(res, 502, { error: String(e) });
+          respondJson(res, 502, { error: String(e) });
         }
-      }
-    })
-  );
-  ctx.effect(
-    () => ctx.webServer.register({
-      kind: "exact",
-      path: `${base}/asr`,
-      handler: (req, res) => {
-        if (denyNonLoopback(req, res)) return;
-        let sid = "";
-        try {
-          const url = new URL(req.url ?? "/", "http://localhost");
-          sid = url.searchParams.get("sessionId") ?? "";
-        } catch {
-        }
-        if (!limiter.hit(`asr:${sid || "unknown"}`, 60, 1e3)) {
-          respondJson2(res, 429, { error: "rate limited" });
-          return;
-        }
-        if (sid && sid === activeVoiceSession) {
-          try {
-            const url = new URL(req.url ?? "/", "http://localhost");
-            setTurn(sid, url.searchParams.get("final") === "1" ? "finalizing" : "listening");
-          } catch {
-          }
-        }
-        handleAsrRequest(asr, activeVoiceSession, req, res);
       }
     })
   );
@@ -16704,56 +15836,17 @@ function apply(ctx, config) {
         if (denyCrossOrigin(req, res)) return;
         collectBody(req, res, MAX_JSON_BODY, (body) => {
           let sessionId;
-          let keepAsr = false;
           try {
             const parsed = JSON.parse(body || "{}");
             sessionId = parsed.sessionId;
-            keepAsr = parsed.keepAsr === true;
           } catch {
           }
-          if (sessionId && sessionId === activeVoiceSession) {
-            if (!limiter.hit(`cancel:${sessionId}`, 2, 1e3)) {
-              respondJson2(res, 429, { error: "rate limited" });
-              return;
-            }
-            queue.cancel(sessionId);
-            if (!keepAsr) asr.reset(sessionId);
-          }
-          respondJson2(res, 200, { ok: true });
-        });
-      }
-    })
-  );
-  ctx.effect(
-    () => ctx.webServer.register({
-      kind: "exact",
-      path: `${base}/mode`,
-      handler: (req, res) => {
-        if (denyNonLoopback(req, res)) return;
-        if (denyCrossOrigin(req, res)) return;
-        collectBody(req, res, MAX_JSON_BODY, (body) => {
-          let mode;
-          try {
-            const parsed = JSON.parse(body || "{}");
-            mode = parsed.mode === "toggle" || parsed.mode === "hold" ? parsed.mode : void 0;
-          } catch {
-          }
-          if (!mode) {
-            res.statusCode = 400;
-            res.setHeader("content-type", "application/json");
-            res.end(JSON.stringify({ error: "mode must be toggle or hold" }));
+          if (sessionId && !limiter.hit(`cancel:${sessionId}`, 2, 1e3)) {
+            respondJson(res, 429, { error: "rate limited" });
             return;
           }
-          void settingsScope.update({ mode }).then(() => {
-            res.statusCode = 200;
-            res.setHeader("content-type", "application/json");
-            res.end(JSON.stringify({ ok: true, mode }));
-          }).catch((e) => {
-            console.warn(`[dsh-voice-mode-adaptation] mode update failed: ${String(e)}`);
-            res.statusCode = 500;
-            res.setHeader("content-type", "application/json");
-            res.end(JSON.stringify({ error: "mode update failed" }));
-          });
+          if (sessionId) queue.cancel(sessionId);
+          respondJson(res, 200, { ok: true });
         });
       }
     })
@@ -16765,16 +15858,9 @@ function apply(ctx, config) {
       handler: (req, res) => {
         if (denyNonLoopback(req, res)) return;
         if (sseClients.size >= 4) {
-          respondJson2(res, 429, { error: "too many streams" });
+          respondJson(res, 429, { error: "too many streams" });
           return;
         }
-        let tabId = null;
-        try {
-          const u = new URL(req.url ?? "/", "http://localhost");
-          tabId = u.searchParams.get("tabId");
-        } catch {
-        }
-        if (tabId !== null && tabId.length > 64) tabId = null;
         res.writeHead(200, {
           "content-type": "text/event-stream; charset=utf-8",
           "cache-control": "no-cache, no-transform",
@@ -16787,14 +15873,9 @@ data: ${JSON.stringify(payload)}
 
 `);
         };
-        const client = { tabId, send };
+        const client = { send };
         sseClients.add(client);
-        if (tabId !== null) latestConnByTab.set(tabId, client);
-        if (tabId !== null && tabId === activeTabId && ownerYieldTimer) {
-          clearTimeout(ownerYieldTimer);
-          ownerYieldTimer = null;
-        }
-        send("mode", { active: activeVoiceSession, ownerTabId: activeTabId });
+        send("read", { active: autoReadSession });
         const heartbeat = setInterval(() => {
           try {
             res.write(": hb\n");
@@ -16807,13 +15888,6 @@ data: ${JSON.stringify(payload)}
           cleaned = true;
           clearInterval(heartbeat);
           sseClients.delete(client);
-          if (tabId !== null && latestConnByTab.get(tabId) === client) {
-            latestConnByTab.delete(tabId);
-            if (tabId === activeTabId) {
-              if (ownerYieldTimer) clearTimeout(ownerYieldTimer);
-              ownerYieldTimer = setTimeout(() => yieldActiveSession(activeVoiceSession), 8e3);
-            }
-          }
         };
         req.on("close", cleanup);
         res.on("close", cleanup);
@@ -16831,7 +15905,7 @@ function collectBody(req, res, maxBytes, onBody) {
     received += c.length;
     if (received > maxBytes) {
       tooLarge = true;
-      respondJson2(res, 413, { error: "request body too large" });
+      respondJson(res, 413, { error: "request body too large" });
       return;
     }
     chunks.push(c);
@@ -16849,20 +15923,12 @@ function collectBody(req, res, maxBytes, onBody) {
   req.on("error", () => {
   });
 }
-async function* tapActiveStream(sessionId, inner, queue, broadcast, onTurn, getSpeechConfig) {
-  let firstTokenBroadcast = false;
-  let firstSentenceBroadcast = false;
+async function* tapActiveStream(sessionId, inner, queue, getSpeechConfig) {
   let flushed = false;
   let finishReason = null;
   const adapter = new SpeechAdapter({
     config: getSpeechConfig,
-    onSentence: (s, pauseBeforeMs) => {
-      if (!firstSentenceBroadcast) {
-        firstSentenceBroadcast = true;
-        broadcast("latency", { sessionId, stage: "first-sentence-text" });
-      }
-      queue.enqueue(sessionId, s, pauseBeforeMs);
-    }
+    onSentence: (s, pauseBeforeMs) => queue.enqueue(sessionId, s, pauseBeforeMs)
   });
   const flushOnce = () => {
     if (flushed) return;
@@ -16871,26 +15937,13 @@ async function* tapActiveStream(sessionId, inner, queue, broadcast, onTurn, getS
   };
   try {
     for await (const chunk of inner) {
-      if (chunk.type === "text-delta" && chunk.text) {
-        if (!firstTokenBroadcast) {
-          firstTokenBroadcast = true;
-          broadcast("latency", { sessionId, stage: "first-llm-token" });
-          onTurn("agent-speaking");
-        }
-        adapter.feed(chunk.text);
-      }
-      if (chunk.type === "tool-call-delta" && chunk.name) {
-        broadcast("tool", { sessionId, name: chunk.name });
-      }
-      if (chunk.type === "finish") {
-        finishReason = chunk.reason;
-      }
+      if (chunk.type === "text-delta" && chunk.text) adapter.feed(chunk.text);
+      if (chunk.type === "finish") finishReason = chunk.reason;
       yield chunk;
     }
   } finally {
     const aborted = finishReason !== null && typeof finishReason === "object" && finishReason.kind === "aborted";
     if (!aborted) flushOnce();
-    onTurn("listening");
   }
 }
 export {

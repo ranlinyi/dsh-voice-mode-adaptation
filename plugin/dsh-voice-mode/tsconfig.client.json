@@ -22,14 +22,10 @@
   },
   "include": [
     "src/client.tsx",
-    "src/settings-form.tsx",
-    "src/asr.ts",
-    "src/aec.ts",
-    "src/audio-worklet.ts"
+    "src/settings-form.tsx"
   ],
   "exclude": [
     "src/index.ts",
-    "src/asr-host.ts",
     "src/tts-queue.ts",
     "src/segmenter.ts",
     "node_modules"

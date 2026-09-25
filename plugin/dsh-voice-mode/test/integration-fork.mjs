@@ -21,13 +21,6 @@ const settingsValue = {
   ttsEngine: 'vits',
   voice: 'suyingxue',
   rate: 1.0,
-  interruptLevel: 0,
-  silenceMs: 2000,
-  idleTimeoutMinutes: 10,
-  modelHost: 'https://hf-mirror.com',
-  autoSend: true,
-  mode: 'toggle',
-  wakeWord: '',
   spokenFormat: false,
 }
 let settingsWatcher = null
@@ -82,9 +75,6 @@ plugin.apply(fakeCtx, {
   allowCustomModelHost: false,
   voice: 'suyingxue',
   rate: 1.0,
-  interruptLevel: 0,
-  silenceMs: 2000,
-  idleTimeoutMinutes: 10,
 })
 
 function makeRes() {
@@ -114,7 +104,7 @@ function makeRes() {
   return res
 }
 
-function makeReq({ remoteAddress = '127.0.0.1', origin, host = '127.0.0.1:3080', method = 'POST', url = '/voice-mode-adaptation/toggle', body }) {
+function makeReq({ remoteAddress = '127.0.0.1', origin, host = '127.0.0.1:3080', method = 'POST', url = '/voice-mode-adaptation/read', body }) {
   const listeners = {}
   const req = {
     socket: { remoteAddress },
@@ -163,24 +153,25 @@ async function awaitRes(res, ms = 2000) {
 
 // 2) Origin 校验
 {
-  const res = get('/voice-mode-adaptation/toggle', makeReq({ origin: 'http://evil.example', body: JSON.stringify({ sessionId: 'live-1', on: true }) }))
+  const res = get('/voice-mode-adaptation/read', makeReq({ origin: 'http://evil.example', body: JSON.stringify({ sessionId: 'live-1', on: true }) }))
   check('cross-origin toggle denied (403)', res.statusCode === 403, `status=${res.statusCode}`)
 }
 
 // 3) 会话存在性
 {
-  const res = await awaitRes(get('/voice-mode-adaptation/toggle', makeReq({ body: JSON.stringify({ sessionId: 'ghost', on: true }) })))
+  const res = await awaitRes(get('/voice-mode-adaptation/read', makeReq({ body: JSON.stringify({ sessionId: 'ghost', on: true }) })))
   check('unknown session denied (403)', res.statusCode === 403, `status=${res.statusCode}`)
 }
 {
-  const res = await awaitRes(get('/voice-mode-adaptation/toggle', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: true }) })))
+  const res = await awaitRes(get('/voice-mode-adaptation/read', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: true }) })))
   check('known session enters voice mode (200)', res.statusCode === 200, `status=${res.statusCode} body=${res.body}`)
 }
 
-// 4) 限流（2 秒内再次 toggle）
+// 4) 限流（每会话 2 次/2 秒：连发第 3 次应 429）
 {
-  const res = await awaitRes(get('/voice-mode-adaptation/toggle', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: true }) })))
-  check('toggle rate limit (429)', res.statusCode === 429, `status=${res.statusCode}`)
+  await awaitRes(get('/voice-mode-adaptation/read', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: true }) })))
+  const res = await awaitRes(get('/voice-mode-adaptation/read', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: true }) })))
+  check('read rate limit (429)', res.statusCode === 429, `status=${res.statusCode}`)
 }
 
 // 5) 本地 VITS 试听（真实合成：模型加载 + 推理 + WAV 编码）
@@ -273,7 +264,7 @@ async function awaitRes(res, ms = 2000) {
 // 7) 退出语音模式（已知会话；先等限流窗口过期）
 {
   await new Promise((r) => setTimeout(r, 2200))
-  const res = await awaitRes(get('/voice-mode-adaptation/toggle', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: false }) })))
+  const res = await awaitRes(get('/voice-mode-adaptation/read', makeReq({ body: JSON.stringify({ sessionId: 'live-1', on: false }) })))
   check('exit voice mode (200)', res.statusCode === 200, `status=${res.statusCode} body=${res.body}`)
 }
 
