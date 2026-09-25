@@ -14,18 +14,19 @@
   <rect x="94" y="324" width="230" height="52" rx="10" fill="#161b22" stroke="#30363d"/>
   <text x="209" y="358" fill="#79c0ff" font-size="22" text-anchor="middle">$E = mc^2$</text>
 
-  <rect x="94" y="400" width="64" height="34" rx="8" fill="#21262d" stroke="#30363d"/>
-  <text x="126" y="423" fill="#8b949e" font-size="15" text-anchor="middle">复制</text>
-  <rect x="170" y="400" width="104" height="34" rx="8" fill="#3fb950" fill-opacity="0.18" stroke="#3fb950" stroke-opacity="0.65"/>
-  <g transform="translate(186,410) scale(0.34)"><path d="M0 30h22l36-30v100l-36-30H0z" fill="#56d364"/></g>
-  <text x="244" y="423" fill="#56d364" font-size="15" font-weight="700">朗读</text>
-  <rect x="286" y="400" width="52" height="34" rx="8" fill="#21262d" stroke="#30363d"/>
-  <text x="312" y="423" fill="#8b949e" font-size="15" text-anchor="middle">赞</text>
-  <rect x="346" y="400" width="52" height="34" rx="8" fill="#21262d" stroke="#30363d"/>
-  <text x="372" y="423" fill="#8b949e" font-size="15" text-anchor="middle">踩</text>
+  <!-- 消息操作行：与官方一致的 28px 圆形图标按钮（复制 / 朗读 / 赞 / 踩） -->
+  <rect x="94" y="403" width="28" height="28" rx="14" fill="none" stroke="#30363d"/>
+  <rect x="101" y="409" width="9" height="9" rx="2" fill="none" stroke="#8b949e" stroke-width="1.4"/>
+  <rect x="106" y="414" width="9" height="9" rx="2" fill="#0d1117" stroke="#8b949e" stroke-width="1.4"/>
+  <rect x="130" y="403" width="28" height="28" rx="14" fill="#58a6ff" fill-opacity="0.16" stroke="#58a6ff"/>
+  <g transform="translate(137,411) scale(0.25)"><path d="M0 30h22l36-30v100l-36-30H0z" fill="#79c0ff"/></g>
+  <rect x="166" y="403" width="28" height="28" rx="14" fill="none" stroke="#30363d"/>
+  <path d="M173 421v-6h3l3-6 2 1-1 5h5a2 2 0 0 1 2 2.4l-1 5a2 2 0 0 1-2 1.6h-11z" fill="none" stroke="#8b949e" stroke-width="1.4" stroke-linejoin="round"/>
+  <rect x="202" y="403" width="28" height="28" rx="14" fill="none" stroke="#30363d"/>
+  <path d="M223 413v6h-3l-3 6-2-1 1-5h-5a2 2 0 0 1-2-2.4l1-5a2 2 0 0 1 2-1.6h11z" fill="none" stroke="#8b949e" stroke-width="1.4" stroke-linejoin="round"/>
 
-  <line x1="406" y1="417" x2="480" y2="417" stroke="#3fb950" stroke-width="2" stroke-dasharray="6 5"/>
-  <text x="492" y="411" fill="#56d364" font-size="17" font-weight="600">每条 AI 回复后的朗读键 → 只读这一条</text>
+  <line x1="246" y1="417" x2="322" y2="417" stroke="#58a6ff" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="334" y="411" fill="#79c0ff" font-size="17" font-weight="600">朗读键：与复制/点赞同款图标按钮，点击只读这一条</text>
 
   <rect x="70" y="500" width="1060" height="196" rx="14" fill="#0d1117" stroke="#30363d"/>
   <rect x="94" y="522" width="520" height="38" rx="9" fill="#3fb950" fill-opacity="0.08" stroke="#3fb950" stroke-opacity="0.3"/>

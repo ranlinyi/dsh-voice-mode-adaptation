@@ -53,6 +53,8 @@ interface ReaderState {
   caption: string | null
   ttsNotice: string | null
   notice: string | null
+  /** 当前正在手动朗读的消息 key（messageId 字符串）；用于让对应朗读键保持高亮。 */
+  speakingKey: string | null
 }
 
 interface Reader {
@@ -62,7 +64,7 @@ interface Reader {
   setCurrentSession(id: string | null): void
   enter(sessionId: string): Promise<{ ok: boolean; error?: string }>
   exit(sessionId: string): Promise<void>
-  speak(sessionId: string, text: string): Promise<{ ok: boolean }>
+  speak(sessionId: string, text: string, key?: string): Promise<{ ok: boolean }>
   stop(sessionId: string): void
 }
 
@@ -214,7 +216,7 @@ function createAudioEngine(
 
 function createReader(): Reader {
   const listeners = new Set<(s: ReaderState) => void>()
-  const state: ReaderState = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null }
+  const state: ReaderState = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null }
   let source: EventSource | null = null
   let currentSessionId: string | null = null
   const notify = (): void => {
@@ -230,7 +232,8 @@ function createReader(): Reader {
     Object.assign(state, patch)
     notify()
   }
-  const engine = createAudioEngine(setUi)
+  /** 整段播完自然收尾：清掉「本条正在朗读」高亮。 */
+  const engine = createAudioEngine(setUi, () => setUi({ speakingKey: null }))
 
   const rejectSeqUpTo = new Map<string, number>()
   const lastFinalSeq = new Map<string, number>()
@@ -249,6 +252,7 @@ function createReader(): Reader {
     curBytes = 0
     curChunkCount = 0
     engine.skip()
+    setUi({ speakingKey: null })
   }
 
   const connect = (): void => {
@@ -405,9 +409,10 @@ function createReader(): Reader {
         // SSE 广播最终会纠正
       }
     },
-    async speak(sessionId, text) {
+    async speak(sessionId, text, key) {
       doSkipAudio(sessionId)
-      setUi({ notice: null })
+      // 点击即高亮本条（点击反馈）；失败或播完由 setUi/onAllPlayed 清除。
+      setUi({ notice: null, speakingKey: key ?? null })
       try {
         const res = await fetch(location.origin + BASE_PATH + '/speak', {
           method: 'POST',
@@ -416,12 +421,12 @@ function createReader(): Reader {
         })
         if (!res.ok) {
           const out = (await res.json().catch(() => ({}))) as { error?: string }
-          setUi({ notice: out.error ?? t('readFail') })
+          setUi({ notice: out.error ?? t('readFail'), speakingKey: null })
           return { ok: false }
         }
         return { ok: true }
       } catch {
-        setUi({ notice: t('readFail') })
+        setUi({ notice: t('readFail'), speakingKey: null })
         return { ok: false }
       }
     },
@@ -518,7 +523,32 @@ export function ReadToggleButton({ reader, sessionId }: { reader: Reader; sessio
   )
 }
 
-/** 每条 AI 回复后的朗读键：只朗读被点的那一条。 */
+let buttonCssInjected = false
+/**
+ * 消息操作行图标的统一样式（与官方 MessageIconActions / MessageFeedbackActions 完全一致：
+ * 28px 圆形、透明底无边框、label-tertiary、hover 用 --dsw-alias-interactive-bg-hover），
+ * 外加点击反馈：:active 缩放 + 点击脉冲 + 「本条正在朗读」高亮。
+ */
+function injectButtonCss(): void {
+  if (buttonCssInjected || typeof document === 'undefined') return
+  buttonCssInjected = true
+  const el = document.createElement('style')
+  el.setAttribute('data-dshvm', 'css')
+  el.textContent = [
+    '.dshvma-mbtn{width:calc(28px + var(--dsh-content-font-delta,0px));height:calc(28px + var(--dsh-content-font-delta,0px));color:var(--dsw-alias-label-tertiary);cursor:pointer;background:0 0;border:none;border-radius:28px;justify-content:center;align-items:center;padding:6px;display:inline-flex;transition:background .15s ease,color .15s ease,transform .08s ease}',
+    '.dshvma-mbtn svg{width:calc(15px + var(--dsh-content-font-delta,0px));height:calc(15px + var(--dsh-content-font-delta,0px))}',
+    '.dshvma-mbtn:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}',
+    '.dshvma-mbtn:active{transform:scale(.88)}',
+    '.dshvma-mbtn:disabled{cursor:default;opacity:.4}',
+    '.dshvma-mbtn:disabled:hover{background:0 0;color:var(--dsw-alias-label-tertiary)}',
+    '.dshvma-mbtn[data-active="true"]{color:var(--dsw-alias-brand-primary);background:rgba(88,166,255,.14)}',
+    '.dshvma-mbtn[data-pulse="true"]{animation:dshvma-mbtn-pulse .5s ease-out}',
+    '@keyframes dshvma-mbtn-pulse{0%{box-shadow:0 0 0 0 rgba(88,166,255,.5)}100%{box-shadow:0 0 0 9px rgba(88,166,255,0)}}',
+  ].join('')
+  document.head.appendChild(el)
+}
+
+/** 每条 AI 回复后的朗读键：只朗读被点的那一条。样式与官方消息操作键一致。 */
 export function ReadMessageButton(props: {
   reader: Reader
   messageId?: unknown
@@ -527,24 +557,32 @@ export function ReadMessageButton(props: {
 }): React.ReactElement {
   const { reader, messageId, sessionId, useChat } = props
   const [s, setS] = useState<ReaderState>(reader.state)
+  const [pulse, setPulse] = useState(false)
   useEffect(() => reader.subscribe(setS), [reader])
   useEffect(() => reader.setCurrentSession(sessionId ?? null), [reader, sessionId])
   const nodes = useAssistantNodes(useChat)
   const text = React.useMemo(() => extractAssistantText(nodes, messageId), [nodes, messageId])
   const disabled = !sessionId || !text
-  void s
+  const key = messageId === undefined ? null : String(messageId)
+  const active = key !== null && s.speakingKey === key && s.playing
   return React.createElement(
     'button',
     {
       type: 'button',
+      className: 'dshvma-mbtn',
       'data-dshvm': 'read-one',
+      'data-active': active ? 'true' : undefined,
+      'data-pulse': pulse ? 'true' : undefined,
       'aria-label': t('readOneTitle'),
+      'aria-pressed': active,
       title: disabled ? t('readOneEmpty') : t('readOneTitle'),
       disabled,
       onClick: () => {
-        if (!disabled) void reader.speak(sessionId as string, text)
+        if (disabled) return
+        setPulse(true)
+        setTimeout(() => setPulse(false), 520)
+        void reader.speak(sessionId as string, text, key ?? undefined)
       },
-      style: iconButtonStyle(false, disabled),
     },
     React.createElement(SpeakerIcon, {}),
   )
@@ -599,6 +637,7 @@ export function ReadingStatusBar({ reader, sessionId }: { reader: Reader; sessio
 }
 
 export function apply(ctx: any): void {
+  injectButtonCss()
   const reader = createReader()
 
   ctx.slots.inject('conversation.input.right', () =>

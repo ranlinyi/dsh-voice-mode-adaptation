@@ -1233,7 +1233,7 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "settingsScope"];
-var BUILD_TAG = "b27d981";
+var BUILD_TAG = "b2bbbde";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function createAudioEngine(setUi, onAllPlayed) {
@@ -1369,7 +1369,7 @@ function createAudioEngine(setUi, onAllPlayed) {
 }
 function createReader() {
   const listeners = /* @__PURE__ */ new Set();
-  const state = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null };
+  const state = { autoRead: null, playing: false, caption: null, ttsNotice: null, notice: null, speakingKey: null };
   let source = null;
   let currentSessionId = null;
   const notify = () => {
@@ -1384,7 +1384,7 @@ function createReader() {
     Object.assign(state, patch);
     notify();
   };
-  const engine = createAudioEngine(setUi);
+  const engine = createAudioEngine(setUi, () => setUi({ speakingKey: null }));
   const rejectSeqUpTo = /* @__PURE__ */ new Map();
   const lastFinalSeq = /* @__PURE__ */ new Map();
   let curSentenceId = null;
@@ -1400,6 +1400,7 @@ function createReader() {
     curBytes = 0;
     curChunkCount = 0;
     engine.skip();
+    setUi({ speakingKey: null });
   };
   const connect = () => {
     if (source) return;
@@ -1546,9 +1547,9 @@ function createReader() {
       } catch {
       }
     },
-    async speak(sessionId, text) {
+    async speak(sessionId, text, key) {
       doSkipAudio(sessionId);
-      setUi({ notice: null });
+      setUi({ notice: null, speakingKey: key ?? null });
       try {
         const res = await fetch(location.origin + BASE_PATH2 + "/speak", {
           method: "POST",
@@ -1557,12 +1558,12 @@ function createReader() {
         });
         if (!res.ok) {
           const out = await res.json().catch(() => ({}));
-          setUi({ notice: out.error ?? t("readFail") });
+          setUi({ notice: out.error ?? t("readFail"), speakingKey: null });
           return { ok: false };
         }
         return { ok: true };
       } catch {
-        setUi({ notice: t("readFail") });
+        setUi({ notice: t("readFail"), speakingKey: null });
         return { ok: false };
       }
     },
@@ -1647,27 +1648,54 @@ function ReadToggleButton({ reader, sessionId }) {
     s.playing ? t("readPlaying") : t("readToggle")
   );
 }
+var buttonCssInjected = false;
+function injectButtonCss() {
+  if (buttonCssInjected || typeof document === "undefined") return;
+  buttonCssInjected = true;
+  const el = document.createElement("style");
+  el.setAttribute("data-dshvm", "css");
+  el.textContent = [
+    ".dshvma-mbtn{width:calc(28px + var(--dsh-content-font-delta,0px));height:calc(28px + var(--dsh-content-font-delta,0px));color:var(--dsw-alias-label-tertiary);cursor:pointer;background:0 0;border:none;border-radius:28px;justify-content:center;align-items:center;padding:6px;display:inline-flex;transition:background .15s ease,color .15s ease,transform .08s ease}",
+    ".dshvma-mbtn svg{width:calc(15px + var(--dsh-content-font-delta,0px));height:calc(15px + var(--dsh-content-font-delta,0px))}",
+    ".dshvma-mbtn:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}",
+    ".dshvma-mbtn:active{transform:scale(.88)}",
+    ".dshvma-mbtn:disabled{cursor:default;opacity:.4}",
+    ".dshvma-mbtn:disabled:hover{background:0 0;color:var(--dsw-alias-label-tertiary)}",
+    '.dshvma-mbtn[data-active="true"]{color:var(--dsw-alias-brand-primary);background:rgba(88,166,255,.14)}',
+    '.dshvma-mbtn[data-pulse="true"]{animation:dshvma-mbtn-pulse .5s ease-out}',
+    "@keyframes dshvma-mbtn-pulse{0%{box-shadow:0 0 0 0 rgba(88,166,255,.5)}100%{box-shadow:0 0 0 9px rgba(88,166,255,0)}}"
+  ].join("");
+  document.head.appendChild(el);
+}
 function ReadMessageButton(props) {
   const { reader, messageId, sessionId, useChat } = props;
   const [s, setS] = (0, import_react2.useState)(reader.state);
+  const [pulse, setPulse] = (0, import_react2.useState)(false);
   (0, import_react2.useEffect)(() => reader.subscribe(setS), [reader]);
   (0, import_react2.useEffect)(() => reader.setCurrentSession(sessionId ?? null), [reader, sessionId]);
   const nodes = useAssistantNodes(useChat);
   const text = React.useMemo(() => extractAssistantText(nodes, messageId), [nodes, messageId]);
   const disabled = !sessionId || !text;
-  void s;
+  const key = messageId === void 0 ? null : String(messageId);
+  const active = key !== null && s.speakingKey === key && s.playing;
   return React.createElement(
     "button",
     {
       type: "button",
+      className: "dshvma-mbtn",
       "data-dshvm": "read-one",
+      "data-active": active ? "true" : void 0,
+      "data-pulse": pulse ? "true" : void 0,
       "aria-label": t("readOneTitle"),
+      "aria-pressed": active,
       title: disabled ? t("readOneEmpty") : t("readOneTitle"),
       disabled,
       onClick: () => {
-        if (!disabled) void reader.speak(sessionId, text);
-      },
-      style: iconButtonStyle(false, disabled)
+        if (disabled) return;
+        setPulse(true);
+        setTimeout(() => setPulse(false), 520);
+        void reader.speak(sessionId, text, key ?? void 0);
+      }
     },
     React.createElement(SpeakerIcon, {})
   );
@@ -1719,6 +1747,7 @@ function ReadingStatusBar({ reader, sessionId }) {
   );
 }
 function apply(ctx) {
+  injectButtonCss();
   const reader = createReader();
   ctx.slots.inject(
     "conversation.input.right",
