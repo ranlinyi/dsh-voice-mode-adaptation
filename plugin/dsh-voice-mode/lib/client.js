@@ -1233,9 +1233,36 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "settingsScope"];
-var BUILD_TAG = "b2bbbde";
+var BUILD_TAG = "5ffed03";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
+function getTabId() {
+  try {
+    const KEY = "dshvma-tabId";
+    let id = sessionStorage.getItem(KEY);
+    if (!id) {
+      id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem(KEY, id);
+    }
+    return id;
+  } catch {
+    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+}
+var TAB_ID = getTabId();
+var seenAudioFrames = /* @__PURE__ */ new Map();
+function audioFrameSeen(key) {
+  const now = Date.now();
+  if (seenAudioFrames.size > 4e3) {
+    for (const [k, ts] of seenAudioFrames) {
+      if (now - ts > 6e4) seenAudioFrames.delete(k);
+    }
+    if (seenAudioFrames.size > 4e3) seenAudioFrames.clear();
+  }
+  if (seenAudioFrames.has(key)) return true;
+  seenAudioFrames.set(key, now);
+  return false;
+}
 function createAudioEngine(setUi, onAllPlayed) {
   const pending = [];
   const fallbackAudio = new Audio();
@@ -1404,7 +1431,7 @@ function createReader() {
   };
   const connect = () => {
     if (source) return;
-    source = new EventSource(location.origin + BASE_PATH2 + "/stream");
+    source = new EventSource(location.origin + BASE_PATH2 + "/stream?tabId=" + encodeURIComponent(TAB_ID));
     source.addEventListener("open", () => {
       rejectSeqUpTo.clear();
       lastFinalSeq.clear();
@@ -1443,6 +1470,8 @@ function createReader() {
     if (frame.sessionId !== currentSessionId) return;
     const rejectLine = rejectSeqUpTo.get(frame.sessionId);
     if (rejectLine !== void 0 && frame.sentenceId <= rejectLine) return;
+    const dedupKey = frame.sessionId + "#" + (frame.gen ?? 0) + "#" + frame.sentenceId + "#" + frame.chunkId + "#" + (frame.final ? 1 : 0);
+    if (audioFrameSeen(dedupKey)) return;
     const gen = frame.gen ?? 0;
     if (gen !== curGen) {
       curGen = gen;
@@ -1522,7 +1551,7 @@ function createReader() {
         const res = await fetch(location.origin + BASE_PATH2 + "/read", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sessionId, on: true })
+          body: JSON.stringify({ sessionId, on: true, tabId: TAB_ID })
         });
         const out = await res.json();
         if (!res.ok) return { ok: false, error: out.error ?? t("readFail") };
@@ -1539,7 +1568,7 @@ function createReader() {
         const res = await fetch(location.origin + BASE_PATH2 + "/read", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sessionId, on: false })
+          body: JSON.stringify({ sessionId, on: false, tabId: TAB_ID })
         });
         const out = await res.json();
         state.autoRead = out.active ?? null;
@@ -1554,7 +1583,7 @@ function createReader() {
         const res = await fetch(location.origin + BASE_PATH2 + "/speak", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sessionId, text })
+          body: JSON.stringify({ sessionId, text, tabId: TAB_ID })
         });
         if (!res.ok) {
           const out = await res.json().catch(() => ({}));
@@ -1572,8 +1601,17 @@ function createReader() {
       void fetch(location.origin + BASE_PATH2 + "/cancel", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ sessionId })
+        body: JSON.stringify({ sessionId, tabId: TAB_ID })
       }).catch(() => void 0);
+    },
+    dispose() {
+      try {
+        source?.close();
+      } catch {
+      }
+      source = null;
+      doSkipAudio();
+      listeners.clear();
     }
   };
 }
@@ -1748,7 +1786,13 @@ function ReadingStatusBar({ reader, sessionId }) {
 }
 function apply(ctx) {
   injectButtonCss();
+  const g = globalThis;
+  try {
+    g.__dshvmaReader__?.dispose();
+  } catch {
+  }
   const reader = createReader();
+  g.__dshvmaReader__ = reader;
   ctx.slots.inject(
     "conversation.input.right",
     () => ctx.slots.register(
@@ -1799,6 +1843,12 @@ function apply(ctx) {
         () => React.createElement(VoiceSettingsCard, { scope: ctx.settingsScope.bind({ namespace: "voice-mode-adaptation" }) })
       )
     );
+  }
+  if (typeof ctx.effect === "function") {
+    ctx.effect(() => () => {
+      if (g.__dshvmaReader__ === reader) g.__dshvmaReader__ = void 0;
+      reader.dispose();
+    });
   }
 }
 return module.exports; } });

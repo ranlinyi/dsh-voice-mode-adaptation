@@ -24,6 +24,46 @@ console.log('[dsh-voice-mode-adaptation] build=' + BUILD_TAG)
 
 const BASE_PATH = '/voice-mode-adaptation'
 
+/**
+ * 每 tab 稳定唯一 ID（sessionStorage 跨刷新保持、关 tab 清除）。
+ * host 用它把音频帧只发给「播放所有者」标签页——同一句 TTS 不会被多个标签页叠加播放。
+ */
+function getTabId(): string {
+  try {
+    const KEY = 'dshvma-tabId'
+    let id = sessionStorage.getItem(KEY)
+    if (!id) {
+      id =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2) + Date.now().toString(36)
+      sessionStorage.setItem(KEY, id)
+    }
+    return id
+  } catch {
+    return Math.random().toString(36).slice(2) + Date.now().toString(36)
+  }
+}
+const TAB_ID = getTabId()
+
+/**
+ * 已处理帧指纹（模块级，跨 reader 实例共享）。兜底：若同一页面因热重载/重复加载出现
+ * 两个 reader，两个播放器会各自收到同一批音频帧——只让第一个出声，第二个丢弃。
+ */
+const seenAudioFrames = new Map<string, number>()
+function audioFrameSeen(key: string): boolean {
+  const now = Date.now()
+  if (seenAudioFrames.size > 4000) {
+    for (const [k, ts] of seenAudioFrames) {
+      if (now - ts > 60000) seenAudioFrames.delete(k)
+    }
+    if (seenAudioFrames.size > 4000) seenAudioFrames.clear()
+  }
+  if (seenAudioFrames.has(key)) return true
+  seenAudioFrames.set(key, now)
+  return false
+}
+
 interface TtsChunkFrame {
   sessionId: string
   /** 队列世代（cancel 递增）：变化即新回合开始，需停掉旧回合已调度的音频。 */
@@ -66,6 +106,8 @@ interface Reader {
   exit(sessionId: string): Promise<void>
   speak(sessionId: string, text: string, key?: string): Promise<{ ok: boolean }>
   stop(sessionId: string): void
+  /** 关闭 SSE、停止播放并移除监听（重复 apply / 热重载时停掉旧实例，防多重声音）。 */
+  dispose(): void
 }
 
 /**
@@ -257,7 +299,7 @@ function createReader(): Reader {
 
   const connect = (): void => {
     if (source) return
-    source = new EventSource(location.origin + BASE_PATH + '/stream')
+    source = new EventSource(location.origin + BASE_PATH + '/stream?tabId=' + encodeURIComponent(TAB_ID))
     source.addEventListener('open', () => {
       rejectSeqUpTo.clear()
       lastFinalSeq.clear()
@@ -301,6 +343,10 @@ function createReader(): Reader {
     if (frame.sessionId !== currentSessionId) return
     const rejectLine = rejectSeqUpTo.get(frame.sessionId)
     if (rejectLine !== undefined && frame.sentenceId <= rejectLine) return
+    // 去重兜底：同一 (gen,sentenceId,chunkId,final) 只处理一次（防两个 reader 重复出声）。
+    const dedupKey =
+      frame.sessionId + '#' + (frame.gen ?? 0) + '#' + frame.sentenceId + '#' + frame.chunkId + '#' + (frame.final ? 1 : 0)
+    if (audioFrameSeen(dedupKey)) return
     // 需求 2：世代变化 = AI 开始新一回合 → 立刻停掉上一回合已调度的音频，改读新回合。
     const gen = frame.gen ?? 0
     if (gen !== curGen) {
@@ -383,7 +429,7 @@ function createReader(): Reader {
         const res = await fetch(location.origin + BASE_PATH + '/read', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ sessionId, on: true }),
+          body: JSON.stringify({ sessionId, on: true, tabId: TAB_ID }),
         })
         const out = (await res.json()) as { active?: string | null; error?: string }
         if (!res.ok) return { ok: false, error: out.error ?? t('readFail') }
@@ -400,7 +446,7 @@ function createReader(): Reader {
         const res = await fetch(location.origin + BASE_PATH + '/read', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ sessionId, on: false }),
+          body: JSON.stringify({ sessionId, on: false, tabId: TAB_ID }),
         })
         const out = (await res.json()) as { active?: string | null }
         state.autoRead = out.active ?? null
@@ -417,7 +463,7 @@ function createReader(): Reader {
         const res = await fetch(location.origin + BASE_PATH + '/speak', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ sessionId, text }),
+          body: JSON.stringify({ sessionId, text, tabId: TAB_ID }),
         })
         if (!res.ok) {
           const out = (await res.json().catch(() => ({}))) as { error?: string }
@@ -435,8 +481,18 @@ function createReader(): Reader {
       void fetch(location.origin + BASE_PATH + '/cancel', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ sessionId, tabId: TAB_ID }),
       }).catch(() => undefined)
+    },
+    dispose() {
+      try {
+        source?.close()
+      } catch {
+        // ignore
+      }
+      source = null
+      doSkipAudio()
+      listeners.clear()
     },
   }
 }
@@ -638,7 +694,16 @@ export function ReadingStatusBar({ reader, sessionId }: { reader: Reader; sessio
 
 export function apply(ctx: any): void {
   injectButtonCss()
+  // 单实例兜底：client half 若因热重载/重复加载被 apply 两次，旧 reader 的 SSE 与播放引擎
+  // 会与新实例并行出声（多重声音）。先彻底停掉旧实例，再建新的。
+  const g = globalThis as unknown as { __dshvmaReader__?: Reader }
+  try {
+    g.__dshvmaReader__?.dispose()
+  } catch {
+    // ignore
+  }
   const reader = createReader()
+  g.__dshvmaReader__ = reader
 
   ctx.slots.inject('conversation.input.right', () =>
     ctx.slots.register(
@@ -690,5 +755,12 @@ export function apply(ctx: any): void {
         () => React.createElement(VoiceSettingsCard, { scope: ctx.settingsScope.bind({ namespace: 'voice-mode-adaptation' }) }),
       ),
     )
+  }
+  // 卸载/热重载：关闭本实例的 SSE 与播放引擎（防旧实例残留继续出声）。
+  if (typeof ctx.effect === 'function') {
+    ctx.effect(() => () => {
+      if (g.__dshvmaReader__ === reader) g.__dshvmaReader__ = undefined
+      reader.dispose()
+    })
   }
 }

@@ -354,6 +354,8 @@ export const Config: z<Config> = z.object({
 export function apply(ctx: Context, config: Config): void {
   // --- 全局单活指针：同一时刻至多一个会话处于「自动朗读」（手动朗读不占此位）。 ---
   let autoReadSession: string | null = null
+  /** 播放所有者标签页：音频帧只发给它，避免多标签页叠加播放同一句（多重声音）。 */
+  let readerTabId: string | null = null
 
   // --- 回合世代：同一会话每次新 llm/stream 递增。新回合开始时先 cancel 本会话队列，
   //     上一回合没读完的部分立即丢弃、从新回合重新读（需求 2）。 ---
@@ -396,10 +398,25 @@ export function apply(ctx: Context, config: Config): void {
 
   // --- SSE 客户端表：audio 帧 + mode 状态广播共用一条下行通道。 ---
   type SseSink = (event: string, payload: unknown) => void
-  type SseClient = { send: SseSink }
+  type SseClient = { tabId: string | null; send: SseSink }
   const sseClients = new Set<SseClient>()
   const broadcast = (event: string, payload: unknown): void => {
     for (const c of sseClients) {
+      try {
+        c.send(event, payload)
+      } catch {
+        // dead socket: the close handler removes it
+      }
+    }
+  }
+  /**
+   * 只发给「播放所有者」标签页。历史问题：audio 帧广播给全部标签页时，
+   * 同一句 TTS 会在 N 个 tab 同时播放（多重声音/双重奏）。音频帧统一走本函数。
+   */
+  const sendToReader = (event: string, payload: unknown): void => {
+    if (readerTabId === null) return
+    for (const c of sseClients) {
+      if (c.tabId !== readerTabId) continue
       try {
         c.send(event, payload)
       } catch {
@@ -548,12 +565,12 @@ export function apply(ctx: Context, config: Config): void {
   // --- TTS 队列（§8.4）：逐句合成后经 SSE 广播；epoch 机制支撑打断。 ---
   const queue = new TtsQueue({
     engine: makeEngine(engineKind),
-    onError: (sessionId) => broadcast('tts-error', { sessionId }),
+    onError: (sessionId) => sendToReader('tts-error', { sessionId }),
   })
   // fork 修复：启动时把当前设置的音色/语速应用到引擎——
   // 此前引擎默认硬编码为素映雪，朗读直到"设置变化"才更新（重启后朗读一直女声的根因）。
   queue.updateVoice(vset.voice, vset.rate)
-  const unsubscribe = queue.subscribe((frame) => broadcast('audio', frame))
+  const unsubscribe = queue.subscribe((frame) => sendToReader('audio', frame))
   ctx.effect(() => unsubscribe)
   // 生命周期收尾：插件卸载/热重载时关闭 TTS WebSocket（否则连接悬挂泄漏）。
   ctx.effect(() => () => void queue.close())
@@ -813,10 +830,12 @@ export function apply(ctx: Context, config: Config): void {
         collectBody(req, res, MAX_JSON_BODY, (body) => {
           let sessionId: string | undefined
           let on: boolean | undefined
+          let tabId: string | undefined
           try {
-            const parsed = JSON.parse(body || '{}') as { sessionId?: string; on?: boolean }
+            const parsed = JSON.parse(body || '{}') as { sessionId?: string; on?: boolean; tabId?: string }
             sessionId = parsed.sessionId
             on = parsed.on
+            tabId = typeof parsed.tabId === 'string' && parsed.tabId && parsed.tabId.length <= 64 ? parsed.tabId : undefined
           } catch {
             // ignore malformed body
           }
@@ -845,16 +864,19 @@ export function apply(ctx: Context, config: Config): void {
             }
             const previous = autoReadSession
             autoReadSession = sessionId
+            // 播放所有者：谁开启自动朗读，音频就只发给谁，其余标签页只同步状态、不出声。
+            if (tabId) readerTabId = tabId
             // 进入即清本会话旧 TTS 积压（cancel 保留 seq 递增，客户端拒绝线继续有效）。
             queue.cancel(sessionId)
             if (previous && previous !== sessionId) queue.cancel(previous)
-            broadcast('read', { active: autoReadSession })
+            broadcast('read', { active: autoReadSession, ownerTabId: readerTabId })
           } else if (autoReadSession === sessionId) {
             autoReadSession = null
+            readerTabId = null
             queue.cancel(sessionId)
-            broadcast('read', { active: null })
+            broadcast('read', { active: null, ownerTabId: null })
           }
-          respondJson(res, 200, { active: autoReadSession })
+          respondJson(res, 200, { active: autoReadSession, ownerTabId: readerTabId })
         })
       },
     }),
@@ -878,10 +900,12 @@ export function apply(ctx: Context, config: Config): void {
         collectBody(req, res, MAX_SPEAK_BODY, (body) => {
           let sessionId: string | undefined
           let text = ''
+          let tabId: string | undefined
           try {
-            const parsed = JSON.parse(body || '{}') as { sessionId?: string; text?: unknown }
+            const parsed = JSON.parse(body || '{}') as { sessionId?: string; text?: unknown; tabId?: string }
             sessionId = parsed.sessionId
             text = typeof parsed.text === 'string' ? parsed.text : ''
+            tabId = typeof parsed.tabId === 'string' && parsed.tabId && parsed.tabId.length <= 64 ? parsed.tabId : undefined
           } catch {
             // malformed -> 400 below
           }
@@ -905,6 +929,8 @@ export function apply(ctx: Context, config: Config): void {
             respondJson(res, 429, { error: 'rate limited' })
             return
           }
+          // 点朗读键的标签页成为播放所有者（其余标签页不出声）。
+          if (tabId) readerTabId = tabId
           // 打断当前朗读，改读这一条。
           queue.cancel(sessionId)
           const adapter = new SpeechAdapter({
@@ -913,7 +939,8 @@ export function apply(ctx: Context, config: Config): void {
           })
           adapter.feed(text)
           adapter.flush()
-          respondJson(res, 200, { ok: true })
+          broadcast('read', { active: autoReadSession, ownerTabId: readerTabId })
+          respondJson(res, 200, { ok: true, ownerTabId: readerTabId })
         })
       },
     }),
@@ -1069,6 +1096,15 @@ export function apply(ctx: Context, config: Config): void {
           respondJson(res, 429, { error: 'too many streams' })
           return
         }
+        // 从查询串取 tabId：音频只发给播放所有者标签页。
+        let tabId: string | null = null
+        try {
+          const u = new URL(req.url ?? '/', 'http://localhost')
+          tabId = u.searchParams.get('tabId')
+        } catch {
+          // ignore malformed url
+        }
+        if (tabId !== null && (tabId === '' || tabId.length > 64)) tabId = null
         res.writeHead(200, {
           'content-type': 'text/event-stream; charset=utf-8',
           'cache-control': 'no-cache, no-transform',
@@ -1078,10 +1114,10 @@ export function apply(ctx: Context, config: Config): void {
         const send: SseSink = (event, payload) => {
           res.write(`event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`)
         }
-        const client: SseClient = { send }
+        const client: SseClient = { tabId, send }
         sseClients.add(client)
-        // 上线即告知当前自动朗读归属（纠正多标签页/多会话漂移）。
-        send('read', { active: autoReadSession })
+        // 上线即告知当前自动朗读归属与播放所有者（纠正多标签页/多会话漂移）。
+        send('read', { active: autoReadSession, ownerTabId: readerTabId })
         const heartbeat = setInterval(() => {
           try {
             res.write(': hb\n')
@@ -1095,6 +1131,13 @@ export function apply(ctx: Context, config: Config): void {
           cleaned = true
           clearInterval(heartbeat)
           sseClients.delete(client)
+          // 播放所有者标签页断开：把所有权移交给仍在线的一个标签页；没有则清空，
+          // 避免「自动朗读显示为开、却没有任何标签页出声」。
+          if (tabId !== null && tabId === readerTabId) {
+            const next = [...sseClients].find((c) => c.tabId !== null)
+            readerTabId = next && next.tabId !== null ? next.tabId : null
+            broadcast('read', { active: autoReadSession, ownerTabId: readerTabId })
+          }
         }
         req.on('close', cleanup)
         res.on('close', cleanup)
