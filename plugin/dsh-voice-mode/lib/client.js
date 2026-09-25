@@ -1233,7 +1233,7 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "settingsScope"];
-var BUILD_TAG = "5ffed03";
+var BUILD_TAG = "b80192c";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {
@@ -1646,6 +1646,19 @@ function SpeakerIcon({ active }) {
     })
   );
 }
+function SpeakerGlyph({ filled }) {
+  const stroke = { stroke: "currentColor", strokeWidth: 1.4, strokeLinecap: "round", strokeLinejoin: "round" };
+  return React.createElement(
+    "svg",
+    { viewBox: "0 0 16 16", width: 15, height: 15, fill: "none", "aria-hidden": "true" },
+    React.createElement(
+      "path",
+      filled ? { d: "M8.4 2.4 4.9 5.3H2.3v5.4h2.6l3.5 2.9V2.4Z", fill: "currentColor" } : { d: "M8.4 2.4 4.9 5.3H2.3v5.4h2.6l3.5 2.9V2.4Z", ...stroke }
+    ),
+    React.createElement("path", { d: "M10.7 5.9a3 3 0 0 1 0 4.2", ...stroke }),
+    React.createElement("path", { d: "M12.6 3.9a5.4 5.4 0 0 1 0 8.2", ...stroke })
+  );
+}
 function iconButtonStyle(on, disabled) {
   return {
     border: "1px solid " + (on ? "rgba(63, 185, 80, 0.45)" : "rgba(139, 148, 158, 0.35)"),
@@ -1699,7 +1712,7 @@ function injectButtonCss() {
     ".dshvma-mbtn:active{transform:scale(.88)}",
     ".dshvma-mbtn:disabled{cursor:default;opacity:.4}",
     ".dshvma-mbtn:disabled:hover{background:0 0;color:var(--dsw-alias-label-tertiary)}",
-    '.dshvma-mbtn[data-active="true"]{color:var(--dsw-alias-brand-primary);background:rgba(88,166,255,.14)}',
+    '.dshvma-mbtn[data-active="true"]{color:var(--dsw-alias-brand-primary)}',
     '.dshvma-mbtn[data-pulse="true"]{animation:dshvma-mbtn-pulse .5s ease-out}',
     "@keyframes dshvma-mbtn-pulse{0%{box-shadow:0 0 0 0 rgba(88,166,255,.5)}100%{box-shadow:0 0 0 9px rgba(88,166,255,0)}}"
   ].join("");
@@ -1735,7 +1748,7 @@ function ReadMessageButton(props) {
         void reader.speak(sessionId, text, key ?? void 0);
       }
     },
-    React.createElement(SpeakerIcon, {})
+    React.createElement(SpeakerGlyph, { filled: active })
   );
 }
 function ReadingStatusBar({ reader, sessionId }) {
