@@ -15264,7 +15264,6 @@ var Config = z.object({
 });
 function apply(ctx, config) {
   let autoReadSession = null;
-  let readerTabId = null;
   const streamGen = /* @__PURE__ */ new Map();
   const sessions = ctx.get("sessions");
   const limiter = new RateLimiter();
@@ -15297,12 +15296,6 @@ function apply(ctx, config) {
       } catch {
       }
     }
-  };
-  const resolveReaderTab = (tabId) => {
-    const ids = [];
-    for (const c of sseClients) if (c.tabId !== null) ids.push(c.tabId);
-    if (tabId && ids.includes(tabId)) return tabId;
-    return ids.length > 0 ? ids[ids.length - 1] : null;
   };
   const settingsScope = ctx.settings.register(
     NS_VOICE_MODE,
@@ -15640,12 +15633,10 @@ function apply(ctx, config) {
         collectBody(req, res, MAX_JSON_BODY, (body) => {
           let sessionId;
           let on;
-          let tabId;
           try {
             const parsed = JSON.parse(body || "{}");
             sessionId = parsed.sessionId;
             on = parsed.on;
-            tabId = typeof parsed.tabId === "string" && parsed.tabId && parsed.tabId.length <= 64 ? parsed.tabId : void 0;
           } catch {
           }
           if (!sessionId) {
@@ -15671,17 +15662,15 @@ function apply(ctx, config) {
             }
             const previous4 = autoReadSession;
             autoReadSession = sessionId;
-            readerTabId = resolveReaderTab(tabId);
             queue.cancel(sessionId);
             if (previous4 && previous4 !== sessionId) queue.cancel(previous4);
-            broadcast("read", { active: autoReadSession, ownerTabId: readerTabId });
+            broadcast("read", { active: autoReadSession });
           } else if (autoReadSession === sessionId) {
             autoReadSession = null;
-            readerTabId = null;
             queue.cancel(sessionId);
-            broadcast("read", { active: null, ownerTabId: null });
+            broadcast("read", { active: null });
           }
-          respondJson(res, 200, { active: autoReadSession, ownerTabId: readerTabId });
+          respondJson(res, 200, { active: autoReadSession });
         });
       }
     })
@@ -15702,12 +15691,10 @@ function apply(ctx, config) {
         collectBody(req, res, MAX_SPEAK_BODY, (body) => {
           let sessionId;
           let text5 = "";
-          let tabId;
           try {
             const parsed = JSON.parse(body || "{}");
             sessionId = parsed.sessionId;
             text5 = typeof parsed.text === "string" ? parsed.text : "";
-            tabId = typeof parsed.tabId === "string" && parsed.tabId && parsed.tabId.length <= 64 ? parsed.tabId : void 0;
           } catch {
           }
           if (!sessionId) {
@@ -15730,7 +15717,6 @@ function apply(ctx, config) {
             respondJson(res, 429, { error: "rate limited" });
             return;
           }
-          readerTabId = resolveReaderTab(tabId);
           queue.cancel(sessionId);
           const adapter = new SpeechAdapter({
             config: speechConfig,
@@ -15738,8 +15724,8 @@ function apply(ctx, config) {
           });
           adapter.feed(text5);
           adapter.flush();
-          broadcast("read", { active: autoReadSession, ownerTabId: readerTabId });
-          respondJson(res, 200, { ok: true, ownerTabId: readerTabId });
+          broadcast("read", { active: autoReadSession });
+          respondJson(res, 200, { ok: true });
         });
       }
     })
@@ -15876,13 +15862,6 @@ function apply(ctx, config) {
           respondJson(res, 429, { error: "too many streams" });
           return;
         }
-        let tabId = null;
-        try {
-          const u = new URL(req.url ?? "/", "http://localhost");
-          tabId = u.searchParams.get("tabId");
-        } catch {
-        }
-        if (tabId !== null && (tabId === "" || tabId.length > 64)) tabId = null;
         res.writeHead(200, {
           "content-type": "text/event-stream; charset=utf-8",
           "cache-control": "no-cache, no-transform",
@@ -15895,9 +15874,9 @@ data: ${JSON.stringify(payload)}
 
 `);
         };
-        const client = { tabId, send };
+        const client = { send };
         sseClients.add(client);
-        send("read", { active: autoReadSession, ownerTabId: readerTabId });
+        send("read", { active: autoReadSession });
         const heartbeat = setInterval(() => {
           try {
             res.write(": hb\n");
@@ -15910,11 +15889,6 @@ data: ${JSON.stringify(payload)}
           cleaned = true;
           clearInterval(heartbeat);
           sseClients.delete(client);
-          if (tabId !== null && tabId === readerTabId) {
-            const next = [...sseClients].find((c) => c.tabId !== null);
-            readerTabId = next && next.tabId !== null ? next.tabId : null;
-            broadcast("read", { active: autoReadSession, ownerTabId: readerTabId });
-          }
         };
         req.on("close", cleanup);
         res.on("close", cleanup);
