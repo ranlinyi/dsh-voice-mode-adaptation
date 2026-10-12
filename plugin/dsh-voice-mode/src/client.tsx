@@ -15,9 +15,8 @@ import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { t } from './strings.ts'
 import { VoiceSettingsCard } from './settings-form.tsx'
-import { createRemoteSettingsScope } from './remote-scope.ts'
 
-export const inject = ['slots', 'sessions', 'remote', 'remote.settings']
+export const inject = ['slots', 'sessions', 'configForms']
 
 declare const __BUILD_TAG__: string
 const BUILD_TAG = __BUILD_TAG__
@@ -762,20 +761,34 @@ export function apply(ctx: any): void {
     ),
   )
 
-  // 设置卡片：设置 → 插件 页（0.2.0 契约：settings.plugins.tab 标签页槽位；
-  // 0.1.x 的 settings.plugin.item 槽位与 settingsScope 服务均已移除）。
-  // 数据层经 remote.settings describe/update 适配为 ScopeController，
-  // VoiceSettingsCard 组件保持不变。
-  const voiceSettingsScope = createRemoteSettingsScope(ctx, 'voice-mode-adaptation')
-  ctx.slots.inject('settings.plugins.tab', () =>
-    ctx.slots.register(
-      {
-        name: 'settings.plugins.tab',
-        id: 'voice-mode-adaptation',
-        order: 100,
-        label: t('stateVoiceMode'),
-      },
-      () => React.createElement(VoiceSettingsCard, { scope: voiceSettingsScope }),
+  // 设置卡片：插件管理页（0.2.0 契约，照 settings-web-search 官方模板）：
+  // 数据源 = configForms.get(条目 id)（宿主维护的命名空间表单，接口与卡片
+  // ScopeController 同构）；宿主服务该命名空间期间注册 plugins.item 槽位，
+  // 条目消失自动摘除。旧 settings.plugin.item / settings.plugins.tab 均非第三方
+  // 插件配置页的挂载点。
+  type VoiceConfigForms = {
+    get(ns: string): {
+      getSnapshot(): { status?: string; value?: Record<string, unknown>; [k: string]: unknown }
+      subscribe(fn: () => void): () => void
+      set(field: string, value: unknown): unknown
+    }
+    whileServed(ns: readonly string[], cb: () => void): () => void
+  }
+  const configForms = (ctx as unknown as { configForms: VoiceConfigForms }).configForms
+  const voiceScope = configForms.get('voice-mode-adaptation')
+  ctx.effect(() =>
+    configForms.whileServed(['voice-mode-adaptation'], () =>
+      ctx.slots.inject('plugins.item', () =>
+        ctx.slots.register(
+          {
+            name: 'plugins.item',
+            id: 'voice-mode-adaptation',
+            order: 100,
+            label: t('stateVoiceMode'),
+          },
+          () => React.createElement(VoiceSettingsCard, { scope: voiceScope }),
+        ),
+      ),
     ),
   )
   // 卸载/热重载：关闭本实例的 SSE 与播放引擎（防旧实例残留继续出声）。

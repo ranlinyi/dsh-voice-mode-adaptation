@@ -1231,65 +1231,9 @@ function VoiceSettingsCard({ scope }) {
   ] });
 }
 
-// src/remote-scope.ts
-function createRemoteSettingsScope(ctx, ns) {
-  const remote = ctx?.remote;
-  let snap = { status: "loading", value: {} };
-  let revision;
-  const listeners = /* @__PURE__ */ new Set();
-  const emit = () => {
-    for (const fn of [...listeners]) {
-      try {
-        fn();
-      } catch {
-      }
-    }
-  };
-  const applyView = (view) => {
-    if (!view) return;
-    revision = typeof view.revision === "number" ? view.revision : revision;
-    snap = { status: "ready", value: view.value ?? {}, revision };
-    emit();
-  };
-  const refresh = async () => {
-    if (!remote?.settings) {
-      snap = { status: "unavailable", value: snap.value ?? {} };
-      emit();
-      return;
-    }
-    try {
-      const described = await remote.settings.describe();
-      const view = (described?.namespaces ?? []).find((v) => v?.ns === ns);
-      if (view) applyView(view);
-      else {
-        snap = { status: "unavailable", value: {} };
-        emit();
-      }
-    } catch {
-      snap = { status: "error", value: snap.value ?? {} };
-      emit();
-    }
-  };
-  return {
-    getSnapshot: () => snap,
-    subscribe: (fn) => {
-      listeners.add(fn);
-      void refresh();
-      return () => {
-        listeners.delete(fn);
-      };
-    },
-    set: async (field, value) => {
-      if (!remote?.settings) throw new Error("remote.settings unavailable");
-      const view = await remote.settings.update(ns, { [field]: value }, revision);
-      applyView(view);
-    }
-  };
-}
-
 // src/client.tsx
-var inject = ["slots", "sessions", "remote", "remote.settings"];
-var BUILD_TAG = "abab868";
+var inject = ["slots", "sessions", "configForms"];
+var BUILD_TAG = "c21ce14";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {
@@ -1898,17 +1842,23 @@ function apply(ctx) {
       ReadMessageButton
     )
   );
-  const voiceSettingsScope = createRemoteSettingsScope(ctx, "voice-mode-adaptation");
-  ctx.slots.inject(
-    "settings.plugins.tab",
-    () => ctx.slots.register(
-      {
-        name: "settings.plugins.tab",
-        id: "voice-mode-adaptation",
-        order: 100,
-        label: t("stateVoiceMode")
-      },
-      () => React.createElement(VoiceSettingsCard, { scope: voiceSettingsScope })
+  const configForms = ctx.configForms;
+  const voiceScope = configForms.get("voice-mode-adaptation");
+  ctx.effect(
+    () => configForms.whileServed(
+      ["voice-mode-adaptation"],
+      () => ctx.slots.inject(
+        "plugins.item",
+        () => ctx.slots.register(
+          {
+            name: "plugins.item",
+            id: "voice-mode-adaptation",
+            order: 100,
+            label: t("stateVoiceMode")
+          },
+          () => React.createElement(VoiceSettingsCard, { scope: voiceScope })
+        )
+      )
     )
   );
   if (typeof ctx.effect === "function") {
