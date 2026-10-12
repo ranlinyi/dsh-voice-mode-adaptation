@@ -16,7 +16,6 @@ import z from '@deepseek-ai/schemastery'
 // Type-only: pulls the webServer Context merge (ctx.webServer) into scope.
 import type {} from '@deepseek-ai/dsh-host-webserver'
 // Type-only: pulls the settings Context merge (ctx.settings) into scope.
-import type { SettingsNamespace } from '@deepseek-ai/dsh-settings'
 // Type-only: chunk/options shapes for the llm/stream waterfall tap.
 import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 // Type-only: pulls the 'system-prompt/assemble' waterfall into the Events
@@ -41,7 +40,6 @@ export const name = 'voice-mode-adaptation'
  * 命名空间品牌常量（与官方 settingsNamespace('voice-mode-adaptation') 等价：其运行时仅做
  * kebab-case 校验（/^[a-z][a-z0-9-]*$/）后原样返回；此处本地断言避免对宿主包运行时 import）。
  */
-const NS_VOICE_MODE = 'voice-mode-adaptation' as SettingsNamespace
 
 /**
  * 插件 HTTP 命名空间（固定路径）。client bundle 以静态产物分发，无法感知
@@ -318,38 +316,31 @@ export function createVoiceSettingsSchema(defs?: Partial<VoiceSettingsValue>): z
 export const VoiceSettingsSchema: z<VoiceSettingsValue> = createVoiceSettingsSchema()
 
 /** 插件配置（cordis.patch.yml / 设置面板可覆盖；默认值面向对话场景）。 */
-export interface Config {
+// 0.2.0：设置页数据源 = 条目 Config 本身（schema → 设置表单，profile patch → 用户层）。
+// 语音设置全字段（VoiceSettingsValue）并入 Config，运营字段在此叠加。
+export interface Config extends VoiceSettingsValue {
   /** 总开关；关闭时拒绝进入语音模式（toggle 返回 403）。 */
   enabled: boolean
   /** 模型缓存目录。 */
   cacheDir: string
   /** 模型上游 host；huggingface.co / hf-mirror.com 均可达（§4 已验证）。 */
   modelHost: string
-  /** 朗读引擎：edge（微软云端，默认）/ vits（本地中文）/ kokoro（本地中英，回复文本不出本机）/ azure（付费云端，SSML 音素）。 */
-  ttsEngine: 'edge' | 'vits' | 'kokoro' | 'azure'
-  /** Kokoro 模型精度（int8 默认 / fp32 音质更好）。 */
-  kokoroModel: KokoroModel
   /** 允许局域网访问 /voice-mode-adaptation/*（默认仅回环；开启后建议前置认证门）。 */
   allowLan: boolean
   /** 允许白名单之外的模型下载源（默认关；仅 https）。 */
   allowCustomModelHost: boolean
-  /** 朗读音色（按 ttsEngine 取值：vits 说话人名 / kokoro sid / edge ShortName）。 */
-  voice: string
-  /** 朗读语速倍率（Q15 设置可改）。 */
-  rate: number
 }
 
-export const Config: z<Config> = z.object({
-  enabled: z.boolean().default(true),
-  cacheDir: z.string().default(defaultModelCacheDir()),
-  modelHost: z.string().default('https://huggingface.co'),
-  ttsEngine: z.union([z.const('edge'), z.const('vits'), z.const('kokoro'), z.const('azure')]).default('edge'),
-  kokoroModel: z.union([z.const('int8'), z.const('fp32')]).default('int8'),
-  allowLan: z.boolean().default(false),
-  allowCustomModelHost: z.boolean().default(false),
-  voice: z.string().default('zh-CN-XiaoxiaoNeural'),
-  rate: z.number().default(1.0),
-})
+export const Config: z<Config> = z.intersect([
+  createVoiceSettingsSchema(),
+  z.object({
+    enabled: z.boolean().default(true),
+    cacheDir: z.string().default(defaultModelCacheDir()),
+    modelHost: z.string().default('https://huggingface.co'),
+    allowLan: z.boolean().default(false),
+    allowCustomModelHost: z.boolean().default(false),
+  }),
+]) as unknown as z<Config>
 
 export function apply(ctx: Context, config: Config): void {
   // --- 全局单活指针：同一时刻至多一个会话处于「自动朗读」（手动朗读不占此位）。 ---
@@ -407,19 +398,9 @@ export function apply(ctx: Context, config: Config): void {
       }
     }
   }
-  // --- 设置命名空间（官方分层：schema 平台常量默认 ⊕ config base ⊕ 用户文档）。 ---
-  const settingsScope = ctx.settings.register(
-    NS_VOICE_MODE,
-    createVoiceSettingsSchema(),
-    {
-      base: {
-        ttsEngine: config.ttsEngine,
-        voice: config.voice,
-        rate: config.rate,
-      },
-    },
-  )
-  let vset: VoiceSettingsValue = settingsScope.get()
+  // --- 0.2.0：设置 = 条目 Config 本身（client 经 describe/update 读写 profile patch）。 ---
+  // 配置变更由宿主重启本条目生效（引擎/改写器/词表在 apply 中按新值重建）。
+  let vset: VoiceSettingsValue = config
 
   // --- 语音改编站：改写器（密钥按凭据引用逐次解析，明文不落配置）。 ---
   let rewriter: SpeechRewriter | null = null
@@ -542,7 +523,6 @@ export function apply(ctx: Context, config: Config): void {
     })
   }
   let engineKind: 'edge' | 'vits' | 'kokoro' | 'azure' = vset.ttsEngine ?? config.ttsEngine
-  let activeKokoroModel: KokoroModel = vset.kokoroModel
 
   // --- TTS 队列（§8.4）：逐句合成后经 SSE 广播；epoch 机制支撑打断。 ---
   const queue = new TtsQueue({
@@ -557,27 +537,8 @@ export function apply(ctx: Context, config: Config): void {
   ctx.effect(() => unsubscribe)
   // 生命周期收尾：插件卸载/热重载时关闭 TTS WebSocket（否则连接悬挂泄漏）。
   ctx.effect(() => () => void queue.close())
-  // 设置变化即时生效（applies 'live'）：音色/语速直接热更换；引擎切换重建引擎并
-  // 清空在途队列（fork 新增）；其余在下次进入生效。
-  ctx.effect(() =>
-    settingsScope.watch((next) => {
-      vset = next
-      // 放行规则先解析，rebuildRewriter 的签名与构造都要用到它。
-      guardAllowRaw = null
-      syncGuard()
-      rebuildRewriter()
-      syncPronunciation()
-      if (next.ttsEngine !== engineKind) {
-        engineKind = next.ttsEngine
-        queue.setEngine(makeEngine(engineKind))
-      } else if (engineKind === 'kokoro' && next.kokoroModel !== activeKokoroModel) {
-        // Kokoro 精度切换：重建引擎指向另一模型目录（已缓存则即时，否则下次下载）。
-        activeKokoroModel = next.kokoroModel
-        queue.setEngine(makeEngine('kokoro'))
-      }
-      queue.updateVoice(next.voice, next.rate)
-    }),
-  )
+  // 设置变化生效：0.2.0 起配置写入 profile patch，宿主重启本条目应用新值
+  // （引擎/改写器/词表/音色在 apply 中重建），不再做 in-place 热更换。
   /** 当前生效参数（/config 输出给 client 引导；client 每次进入模式重新拉取）。 */
   const currentVoice = (): string => vset.voice
   const currentRate = (): number => vset.rate

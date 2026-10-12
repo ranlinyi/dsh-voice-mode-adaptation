@@ -1289,7 +1289,7 @@ function createRemoteSettingsScope(ctx, ns) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "remote", "remote.settings"];
-var BUILD_TAG = "71ab8c4";
+var BUILD_TAG = "abab868";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {

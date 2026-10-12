@@ -15177,7 +15177,6 @@ var RateLimiter = class {
 
 // src/index.ts
 var name = "voice-mode-adaptation";
-var NS_VOICE_MODE = "voice-mode-adaptation";
 var BASE_PATH = "/voice-mode-adaptation";
 var respondJson = (res, status, payload) => {
   res.writeHead(status, { "content-type": "application/json" });
@@ -15251,17 +15250,16 @@ function createVoiceSettingsSchema(defs) {
   });
 }
 var VoiceSettingsSchema = createVoiceSettingsSchema();
-var Config = z.object({
-  enabled: z.boolean().default(true),
-  cacheDir: z.string().default(defaultModelCacheDir()),
-  modelHost: z.string().default("https://huggingface.co"),
-  ttsEngine: z.union([z.const("edge"), z.const("vits"), z.const("kokoro"), z.const("azure")]).default("edge"),
-  kokoroModel: z.union([z.const("int8"), z.const("fp32")]).default("int8"),
-  allowLan: z.boolean().default(false),
-  allowCustomModelHost: z.boolean().default(false),
-  voice: z.string().default("zh-CN-XiaoxiaoNeural"),
-  rate: z.number().default(1)
-});
+var Config = z.intersect([
+  createVoiceSettingsSchema(),
+  z.object({
+    enabled: z.boolean().default(true),
+    cacheDir: z.string().default(defaultModelCacheDir()),
+    modelHost: z.string().default("https://huggingface.co"),
+    allowLan: z.boolean().default(false),
+    allowCustomModelHost: z.boolean().default(false)
+  })
+]);
 function apply(ctx, config) {
   let autoReadSession = null;
   const streamGen = /* @__PURE__ */ new Map();
@@ -15297,18 +15295,7 @@ function apply(ctx, config) {
       }
     }
   };
-  const settingsScope = ctx.settings.register(
-    NS_VOICE_MODE,
-    createVoiceSettingsSchema(),
-    {
-      base: {
-        ttsEngine: config.ttsEngine,
-        voice: config.voice,
-        rate: config.rate
-      }
-    }
-  );
-  let vset = settingsScope.get();
+  let vset = config;
   let rewriter = null;
   let rewriterSig = "";
   let guardAllow = { speech: [], segment: [], errors: [] };
@@ -15418,7 +15405,6 @@ function apply(ctx, config) {
     });
   };
   let engineKind = vset.ttsEngine ?? config.ttsEngine;
-  let activeKokoroModel = vset.kokoroModel;
   const queue = new TtsQueue({
     engine: makeEngine(engineKind),
     onError: (sessionId) => broadcast("tts-error", { sessionId })
@@ -15427,23 +15413,6 @@ function apply(ctx, config) {
   const unsubscribe = queue.subscribe((frame) => broadcast("audio", frame));
   ctx.effect(() => unsubscribe);
   ctx.effect(() => () => void queue.close());
-  ctx.effect(
-    () => settingsScope.watch((next) => {
-      vset = next;
-      guardAllowRaw = null;
-      syncGuard();
-      rebuildRewriter();
-      syncPronunciation();
-      if (next.ttsEngine !== engineKind) {
-        engineKind = next.ttsEngine;
-        queue.setEngine(makeEngine(engineKind));
-      } else if (engineKind === "kokoro" && next.kokoroModel !== activeKokoroModel) {
-        activeKokoroModel = next.kokoroModel;
-        queue.setEngine(makeEngine("kokoro"));
-      }
-      queue.updateVoice(next.voice, next.rate);
-    })
-  );
   const currentVoice = () => vset.voice;
   const currentRate = () => vset.rate;
   const currentEngine = () => engineKind;
