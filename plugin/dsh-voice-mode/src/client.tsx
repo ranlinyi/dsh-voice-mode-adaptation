@@ -15,8 +15,9 @@ import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { t } from './strings.ts'
 import { VoiceSettingsCard } from './settings-form.tsx'
+import { createRemoteSettingsScope } from './remote-scope.ts'
 
-export const inject = ['slots', 'sessions', 'settingsScope']
+export const inject = ['slots', 'sessions', 'remote', 'remote.settings']
 
 declare const __BUILD_TAG__: string
 const BUILD_TAG = __BUILD_TAG__
@@ -761,21 +762,22 @@ export function apply(ctx: any): void {
     ),
   )
 
-  // 设置卡片：Plugins → 插件配置 区。
-  if (ctx.settingsScope) {
-    ctx.slots.inject('settings.plugin.item', () =>
-      ctx.slots.register(
-        {
-          name: 'settings.plugin.item',
-          id: 'voice-mode-adaptation',
-          key: 'voice-mode-adaptation',
-          order: 100,
-          label: t('stateVoiceMode'),
-        },
-        () => React.createElement(VoiceSettingsCard, { scope: ctx.settingsScope.bind({ namespace: 'voice-mode-adaptation' }) }),
-      ),
-    )
-  }
+  // 设置卡片：设置 → 插件 页（0.2.0 契约：settings.plugins.tab 标签页槽位；
+  // 0.1.x 的 settings.plugin.item 槽位与 settingsScope 服务均已移除）。
+  // 数据层经 remote.settings describe/update 适配为 ScopeController，
+  // VoiceSettingsCard 组件保持不变。
+  const voiceSettingsScope = createRemoteSettingsScope(ctx, 'voice-mode-adaptation')
+  ctx.slots.inject('settings.plugins.tab', () =>
+    ctx.slots.register(
+      {
+        name: 'settings.plugins.tab',
+        id: 'voice-mode-adaptation',
+        order: 100,
+        label: t('stateVoiceMode'),
+      },
+      () => React.createElement(VoiceSettingsCard, { scope: voiceSettingsScope }),
+    ),
+  )
   // 卸载/热重载：关闭本实例的 SSE 与播放引擎（防旧实例残留继续出声）。
   if (typeof ctx.effect === 'function') {
     ctx.effect(() => () => {
