@@ -28,9 +28,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// node_modules/extend/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/extend/index.js
 var require_extend = __commonJS({
-  "node_modules/extend/index.js"(exports, module) {
+  "../../../../../\u9879\u76EE/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/extend/index.js"(exports, module) {
     "use strict";
     var hasOwn = Object.prototype.hasOwnProperty;
     var toStr = Object.prototype.toString;
@@ -125,21 +125,21 @@ import { join as join3 } from "node:path";
 import { homedir } from "node:os";
 import { rm } from "node:fs/promises";
 
-// node_modules/bail/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/bail/index.js
 function bail(error) {
   if (error) {
     throw error;
   }
 }
 
-// node_modules/unified/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/index.js
 var import_extend = __toESM(require_extend(), 1);
 
-// node_modules/devlop/lib/default.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/devlop/lib/default.js
 function ok() {
 }
 
-// node_modules/is-plain-obj/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/is-plain-obj/index.js
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -148,7 +148,7 @@ function isPlainObject(value) {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
-// node_modules/trough/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/trough/lib/index.js
 function trough() {
   const fns = [];
   const pipeline = { run, use };
@@ -232,7 +232,7 @@ function wrap(middleware, callback) {
   }
 }
 
-// node_modules/unist-util-stringify-position/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-stringify-position/lib/index.js
 function stringifyPosition(value) {
   if (!value || typeof value !== "object") {
     return "";
@@ -258,7 +258,7 @@ function index(value) {
   return value && typeof value === "number" ? value : 1;
 }
 
-// node_modules/vfile-message/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile-message/lib/index.js
 var VFileMessage = class extends Error {
   /**
    * Create a message for `reason`.
@@ -394,16 +394,16 @@ VFileMessage.prototype.place = void 0;
 VFileMessage.prototype.ruleId = void 0;
 VFileMessage.prototype.source = void 0;
 
-// node_modules/vfile/lib/minpath.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minpath.js
 import { default as default2 } from "node:path";
 
-// node_modules/vfile/lib/minproc.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minproc.js
 import { default as default3 } from "node:process";
 
-// node_modules/vfile/lib/minurl.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minurl.js
 import { fileURLToPath } from "node:url";
 
-// node_modules/vfile/lib/minurl.shared.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minurl.shared.js
 function isUrl(fileUrlOrPath) {
   return Boolean(
     fileUrlOrPath !== null && typeof fileUrlOrPath === "object" && "href" in fileUrlOrPath && fileUrlOrPath.href && "protocol" in fileUrlOrPath && fileUrlOrPath.protocol && // @ts-expect-error: indexing is fine.
@@ -411,7 +411,7 @@ function isUrl(fileUrlOrPath) {
   );
 }
 
-// node_modules/vfile/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/index.js
 var order = (
   /** @type {const} */
   [
@@ -867,7 +867,7 @@ function isUint8Array(value) {
   );
 }
 
-// node_modules/unified/lib/callable-instance.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/callable-instance.js
 var CallableInstance = (
   /**
    * @type {new <Parameters extends Array<unknown>, Result>(property: string | symbol) => (...parameters: Parameters) => Result}
@@ -896,7 +896,7 @@ var CallableInstance = (
   })
 );
 
-// node_modules/unified/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/index.js
 var own = {}.hasOwnProperty;
 var Processor = class _Processor extends CallableInstance {
   /**
@@ -1532,7 +1532,7 @@ function isUint8Array2(value) {
   );
 }
 
-// node_modules/mdast-util-to-string/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-string/lib/index.js
 var emptyOptions = {};
 function toString(value, options) {
   const settings = options || emptyOptions;
@@ -1569,7 +1569,7 @@ function node(value) {
   return Boolean(value && typeof value === "object");
 }
 
-// node_modules/character-entities/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/character-entities/index.js
 var characterEntities = {
   AElig: "\xC6",
   AMP: "&",
@@ -3698,13 +3698,13 @@ var characterEntities = {
   zwnj: "\u200C"
 };
 
-// node_modules/decode-named-character-reference/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/decode-named-character-reference/index.js
 var own2 = {}.hasOwnProperty;
 function decodeNamedCharacterReference(value) {
   return own2.call(characterEntities, value) ? characterEntities[value] : false;
 }
 
-// node_modules/micromark-util-chunked/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-chunked/index.js
 function splice(list3, start, remove, items) {
   const end = list3.length;
   let chunkStart = 0;
@@ -3738,7 +3738,7 @@ function push(list3, items) {
   return items;
 }
 
-// node_modules/micromark-util-combine-extensions/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-combine-extensions/index.js
 var hasOwnProperty = {}.hasOwnProperty;
 function combineExtensions(extensions) {
   const all2 = {};
@@ -3778,7 +3778,7 @@ function constructs(existing, list3) {
   splice(existing, 0, 0, before);
 }
 
-// node_modules/micromark-util-decode-numeric-character-reference/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-decode-numeric-character-reference/index.js
 function decodeNumericCharacterReference(value, base) {
   const code3 = Number.parseInt(value, base);
   if (
@@ -3796,12 +3796,12 @@ function decodeNumericCharacterReference(value, base) {
   return String.fromCodePoint(code3);
 }
 
-// node_modules/micromark-util-normalize-identifier/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-normalize-identifier/index.js
 function normalizeIdentifier(value) {
   return value.replace(/[\t\n\r ]+/g, " ").replace(/^ | $/g, "").toLowerCase().toUpperCase();
 }
 
-// node_modules/micromark-util-character/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-character/index.js
 var asciiAlpha = regexCheck(/[A-Za-z]/);
 var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
 var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/);
@@ -3833,7 +3833,7 @@ function regexCheck(regex) {
   }
 }
 
-// node_modules/micromark-factory-space/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-space/index.js
 function factorySpace(effects, ok3, type, max) {
   const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
   let size = 0;
@@ -3855,7 +3855,7 @@ function factorySpace(effects, ok3, type, max) {
   }
 }
 
-// node_modules/micromark/lib/initialize/content.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/content.js
 var content = {
   tokenize: initializeContent
 };
@@ -3905,7 +3905,7 @@ function initializeContent(effects) {
   }
 }
 
-// node_modules/micromark/lib/initialize/document.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/document.js
 var document = {
   tokenize: initializeDocument
 };
@@ -4087,7 +4087,7 @@ function tokenizeContainer(effects, ok3, nok) {
   return factorySpace(effects, effects.attempt(this.parser.constructs.document, ok3, nok), "linePrefix", this.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4);
 }
 
-// node_modules/micromark-util-classify-character/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-classify-character/index.js
 function classifyCharacter(code3) {
   if (code3 === null || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3)) {
     return 1;
@@ -4097,7 +4097,7 @@ function classifyCharacter(code3) {
   }
 }
 
-// node_modules/micromark-util-resolve-all/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-resolve-all/index.js
 function resolveAll(constructs2, events, context) {
   const called = [];
   let index2 = -1;
@@ -4111,7 +4111,7 @@ function resolveAll(constructs2, events, context) {
   return events;
 }
 
-// node_modules/micromark-core-commonmark/lib/attention.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/attention.js
 var attention = {
   name: "attention",
   resolveAll: resolveAllAttention,
@@ -4242,7 +4242,7 @@ function movePoint(point3, offset) {
   point3._bufferIndex += offset;
 }
 
-// node_modules/micromark-core-commonmark/lib/autolink.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/autolink.js
 var autolink = {
   name: "autolink",
   tokenize: tokenizeAutolink
@@ -4343,7 +4343,7 @@ function tokenizeAutolink(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/blank-line.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/blank-line.js
 var blankLine = {
   partial: true,
   tokenize: tokenizeBlankLine
@@ -4358,7 +4358,7 @@ function tokenizeBlankLine(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/block-quote.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/block-quote.js
 var blockQuote = {
   continuation: {
     tokenize: tokenizeBlockQuoteContinuation
@@ -4416,7 +4416,7 @@ function exit(effects) {
   effects.exit("blockQuote");
 }
 
-// node_modules/micromark-core-commonmark/lib/character-escape.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/character-escape.js
 var characterEscape = {
   name: "characterEscape",
   tokenize: tokenizeCharacterEscape
@@ -4442,7 +4442,7 @@ function tokenizeCharacterEscape(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/character-reference.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/character-reference.js
 var characterReference = {
   name: "characterReference",
   tokenize: tokenizeCharacterReference
@@ -4507,7 +4507,7 @@ function tokenizeCharacterReference(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/code-fenced.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-fenced.js
 var nonLazyContinuation = {
   partial: true,
   tokenize: tokenizeNonLazyContinuation
@@ -4690,7 +4690,7 @@ function tokenizeNonLazyContinuation(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/code-indented.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-indented.js
 var codeIndented = {
   name: "codeIndented",
   tokenize: tokenizeCodeIndented
@@ -4754,7 +4754,7 @@ function tokenizeFurtherStart(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/code-text.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-text.js
 var codeText = {
   name: "codeText",
   previous,
@@ -4869,7 +4869,7 @@ function tokenizeCodeText(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-util-subtokenize/lib/splice-buffer.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-subtokenize/lib/splice-buffer.js
 var SpliceBuffer = class {
   /**
    * @param {ReadonlyArray<T> | null | undefined} [initial]
@@ -5062,7 +5062,7 @@ function chunkedPush(list3, right) {
   }
 }
 
-// node_modules/micromark-util-subtokenize/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-subtokenize/index.js
 function subtokenize(eventsArray) {
   const jumps = {};
   let index2 = -1;
@@ -5215,7 +5215,7 @@ function subcontent(events, eventIndex) {
   return gaps;
 }
 
-// node_modules/micromark-core-commonmark/lib/content.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/content.js
 var content2 = {
   resolve: resolveContent,
   tokenize: tokenizeContent
@@ -5286,7 +5286,7 @@ function tokenizeContinuation(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-factory-destination/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-destination/index.js
 function factoryDestination(effects, ok3, nok, type, literalType, literalMarkerType, rawType, stringType, max) {
   const limit = max || Number.POSITIVE_INFINITY;
   let balance = 0;
@@ -5378,7 +5378,7 @@ function factoryDestination(effects, ok3, nok, type, literalType, literalMarkerT
   }
 }
 
-// node_modules/micromark-factory-label/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-label/index.js
 function factoryLabel(effects, ok3, nok, type, markerType, stringType) {
   const self = this;
   let size = 0;
@@ -5439,7 +5439,7 @@ function factoryLabel(effects, ok3, nok, type, markerType, stringType) {
   }
 }
 
-// node_modules/micromark-factory-title/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-title/index.js
 function factoryTitle(effects, ok3, nok, type, markerType, stringType) {
   let marker;
   return start;
@@ -5501,7 +5501,7 @@ function factoryTitle(effects, ok3, nok, type, markerType, stringType) {
   }
 }
 
-// node_modules/micromark-factory-whitespace/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-whitespace/index.js
 function factoryWhitespace(effects, ok3) {
   let seen;
   return start;
@@ -5520,7 +5520,7 @@ function factoryWhitespace(effects, ok3) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/definition.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/definition.js
 var definition = {
   name: "definition",
   tokenize: tokenizeDefinition
@@ -5606,7 +5606,7 @@ function tokenizeTitleBefore(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/hard-break-escape.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/hard-break-escape.js
 var hardBreakEscape = {
   name: "hardBreakEscape",
   tokenize: tokenizeHardBreakEscape
@@ -5627,7 +5627,7 @@ function tokenizeHardBreakEscape(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/heading-atx.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/heading-atx.js
 var headingAtx = {
   name: "headingAtx",
   resolve: resolveHeadingAtx,
@@ -5718,7 +5718,7 @@ function tokenizeHeadingAtx(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-util-html-tag-name/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-html-tag-name/index.js
 var htmlBlockNames = [
   "address",
   "article",
@@ -5785,7 +5785,7 @@ var htmlBlockNames = [
 ];
 var htmlRawNames = ["pre", "script", "style", "textarea"];
 
-// node_modules/micromark-core-commonmark/lib/html-flow.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/html-flow.js
 var htmlFlow = {
   concrete: true,
   name: "htmlFlow",
@@ -6164,7 +6164,7 @@ function tokenizeBlankLineBefore(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/html-text.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/html-text.js
 var htmlText = {
   name: "htmlText",
   tokenize: tokenizeHtmlText
@@ -6470,7 +6470,7 @@ function tokenizeHtmlText(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/label-end.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-end.js
 var labelEnd = {
   name: "labelEnd",
   resolveAll: resolveAllLabelEnd,
@@ -6696,7 +6696,7 @@ function tokenizeReferenceCollapsed(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/label-start-image.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-start-image.js
 var labelStartImage = {
   name: "labelStartImage",
   resolveAll: labelEnd.resolveAll,
@@ -6727,7 +6727,7 @@ function tokenizeLabelStartImage(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/label-start-link.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-start-link.js
 var labelStartLink = {
   name: "labelStartLink",
   resolveAll: labelEnd.resolveAll,
@@ -6749,7 +6749,7 @@ function tokenizeLabelStartLink(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/line-ending.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/line-ending.js
 var lineEnding = {
   name: "lineEnding",
   tokenize: tokenizeLineEnding
@@ -6764,7 +6764,7 @@ function tokenizeLineEnding(effects, ok3) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/thematic-break.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/thematic-break.js
 var thematicBreak = {
   name: "thematicBreak",
   tokenize: tokenizeThematicBreak
@@ -6803,7 +6803,7 @@ function tokenizeThematicBreak(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/list.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/list.js
 var list = {
   continuation: {
     tokenize: tokenizeListContinuation
@@ -6933,7 +6933,7 @@ function tokenizeListItemPrefixWhitespace(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-core-commonmark/lib/setext-underline.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/setext-underline.js
 var setextUnderline = {
   name: "setextUnderline",
   resolveTo: resolveToSetextUnderline,
@@ -7025,7 +7025,7 @@ function tokenizeSetextUnderline(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark/lib/initialize/flow.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/flow.js
 var flow = {
   tokenize: initializeFlow
 };
@@ -7063,7 +7063,7 @@ function initializeFlow(effects) {
   }
 }
 
-// node_modules/micromark/lib/initialize/text.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/text.js
 var resolver = {
   resolveAll: createResolver()
 };
@@ -7202,7 +7202,7 @@ function resolveAllLineSuffixes(events, context) {
   return events;
 }
 
-// node_modules/micromark/lib/constructs.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/constructs.js
 var constructs_exports = {};
 __export(constructs_exports, {
   attentionMarkers: () => attentionMarkers,
@@ -7277,7 +7277,7 @@ var disable = {
   null: []
 };
 
-// node_modules/micromark/lib/create-tokenizer.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/create-tokenizer.js
 function createTokenizer(parser, initialize, from) {
   let point3 = {
     _bufferIndex: -1,
@@ -7600,7 +7600,7 @@ function serializeChunks(chunks, expandTabs) {
   return result.join("");
 }
 
-// node_modules/micromark/lib/parse.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/parse.js
 function parse(options) {
   const settings = options || {};
   const constructs2 = (
@@ -7626,14 +7626,14 @@ function parse(options) {
   }
 }
 
-// node_modules/micromark/lib/postprocess.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/postprocess.js
 function postprocess(events) {
   while (!subtokenize(events)) {
   }
   return events;
 }
 
-// node_modules/micromark/lib/preprocess.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/preprocess.js
 var search = /[\0\t\n\r]/g;
 function preprocess() {
   let column = 1;
@@ -7712,7 +7712,7 @@ function preprocess() {
   }
 }
 
-// node_modules/micromark-util-decode-string/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-decode-string/index.js
 var characterEscapeOrReference = /\\([!-/:-@[-`{-~])|&(#(?:\d{1,7}|x[\da-f]{1,6})|[\da-z]{1,31});/gi;
 function decodeString(value) {
   return value.replace(characterEscapeOrReference, decode);
@@ -7730,7 +7730,7 @@ function decode($0, $1, $2) {
   return decodeNamedCharacterReference($2) || $0;
 }
 
-// node_modules/mdast-util-from-markdown/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-from-markdown/lib/index.js
 var own3 = {}.hasOwnProperty;
 function fromMarkdown(value, encoding, options) {
   if (encoding && typeof encoding === "object") {
@@ -8439,7 +8439,7 @@ function defaultOnError(left, right) {
   }
 }
 
-// node_modules/remark-parse/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-parse/lib/index.js
 function remarkParse(options) {
   const self = this;
   self.parser = parser;
@@ -8456,7 +8456,7 @@ function remarkParse(options) {
   }
 }
 
-// node_modules/ccount/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/ccount/index.js
 function ccount(value, character) {
   const source = String(value);
   if (typeof character !== "string") {
@@ -8471,7 +8471,7 @@ function ccount(value, character) {
   return count;
 }
 
-// node_modules/escape-string-regexp/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/escape-string-regexp/index.js
 function escapeStringRegexp(string3) {
   if (typeof string3 !== "string") {
     throw new TypeError("Expected a string");
@@ -8479,7 +8479,7 @@ function escapeStringRegexp(string3) {
   return string3.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
 
-// node_modules/unist-util-is/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-is/lib/index.js
 var convert = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
@@ -8578,12 +8578,12 @@ function looksLikeANode(value) {
   return value !== null && typeof value === "object" && "type" in value;
 }
 
-// node_modules/unist-util-visit-parents/lib/color.node.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit-parents/lib/color.node.js
 function color(d) {
   return "\x1B[33m" + d + "\x1B[39m";
 }
 
-// node_modules/unist-util-visit-parents/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit-parents/lib/index.js
 var empty = [];
 var CONTINUE = true;
 var EXIT = false;
@@ -8660,7 +8660,7 @@ function toResult(value) {
   return value === null || value === void 0 ? empty : [value];
 }
 
-// node_modules/mdast-util-find-and-replace/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-find-and-replace/lib/index.js
 function findAndReplace(tree, list3, options) {
   const settings = options || {};
   const ignored = convert(settings.ignore || []);
@@ -8765,7 +8765,7 @@ function toFunction(replace2) {
   };
 }
 
-// node_modules/mdast-util-gfm-autolink-literal/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-autolink-literal/lib/index.js
 var inConstruct = "phrasing";
 var notInConstruct = ["autolink", "link", "image", "label"];
 function gfmAutolinkLiteralFromMarkdown() {
@@ -8915,7 +8915,7 @@ function previous2(match, email) {
   (!email || code3 !== 47);
 }
 
-// node_modules/mdast-util-gfm-footnote/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-footnote/lib/index.js
 footnoteReference.peek = footnoteReferencePeek;
 function enterFootnoteCallString() {
   this.buffer();
@@ -9028,7 +9028,7 @@ function mapAll(line, index2, blank) {
   return (blank ? "" : "    ") + line;
 }
 
-// node_modules/mdast-util-gfm-strikethrough/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-strikethrough/lib/index.js
 var constructsWithoutStrikethrough = [
   "autolink",
   "destinationLiteral",
@@ -9080,7 +9080,7 @@ function peekDelete() {
   return "~";
 }
 
-// node_modules/markdown-table/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/markdown-table/index.js
 function defaultStringLength(value) {
   return value.length;
 }
@@ -9221,7 +9221,7 @@ function toAlignment(value) {
   return code3 === 67 || code3 === 99 ? 99 : code3 === 76 || code3 === 108 ? 108 : code3 === 82 || code3 === 114 ? 114 : 0;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
 function blockquote(node2, _, state, info) {
   const exit3 = state.enter("blockquote");
   const tracker = state.createTracker(info);
@@ -9238,7 +9238,7 @@ function map(line, _, blank) {
   return ">" + (blank ? "" : " ") + line;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
 function patternInScope(stack, pattern) {
   return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
 }
@@ -9258,7 +9258,7 @@ function listInScope(stack, list3, none) {
   return false;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/break.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/break.js
 function hardBreak(_, _1, state, info) {
   let index2 = -1;
   while (++index2 < state.unsafe.length) {
@@ -9269,7 +9269,7 @@ function hardBreak(_, _1, state, info) {
   return "\\\n";
 }
 
-// node_modules/longest-streak/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/longest-streak/index.js
 function longestStreak(value, substring) {
   const source = String(value);
   let index2 = source.indexOf(substring);
@@ -9293,7 +9293,7 @@ function longestStreak(value, substring) {
   return max;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js
 function formatCodeAsIndented(node2, state) {
   return Boolean(
     state.options.fences === false && node2.value && // If there’s no info…
@@ -9303,7 +9303,7 @@ function formatCodeAsIndented(node2, state) {
   );
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-fence.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-fence.js
 function checkFence(state) {
   const marker = state.options.fence || "`";
   if (marker !== "`" && marker !== "~") {
@@ -9314,7 +9314,7 @@ function checkFence(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/code.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/code.js
 function code(node2, _, state, info) {
   const marker = checkFence(state);
   const raw = node2.value || "";
@@ -9366,7 +9366,7 @@ function map2(line, _, blank) {
   return (blank ? "" : "    ") + line;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-quote.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
 function checkQuote(state) {
   const marker = state.options.quote || '"';
   if (marker !== '"' && marker !== "'") {
@@ -9377,7 +9377,7 @@ function checkQuote(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/definition.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/definition.js
 function definition2(node2, _, state, info) {
   const quote = checkQuote(state);
   const suffix = quote === '"' ? "Quote" : "Apostrophe";
@@ -9433,7 +9433,7 @@ function definition2(node2, _, state, info) {
   return value;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js
 function checkEmphasis(state) {
   const marker = state.options.emphasis || "*";
   if (marker !== "*" && marker !== "_") {
@@ -9444,12 +9444,12 @@ function checkEmphasis(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js
 function encodeCharacterReference(code3) {
   return "&#x" + code3.toString(16).toUpperCase() + ";";
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/encode-info.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/encode-info.js
 function encodeInfo(outside, inside, marker) {
   const outsideKind = classifyCharacter(outside);
   const insideKind = classifyCharacter(inside);
@@ -9491,7 +9491,7 @@ function encodeInfo(outside, inside, marker) {
   );
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/emphasis.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js
 emphasis.peek = emphasisPeek;
 function emphasis(node2, _, state, info) {
   const marker = checkEmphasis(state);
@@ -9531,7 +9531,7 @@ function emphasisPeek(_, _1, state) {
   return state.options.emphasis || "*";
 }
 
-// node_modules/unist-util-visit/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit/lib/index.js
 function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   let reverse;
   let test;
@@ -9553,7 +9553,7 @@ function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   }
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js
 function formatHeadingAsSetext(node2, state) {
   let literalWithBreak = false;
   visit(node2, function(node3) {
@@ -9567,7 +9567,7 @@ function formatHeadingAsSetext(node2, state) {
   );
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/heading.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/heading.js
 function heading(node2, _, state, info) {
   const rank = Math.max(Math.min(6, node2.depth || 1), 1);
   const tracker = state.createTracker(info);
@@ -9609,7 +9609,7 @@ function heading(node2, _, state, info) {
   return value;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/html.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/html.js
 html.peek = htmlPeek;
 function html(node2) {
   return node2.value || "";
@@ -9618,7 +9618,7 @@ function htmlPeek() {
   return "<";
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/image.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/image.js
 image.peek = imagePeek;
 function image(node2, _, state, info) {
   const quote = checkQuote(state);
@@ -9675,7 +9675,7 @@ function imagePeek() {
   return "!";
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/image-reference.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js
 imageReference.peek = imageReferencePeek;
 function imageReference(node2, _, state, info) {
   const type = node2.referenceType;
@@ -9714,7 +9714,7 @@ function imageReferencePeek() {
   return "!";
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/inline-code.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js
 inlineCode.peek = inlineCodePeek;
 function inlineCode(node2, _, state) {
   let value = node2.value || "";
@@ -9745,7 +9745,7 @@ function inlineCodePeek() {
   return "`";
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js
 function formatLinkAsAutolink(node2, state) {
   const raw = toString(node2);
   return Boolean(
@@ -9760,7 +9760,7 @@ function formatLinkAsAutolink(node2, state) {
   );
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/link.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/link.js
 link.peek = linkPeek;
 function link(node2, _, state, info) {
   const quote = checkQuote(state);
@@ -9840,7 +9840,7 @@ function linkPeek(node2, _, state) {
   return formatLinkAsAutolink(node2, state) ? "<" : "[";
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/link-reference.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js
 linkReference.peek = linkReferencePeek;
 function linkReference(node2, _, state, info) {
   const type = node2.referenceType;
@@ -9879,7 +9879,7 @@ function linkReferencePeek() {
   return "[";
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-bullet.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js
 function checkBullet(state) {
   const marker = state.options.bullet || "*";
   if (marker !== "*" && marker !== "+" && marker !== "-") {
@@ -9890,7 +9890,7 @@ function checkBullet(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js
 function checkBulletOther(state) {
   const bullet = checkBullet(state);
   const bulletOther = state.options.bulletOther;
@@ -9910,7 +9910,7 @@ function checkBulletOther(state) {
   return bulletOther;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js
 function checkBulletOrdered(state) {
   const marker = state.options.bulletOrdered || ".";
   if (marker !== "." && marker !== ")") {
@@ -9921,7 +9921,7 @@ function checkBulletOrdered(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-rule.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-rule.js
 function checkRule(state) {
   const marker = state.options.rule || "*";
   if (marker !== "*" && marker !== "-" && marker !== "_") {
@@ -9932,7 +9932,7 @@ function checkRule(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/list.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/list.js
 function list2(node2, parent, state, info) {
   const exit3 = state.enter("list");
   const bulletCurrent = state.bulletCurrent;
@@ -9972,7 +9972,7 @@ function list2(node2, parent, state, info) {
   return value;
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js
 function checkListItemIndent(state) {
   const style = state.options.listItemIndent || "one";
   if (style !== "tab" && style !== "one" && style !== "mixed") {
@@ -9983,7 +9983,7 @@ function checkListItemIndent(state) {
   return style;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/list-item.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/list-item.js
 function listItem(node2, parent, state, info) {
   const listItemIndent = checkListItemIndent(state);
   let bullet = state.bulletCurrent || checkBullet(state);
@@ -10012,7 +10012,7 @@ function listItem(node2, parent, state, info) {
   }
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
 function paragraph(node2, _, state, info) {
   const exit3 = state.enter("paragraph");
   const subexit = state.enter("phrasing");
@@ -10022,7 +10022,7 @@ function paragraph(node2, _, state, info) {
   return value;
 }
 
-// node_modules/mdast-util-phrasing/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-phrasing/lib/index.js
 var phrasing = (
   /** @type {(node?: unknown) => node is Exclude<PhrasingContent, Html>} */
   convert([
@@ -10050,7 +10050,7 @@ var phrasing = (
   ])
 );
 
-// node_modules/mdast-util-to-markdown/lib/handle/root.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/root.js
 function root(node2, _, state, info) {
   const hasPhrasing = node2.children.some(function(d) {
     return phrasing(d);
@@ -10059,7 +10059,7 @@ function root(node2, _, state, info) {
   return container.call(state, node2, info);
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-strong.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-strong.js
 function checkStrong(state) {
   const marker = state.options.strong || "*";
   if (marker !== "*" && marker !== "_") {
@@ -10070,7 +10070,7 @@ function checkStrong(state) {
   return marker;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/strong.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/strong.js
 strong.peek = strongPeek;
 function strong(node2, _, state, info) {
   const marker = checkStrong(state);
@@ -10110,12 +10110,12 @@ function strongPeek(_, _1, state) {
   return state.options.strong || "*";
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/text.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/text.js
 function text3(node2, _, state, info) {
   return state.safe(node2.value, info);
 }
 
-// node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js
 function checkRuleRepetition(state) {
   const repetition = state.options.ruleRepetition || 3;
   if (repetition < 3) {
@@ -10126,13 +10126,13 @@ function checkRuleRepetition(state) {
   return repetition;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js
 function thematicBreak2(_, _1, state) {
   const value = (checkRule(state) + (state.options.ruleSpaces ? " " : "")).repeat(checkRuleRepetition(state));
   return state.options.ruleSpaces ? value.slice(0, -1) : value;
 }
 
-// node_modules/mdast-util-to-markdown/lib/handle/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/index.js
 var handle = {
   blockquote,
   break: hardBreak,
@@ -10156,7 +10156,7 @@ var handle = {
   thematicBreak: thematicBreak2
 };
 
-// node_modules/mdast-util-gfm-table/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-table/lib/index.js
 function gfmTableFromMarkdown() {
   return {
     enter: {
@@ -10309,7 +10309,7 @@ function gfmTableToMarkdown(options) {
   }
 }
 
-// node_modules/mdast-util-gfm-task-list-item/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-task-list-item/lib/index.js
 function gfmTaskListItemFromMarkdown() {
   return {
     exit: {
@@ -10382,7 +10382,7 @@ function listItemWithTaskListItem(node2, parent, state, info) {
   }
 }
 
-// node_modules/mdast-util-gfm/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm/lib/index.js
 function gfmFromMarkdown() {
   return [
     gfmAutolinkLiteralFromMarkdown(),
@@ -10404,7 +10404,7 @@ function gfmToMarkdown(options) {
   };
 }
 
-// node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js
 var wwwPrefix = {
   tokenize: tokenizeWwwPrefix,
   partial: true
@@ -10746,7 +10746,7 @@ function previousUnbalanced(events) {
   return result;
 }
 
-// node_modules/micromark-extension-gfm-footnote/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-footnote/lib/syntax.js
 var indent = {
   tokenize: tokenizeIndent2,
   partial: true
@@ -11021,7 +11021,7 @@ function tokenizeIndent2(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js
 function gfmStrikethrough(options) {
   const options_ = options || {};
   let single = options_.singleTilde;
@@ -11115,7 +11115,7 @@ function gfmStrikethrough(options) {
   }
 }
 
-// node_modules/micromark-extension-gfm-table/lib/edit-map.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/edit-map.js
 var EditMap = class {
   /**
    * Create a new edit map.
@@ -11201,7 +11201,7 @@ function addImplementation(editMap, at, remove, add) {
   editMap.index.set(at, change);
 }
 
-// node_modules/micromark-extension-gfm-table/lib/infer.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/infer.js
 function gfmTableAlign(events, index2) {
   let inDelimiterRow = false;
   const align = [];
@@ -11228,7 +11228,7 @@ function gfmTableAlign(events, index2) {
   return align;
 }
 
-// node_modules/micromark-extension-gfm-table/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/syntax.js
 function gfmTable() {
   return {
     flow: {
@@ -11619,7 +11619,7 @@ function getPoint(events, index2) {
   return event[1][side];
 }
 
-// node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js
 var tasklistCheck = {
   name: "tasklistCheck",
   tokenize: tokenizeTasklistCheck
@@ -11693,7 +11693,7 @@ function spaceThenNonSpace(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-extension-gfm/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm/index.js
 function gfm(options) {
   return combineExtensions([
     gfmAutolinkLiteral(),
@@ -11704,7 +11704,7 @@ function gfm(options) {
   ]);
 }
 
-// node_modules/remark-gfm/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-gfm/lib/index.js
 var emptyOptions2 = {};
 function remarkGfm(options) {
   const self = (
@@ -11721,7 +11721,7 @@ function remarkGfm(options) {
   toMarkdownExtensions.push(gfmToMarkdown(settings));
 }
 
-// node_modules/mdast-util-math/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-math/lib/index.js
 function mathFromMarkdown() {
   return {
     enter: {
@@ -11900,7 +11900,7 @@ function mathToMarkdown(options) {
   }
 }
 
-// node_modules/micromark-extension-math/lib/math-flow.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/math-flow.js
 var mathFlow = {
   tokenize: tokenizeMathFenced,
   concrete: true,
@@ -12040,7 +12040,7 @@ function tokenizeNonLazyContinuation2(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-extension-math/lib/math-text.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/math-text.js
 function mathText(options) {
   const options_ = options || {};
   let single = options_.singleDollarTextMath;
@@ -12165,7 +12165,7 @@ function previous3(code3) {
   return code3 !== 36 || this.events[this.events.length - 1][1].type === "characterEscape";
 }
 
-// node_modules/micromark-extension-math/lib/syntax.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/syntax.js
 function math(options) {
   return {
     flow: {
@@ -12177,7 +12177,7 @@ function math(options) {
   };
 }
 
-// node_modules/remark-math/lib/index.js
+// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-math/lib/index.js
 var emptyOptions3 = {};
 function remarkMath(options) {
   const self = (

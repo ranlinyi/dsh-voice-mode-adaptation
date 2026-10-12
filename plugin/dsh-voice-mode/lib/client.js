@@ -1231,9 +1231,65 @@ function VoiceSettingsCard({ scope }) {
   ] });
 }
 
+// src/remote-scope.ts
+function createRemoteSettingsScope(ctx, ns) {
+  const remote = ctx?.remote;
+  let snap = { status: "loading", value: {} };
+  let revision;
+  const listeners = /* @__PURE__ */ new Set();
+  const emit = () => {
+    for (const fn of [...listeners]) {
+      try {
+        fn();
+      } catch {
+      }
+    }
+  };
+  const applyView = (view) => {
+    if (!view) return;
+    revision = typeof view.revision === "number" ? view.revision : revision;
+    snap = { status: "ready", value: view.value ?? {}, revision };
+    emit();
+  };
+  const refresh = async () => {
+    if (!remote?.settings) {
+      snap = { status: "unavailable", value: snap.value ?? {} };
+      emit();
+      return;
+    }
+    try {
+      const described = await remote.settings.describe();
+      const view = (described?.namespaces ?? []).find((v) => v?.ns === ns);
+      if (view) applyView(view);
+      else {
+        snap = { status: "unavailable", value: {} };
+        emit();
+      }
+    } catch {
+      snap = { status: "error", value: snap.value ?? {} };
+      emit();
+    }
+  };
+  return {
+    getSnapshot: () => snap,
+    subscribe: (fn) => {
+      listeners.add(fn);
+      void refresh();
+      return () => {
+        listeners.delete(fn);
+      };
+    },
+    set: async (field, value) => {
+      if (!remote?.settings) throw new Error("remote.settings unavailable");
+      const view = await remote.settings.update(ns, { [field]: value }, revision);
+      applyView(view);
+    }
+  };
+}
+
 // src/client.tsx
-var inject = ["slots", "sessions", "settingsScope"];
-var BUILD_TAG = "e110cb5";
+var inject = ["slots", "sessions", "remote", "remote.settings"];
+var BUILD_TAG = "71ab8c4";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {
@@ -1842,21 +1898,19 @@ function apply(ctx) {
       ReadMessageButton
     )
   );
-  if (ctx.settingsScope) {
-    ctx.slots.inject(
-      "settings.plugin.item",
-      () => ctx.slots.register(
-        {
-          name: "settings.plugin.item",
-          id: "voice-mode-adaptation",
-          key: "voice-mode-adaptation",
-          order: 100,
-          label: t("stateVoiceMode")
-        },
-        () => React.createElement(VoiceSettingsCard, { scope: ctx.settingsScope.bind({ namespace: "voice-mode-adaptation" }) })
-      )
-    );
-  }
+  const voiceSettingsScope = createRemoteSettingsScope(ctx, "voice-mode-adaptation");
+  ctx.slots.inject(
+    "settings.plugins.tab",
+    () => ctx.slots.register(
+      {
+        name: "settings.plugins.tab",
+        id: "voice-mode-adaptation",
+        order: 100,
+        label: t("stateVoiceMode")
+      },
+      () => React.createElement(VoiceSettingsCard, { scope: voiceSettingsScope })
+    )
+  );
   if (typeof ctx.effect === "function") {
     ctx.effect(() => () => {
       if (g.__dshvmaReader__ === reader) g.__dshvmaReader__ = void 0;
