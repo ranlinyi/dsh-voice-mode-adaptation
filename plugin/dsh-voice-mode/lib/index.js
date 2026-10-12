@@ -15390,6 +15390,7 @@ var Config = (() => {
   return schema;
 })();
 function apply(ctx, config) {
+  ctx.effect(() => ctx.settings.configure({ auto: false }, ctx.fiber));
   let autoReadSession = null;
   const streamGen = /* @__PURE__ */ new Map();
   const sessions = ctx.get("sessions");

@@ -786,7 +786,10 @@ export function apply(ctx: any): void {
             order: 100,
             label: t('stateVoiceMode'),
           },
-          () => React.createElement(VoiceSettingsCard, { scope: voiceScope }),
+          // 槽位契约（照 settings-web-search）：summary 视图返回一句话简介，
+          // 其余视图渲染完整设置卡；否则条目页会把整卡渲染两遍。
+          (props: { view?: string }) =>
+            React.createElement(VoiceSettingsCard, { scope: voiceScope, view: props?.view }),
         ),
       ),
     ),

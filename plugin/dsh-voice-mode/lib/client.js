@@ -308,22 +308,6 @@ var FIELD_LABELS = {
   azurePhonemes: "Azure \u591A\u97F3\u5B57\u62FC\u97F3\u8868",
   usageStats: "\u7D2F\u8BA1 token \u6D88\u8017"
 };
-var setHeader = {
-  appearance: "none",
-  width: "100%",
-  font: "inherit",
-  color: "inherit",
-  textAlign: "left",
-  cursor: "pointer",
-  background: "transparent",
-  border: 0,
-  borderRadius: 12,
-  alignItems: "center",
-  gap: 12,
-  padding: "14px 16px",
-  display: "flex"
-};
-var setHeadText = { flexDirection: "column", flex: 1, gap: 4, minWidth: 0, display: "flex" };
 var setName = { color: t2.label, fontSize: 15, fontWeight: 600, lineHeight: 1.4 };
 var setDesc = { color: t2.term, fontSize: 13, lineHeight: 1.5 };
 var setChevron = { color: t2.term, flex: "none", transition: "transform .16s", display: "inline-flex" };
@@ -1069,9 +1053,8 @@ function EngineStatusInline() {
     tts.error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { fontSize: 11, color: "var(--dsw-alias-state-error-primary)", flexBasis: "100%" }, children: tts.error })
   ] });
 }
-function VoiceSettingsCard({ scope }) {
+function VoiceSettingsCard({ scope, view }) {
   const [snap, setSnap] = (0, import_react.useState)(() => scope.getSnapshot());
-  const [collapsed, setCollapsed] = (0, import_react.useState)(true);
   (0, import_react.useEffect)(
     () => scope.subscribe(() => {
       setSnap({ ...scope.getSnapshot() });
@@ -1103,6 +1086,7 @@ function VoiceSettingsCard({ scope }) {
     };
   }, [engine]);
   const voiceOptions = engine === "edge" || engine === "azure" ? edgeVoices ?? VOICE_OPTIONS : engine === "kokoro" ? VOICE_OPTIONS_KOKORO : VOICE_OPTIONS_LOCAL;
+  if (view === "summary") return t("settingsCardDesc");
   if (unavailable) {
     return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { "data-dshvma-settings": "card", style: { color: t2.term, fontSize: 12, padding: "14px 16px", ...cardStyle }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { color: "var(--dsw-alias-state-error-primary)" }, children: t("configUnavailable") }),
@@ -1111,14 +1095,7 @@ function VoiceSettingsCard({ scope }) {
   }
   return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { "data-dshvma-settings": "card", style: cardStyle, children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", { children: focusVisibleCss }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", { type: "button", "aria-expanded": !collapsed, onClick: () => setCollapsed((c) => !c), style: { ...setHeader, background: collapsed ? "transparent" : t2.bgOpen }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { style: setHeadText, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: setName, children: t("stateVoiceMode") }),
-        /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: setDesc, children: t("settingsCardDesc") })
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { style: { ...setChevron, transform: collapsed ? "rotate(0deg)" : "rotate(180deg)" }, "aria-hidden": "true", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { viewBox: "0 0 16 16", width: 14, height: 14, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { fill: "currentColor", d: "M4 6l4 4 4-4z" }) }) })
-    ] }),
-    !collapsed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: setBody, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: 4 }, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: setBody, children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: 4 }, children: [
       /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Section, { title: t("secRead"), children: [
         /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Row, { name: "ttsEngine", desc: t("descTtsEngine"), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
           SegGroup,
@@ -1233,7 +1210,7 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "configForms"];
-var BUILD_TAG = "c42835b";
+var BUILD_TAG = "4be0471";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {
@@ -1856,7 +1833,9 @@ function apply(ctx) {
             order: 100,
             label: t("stateVoiceMode")
           },
-          () => React.createElement(VoiceSettingsCard, { scope: voiceScope })
+          // 槽位契约（照 settings-web-search）：summary 视图返回一句话简介，
+          // 其余视图渲染完整设置卡；否则条目页会把整卡渲染两遍。
+          (props) => React.createElement(VoiceSettingsCard, { scope: voiceScope, view: props?.view })
         )
       )
     )

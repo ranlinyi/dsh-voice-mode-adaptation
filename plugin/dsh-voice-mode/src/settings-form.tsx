@@ -950,9 +950,8 @@ function EngineStatusInline(): React.ReactElement {
 }
 
 
-export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.ReactElement {
+export function VoiceSettingsCard({ scope, view }: { scope: ScopeController; view?: string }): React.ReactElement {
   const [snap, setSnap] = useState(() => scope.getSnapshot())
-  const [collapsed, setCollapsed] = useState(true) // 默认折叠，与其他设置卡一致
   useEffect(
     () =>
       scope.subscribe(() => {
@@ -998,6 +997,9 @@ export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.
   }, [engine])
   const voiceOptions = engine === 'edge' || engine === 'azure' ? (edgeVoices ?? VOICE_OPTIONS) : engine === 'kokoro' ? VOICE_OPTIONS_KOKORO : VOICE_OPTIONS_LOCAL
 
+  // summary 视图：条目页标题下的一句话简介（官方契约：返回纯文本，不渲染整卡）。
+  if (view === 'summary') return tr('settingsCardDesc') as unknown as React.ReactElement
+
   if (unavailable) {
     return (
       <div data-dshvma-settings="card" style={{ color: t.term, fontSize: 12, padding: '14px 16px', ...cardStyle }}>
@@ -1009,20 +1011,8 @@ export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.
   return (
     <div data-dshvma-settings="card" style={cardStyle}>
       <style>{focusVisibleCss}</style>
-      <button type="button" aria-expanded={!collapsed} onClick={() => setCollapsed((c) => !c)} style={{ ...setHeader, background: collapsed ? 'transparent' : t.bgOpen }}>
-        <span style={setHeadText}>
-          <span style={setName}>{tr('stateVoiceMode')}</span>
-          <span style={setDesc}>{tr('settingsCardDesc')}</span>
-        </span>
-        <span style={{ ...setChevron, transform: collapsed ? 'rotate(0deg)' : 'rotate(180deg)' }} aria-hidden="true">
-          <svg viewBox="0 0 16 16" width={14} height={14}>
-            <path fill="currentColor" d="M4 6l4 4 4-4z" />
-          </svg>
-        </span>
-      </button>
-
-      {!collapsed && (
-        <div style={setBody}>
+      {/* 条目页的 detailSection 已提供折叠容器与标题，卡片只渲染正文，避免双折叠头。 */}
+      <div style={setBody}>
           <div style={{ marginTop: 4 }}>
             <Section title={tr('secRead')}>
             <Row name="ttsEngine" desc={tr('descTtsEngine')}>
@@ -1177,7 +1167,6 @@ export function VoiceSettingsCard({ scope }: { scope: ScopeController }): React.
             </div>
           </div>
         </div>
-      )}
     </div>
   )
 }

@@ -16,6 +16,7 @@ import z from '@deepseek-ai/schemastery'
 // Type-only: pulls the webServer Context merge (ctx.webServer) into scope.
 import type {} from '@deepseek-ai/dsh-host-webserver'
 // Type-only: pulls the settings Context merge (ctx.settings) into scope.
+import type {} from '@deepseek-ai/dsh-settings'
 // Type-only: chunk/options shapes for the llm/stream waterfall tap.
 import type { GenerateOptions, StreamChunk } from '@deepseek-ai/dsh-llm'
 // Type-only: pulls the 'system-prompt/assemble' waterfall into the Events
@@ -309,7 +310,7 @@ export function createVoiceSettingsSchema(defs?: Partial<VoiceSettingsValue>): z
       .union([z.const('rules'), z.const('model'), z.const('verbatim')])
       .default(d.mathMode)
       .description('数学朗读模式：rules 确定性规则（默认，零容错）/ model 交给改写模型 / verbatim 原样念出'),
-  })
+  }) as unknown as z<VoiceSettingsValue>
 }
 
 /** 兼容导出：平台常量默认 schema（供外部引用/自检）。 */
@@ -348,6 +349,11 @@ export const Config: z<Config> = (() => {
 })()
 
 export function apply(ctx: Context, config: Config): void {
+  // --- 关闭宿主为本条目自动生成的通用配置表单：定制设置卡（plugins.item）已覆盖
+  //     全部字段，避免插件管理页出现两张重复的折叠卡。effect 托管 disposer，
+  //     volatile 配置更新重挂载时先释放再注册，不会重复注册报错。 ---
+  ctx.effect(() => ctx.settings.configure({ auto: false }, ctx.fiber))
+
   // --- 全局单活指针：同一时刻至多一个会话处于「自动朗读」（手动朗读不占此位）。 ---
   let autoReadSession: string | null = null
 
