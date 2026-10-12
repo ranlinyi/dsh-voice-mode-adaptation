@@ -1233,7 +1233,7 @@ function VoiceSettingsCard({ scope }) {
 
 // src/client.tsx
 var inject = ["slots", "sessions", "configForms"];
-var BUILD_TAG = "c21ce14";
+var BUILD_TAG = "c42835b";
 console.log("[dsh-voice-mode-adaptation] build=" + BUILD_TAG);
 var BASE_PATH2 = "/voice-mode-adaptation";
 function getTabId() {

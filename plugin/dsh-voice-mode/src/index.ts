@@ -331,16 +331,21 @@ export interface Config extends VoiceSettingsValue {
   allowCustomModelHost: boolean
 }
 
-export const Config: z<Config> = z.intersect([
-  createVoiceSettingsSchema(),
-  z.object({
+// 0.2.0 设置页要求 Config 为 z.object 且字段带 meta.volatile（volatileForm 只递归 object
+// 字典；z.intersect 类型进不了 settings.describe，条目将不出现在配置镜像里）。
+const voiceDict = (createVoiceSettingsSchema() as unknown as { dict: Record<string, z> }).dict
+export const Config: z<Config> = (() => {
+  const schema = z.object({
+    ...voiceDict,
     enabled: z.boolean().default(true),
     cacheDir: z.string().default(defaultModelCacheDir()),
     modelHost: z.string().default('https://huggingface.co'),
     allowLan: z.boolean().default(false),
     allowCustomModelHost: z.boolean().default(false),
-  }),
-]) as unknown as z<Config>
+  }) as unknown as z<Config> & { dict: Record<string, { meta: Record<string, unknown> }> }
+  for (const field of Object.values(schema.dict)) field.meta.volatile = true
+  return schema
+})()
 
 export function apply(ctx: Context, config: Config): void {
   // --- 全局单活指针：同一时刻至多一个会话处于「自动朗读」（手动朗读不占此位）。 ---

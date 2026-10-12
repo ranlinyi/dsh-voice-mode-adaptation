@@ -28,9 +28,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/extend/index.js
+// node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js
 var require_extend = __commonJS({
-  "../../../../../\u9879\u76EE/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/extend/index.js"(exports, module) {
+  "node_modules/.pnpm/extend@3.0.2/node_modules/extend/index.js"(exports, module) {
     "use strict";
     var hasOwn = Object.prototype.hasOwnProperty;
     var toStr = Object.prototype.toString;
@@ -125,21 +125,21 @@ import { join as join3 } from "node:path";
 import { homedir } from "node:os";
 import { rm } from "node:fs/promises";
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/bail/index.js
+// node_modules/.pnpm/bail@2.0.2/node_modules/bail/index.js
 function bail(error) {
   if (error) {
     throw error;
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/index.js
+// node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js
 var import_extend = __toESM(require_extend(), 1);
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/devlop/lib/default.js
+// node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/default.js
 function ok() {
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/is-plain-obj/index.js
+// node_modules/.pnpm/is-plain-obj@4.1.0/node_modules/is-plain-obj/index.js
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -148,7 +148,7 @@ function isPlainObject(value) {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/trough/lib/index.js
+// node_modules/.pnpm/trough@2.2.0/node_modules/trough/lib/index.js
 function trough() {
   const fns = [];
   const pipeline = { run, use };
@@ -232,7 +232,7 @@ function wrap(middleware, callback) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-stringify-position/lib/index.js
+// node_modules/.pnpm/unist-util-stringify-position@4.0.0/node_modules/unist-util-stringify-position/lib/index.js
 function stringifyPosition(value) {
   if (!value || typeof value !== "object") {
     return "";
@@ -258,7 +258,7 @@ function index(value) {
   return value && typeof value === "number" ? value : 1;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile-message/lib/index.js
+// node_modules/.pnpm/vfile-message@4.0.3/node_modules/vfile-message/lib/index.js
 var VFileMessage = class extends Error {
   /**
    * Create a message for `reason`.
@@ -394,16 +394,16 @@ VFileMessage.prototype.place = void 0;
 VFileMessage.prototype.ruleId = void 0;
 VFileMessage.prototype.source = void 0;
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minpath.js
+// node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minpath.js
 import { default as default2 } from "node:path";
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minproc.js
+// node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minproc.js
 import { default as default3 } from "node:process";
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minurl.js
+// node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.js
 import { fileURLToPath } from "node:url";
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/minurl.shared.js
+// node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/minurl.shared.js
 function isUrl(fileUrlOrPath) {
   return Boolean(
     fileUrlOrPath !== null && typeof fileUrlOrPath === "object" && "href" in fileUrlOrPath && fileUrlOrPath.href && "protocol" in fileUrlOrPath && fileUrlOrPath.protocol && // @ts-expect-error: indexing is fine.
@@ -411,7 +411,7 @@ function isUrl(fileUrlOrPath) {
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/vfile/lib/index.js
+// node_modules/.pnpm/vfile@6.0.3/node_modules/vfile/lib/index.js
 var order = (
   /** @type {const} */
   [
@@ -867,7 +867,7 @@ function isUint8Array(value) {
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/callable-instance.js
+// node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/callable-instance.js
 var CallableInstance = (
   /**
    * @type {new <Parameters extends Array<unknown>, Result>(property: string | symbol) => (...parameters: Parameters) => Result}
@@ -878,7 +878,7 @@ var CallableInstance = (
    * @param {string | symbol} property
    * @returns {(...parameters: Array<unknown>) => unknown}
    */
-  (function(property) {
+  function(property) {
     const self = this;
     const constr = self.constructor;
     const proto = (
@@ -893,10 +893,10 @@ var CallableInstance = (
     };
     Object.setPrototypeOf(apply2, proto);
     return apply2;
-  })
+  }
 );
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unified/lib/index.js
+// node_modules/.pnpm/unified@11.0.5/node_modules/unified/lib/index.js
 var own = {}.hasOwnProperty;
 var Processor = class _Processor extends CallableInstance {
   /**
@@ -1532,7 +1532,7 @@ function isUint8Array2(value) {
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-string/lib/index.js
+// node_modules/.pnpm/mdast-util-to-string@4.0.0/node_modules/mdast-util-to-string/lib/index.js
 var emptyOptions = {};
 function toString(value, options) {
   const settings = options || emptyOptions;
@@ -1569,7 +1569,7 @@ function node(value) {
   return Boolean(value && typeof value === "object");
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/character-entities/index.js
+// node_modules/.pnpm/character-entities@2.0.2/node_modules/character-entities/index.js
 var characterEntities = {
   AElig: "\xC6",
   AMP: "&",
@@ -3698,13 +3698,13 @@ var characterEntities = {
   zwnj: "\u200C"
 };
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/decode-named-character-reference/index.js
+// node_modules/.pnpm/decode-named-character-reference@1.3.0/node_modules/decode-named-character-reference/index.js
 var own2 = {}.hasOwnProperty;
 function decodeNamedCharacterReference(value) {
   return own2.call(characterEntities, value) ? characterEntities[value] : false;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-chunked/index.js
+// node_modules/.pnpm/micromark-util-chunked@2.0.1/node_modules/micromark-util-chunked/index.js
 function splice(list3, start, remove, items) {
   const end = list3.length;
   let chunkStart = 0;
@@ -3738,7 +3738,7 @@ function push(list3, items) {
   return items;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-combine-extensions/index.js
+// node_modules/.pnpm/micromark-util-combine-extensions@2.0.1/node_modules/micromark-util-combine-extensions/index.js
 var hasOwnProperty = {}.hasOwnProperty;
 function combineExtensions(extensions) {
   const all2 = {};
@@ -3778,7 +3778,7 @@ function constructs(existing, list3) {
   splice(existing, 0, 0, before);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-decode-numeric-character-reference/index.js
+// node_modules/.pnpm/micromark-util-decode-numeric-character-reference@2.0.2/node_modules/micromark-util-decode-numeric-character-reference/index.js
 function decodeNumericCharacterReference(value, base) {
   const code3 = Number.parseInt(value, base);
   if (
@@ -3796,12 +3796,12 @@ function decodeNumericCharacterReference(value, base) {
   return String.fromCodePoint(code3);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-normalize-identifier/index.js
+// node_modules/.pnpm/micromark-util-normalize-identifier@2.0.1/node_modules/micromark-util-normalize-identifier/index.js
 function normalizeIdentifier(value) {
   return value.replace(/[\t\n\r ]+/g, " ").replace(/^ | $/g, "").toLowerCase().toUpperCase();
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-character/index.js
+// node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/index.js
 var asciiAlpha = regexCheck(/[A-Za-z]/);
 var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
 var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/);
@@ -3833,9 +3833,9 @@ function regexCheck(regex) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-space/index.js
+// node_modules/.pnpm/micromark-factory-space@2.1.0/node_modules/micromark-factory-space/index.js
 function factorySpace(effects, ok3, type, max) {
-  const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
+  const limit = max ? max - 1 : Infinity;
   let size = 0;
   return start;
   function start(code3) {
@@ -3854,8 +3854,31 @@ function factorySpace(effects, ok3, type, max) {
     return ok3(code3);
   }
 }
+function factorySpaceMinMax(effects, ok3, nok, type, min, max) {
+  let size = 0;
+  return start;
+  function start(code3) {
+    if (max > 0 && markdownSpace(code3)) {
+      effects.enter(type);
+      return prefix(code3);
+    }
+    return after(code3);
+  }
+  function prefix(code3) {
+    if (markdownSpace(code3) && size < max) {
+      effects.consume(code3);
+      size++;
+      return prefix;
+    }
+    effects.exit(type);
+    return after(code3);
+  }
+  function after(code3) {
+    return size >= min ? ok3(code3) : nok(code3);
+  }
+}
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/content.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/initialize/content.js
 var content = {
   tokenize: initializeContent
 };
@@ -3905,7 +3928,105 @@ function initializeContent(effects) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/document.js
+// node_modules/.pnpm/micromark-util-edit-map@1.0.0/node_modules/micromark-util-edit-map/index.js
+var EditMap = class {
+  /**
+   * Create a new edit map.
+   *
+   * @returns
+   *   New instance.
+   */
+  constructor() {
+    this.index = /* @__PURE__ */ new Map();
+    this.map = [];
+  }
+  /**
+   * Create an edit: a remove and/or add at a certain place.
+   *
+   * @param {number} index
+   *   Index at which to apply the edit.
+   * @param {number} remove
+   *   Count of items to remove at the index.
+   * @param {Array<Event>} add
+   *   Items to add at the index.
+   * @returns {undefined}
+   *   Nothing.
+   */
+  add(index2, remove, add) {
+    addImplementation(this, index2, remove, add, false);
+  }
+  /**
+   * Create an edit: but insert `add` before existing additions, instead of
+   * after them.
+   *
+   * @param {number} index
+   *   Index at which to apply the edit.
+   * @param {number} remove
+   *   Count of items to remove at the index.
+   * @param {Array<Event>} add
+   *   Items to add at the index.
+   * @returns {undefined}
+   *   Nothing.
+   */
+  addBefore(index2, remove, add) {
+    addImplementation(this, index2, remove, add, true);
+  }
+  /**
+   * Done, change the events.
+   *
+   * @param {Array<Event>} events
+   *   List of events to apply the edits to.
+   * @returns {undefined}
+   *   Nothing.
+   */
+  consume(events) {
+    this.map.sort(function(a, b) {
+      return a[0] - b[0];
+    });
+    if (this.map.length === 0) {
+      return;
+    }
+    let index2 = this.map.length;
+    const vecs = [];
+    while (index2 > 0) {
+      index2 -= 1;
+      vecs.push(events.slice(this.map[index2][0] + this.map[index2][1]), this.map[index2][2]);
+      events.length = this.map[index2][0];
+    }
+    vecs.push(events.slice());
+    events.length = 0;
+    let slice = vecs.pop();
+    while (slice) {
+      for (const element of slice) {
+        events.push(element);
+      }
+      slice = vecs.pop();
+    }
+    this.map.length = 0;
+    this.index.clear();
+  }
+};
+function addImplementation(editMap, at, remove, add, before) {
+  if (remove === 0 && add.length === 0) {
+    return;
+  }
+  const existing = editMap.index.get(at);
+  if (existing) {
+    existing[1] += remove;
+    if (before) {
+      add.push(...existing[2]);
+      existing[2] = add;
+    } else {
+      existing[2].push(...add);
+    }
+    return;
+  }
+  const change = [at, remove, add];
+  editMap.map.push(change);
+  editMap.index.set(at, change);
+}
+
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/initialize/document.js
 var document = {
   tokenize: initializeDocument
 };
@@ -3952,8 +4073,10 @@ function initializeDocument(effects) {
         };
         index2++;
       }
-      splice(self.events, indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
-      self.events.length = index2;
+      const editMap = new EditMap();
+      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
+      editMap.add(indexBeforeExits, index2 - indexBeforeExits, []);
+      editMap.consume(self.events);
       return checkNewContainers(code3);
     }
     return start(code3);
@@ -3972,7 +4095,9 @@ function initializeDocument(effects) {
     return effects.check(containerConstruct, thereIsANewContainer, thereIsNoNewContainer)(code3);
   }
   function thereIsANewContainer(code3) {
-    if (childFlow) closeFlow();
+    if (childFlow) {
+      closeFlow();
+    }
     exitContainers(continued);
     return documentContinued(code3);
   }
@@ -3992,7 +4117,9 @@ function initializeDocument(effects) {
   }
   function flowStart(code3) {
     if (code3 === null) {
-      if (childFlow) closeFlow();
+      if (childFlow) {
+        closeFlow();
+      }
       exitContainers(0);
       effects.consume(code3);
       return;
@@ -4024,9 +4151,13 @@ function initializeDocument(effects) {
   }
   function writeToChild(token, endOfFile) {
     const stream = self.sliceStream(token);
-    if (endOfFile) stream.push(null);
+    if (endOfFile) {
+      stream.push(null);
+    }
     token.previous = childToken;
-    if (childToken) childToken.next = token;
+    if (childToken) {
+      childToken.next = token;
+    }
     childToken = token;
     childFlow.defineSkip(token.start);
     childFlow.write(stream);
@@ -4063,8 +4194,10 @@ function initializeDocument(effects) {
         };
         index2++;
       }
-      splice(self.events, indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
-      self.events.length = index2;
+      const editMap = new EditMap();
+      editMap.add(indexBeforeFlow + 1, 0, self.events.slice(indexBeforeExits));
+      editMap.add(indexBeforeExits, index2 - indexBeforeExits, []);
+      editMap.consume(self.events);
     }
   }
   function exitContainers(size) {
@@ -4087,7 +4220,7 @@ function tokenizeContainer(effects, ok3, nok) {
   return factorySpace(effects, effects.attempt(this.parser.constructs.document, ok3, nok), "linePrefix", this.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-classify-character/index.js
+// node_modules/.pnpm/micromark-util-classify-character@2.0.1/node_modules/micromark-util-classify-character/index.js
 function classifyCharacter(code3) {
   if (code3 === null || markdownLineEndingOrSpace(code3) || unicodeWhitespace(code3)) {
     return 1;
@@ -4097,7 +4230,7 @@ function classifyCharacter(code3) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-resolve-all/index.js
+// node_modules/.pnpm/micromark-util-resolve-all@2.0.1/node_modules/micromark-util-resolve-all/index.js
 function resolveAll(constructs2, events, context) {
   const called = [];
   let index2 = -1;
@@ -4111,7 +4244,7 @@ function resolveAll(constructs2, events, context) {
   return events;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/attention.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/attention.js
 var attention = {
   name: "attention",
   resolveAll: resolveAllAttention,
@@ -4119,24 +4252,17 @@ var attention = {
 };
 function resolveAllAttention(events, context) {
   let index2 = -1;
-  let open;
-  let group;
-  let text5;
-  let openingSequence;
-  let closingSequence;
-  let use;
   let nextEvents;
-  let offset;
   while (++index2 < events.length) {
     if (events[index2][0] === "enter" && events[index2][1].type === "attentionSequence" && events[index2][1]._close) {
-      open = index2;
+      let open = index2;
       while (open--) {
         if (events[open][0] === "exit" && events[open][1].type === "attentionSequence" && events[open][1]._open && // If the markers are the same:
         context.sliceSerialize(events[open][1]).charCodeAt(0) === context.sliceSerialize(events[index2][1]).charCodeAt(0)) {
           if ((events[open][1]._close || events[index2][1]._open) && (events[index2][1].end.offset - events[index2][1].start.offset) % 3 && !((events[open][1].end.offset - events[open][1].start.offset + events[index2][1].end.offset - events[index2][1].start.offset) % 3)) {
             continue;
           }
-          use = events[open][1].end.offset - events[open][1].start.offset > 1 && events[index2][1].end.offset - events[index2][1].start.offset > 1 ? 2 : 1;
+          const use = events[open][1].end.offset - events[open][1].start.offset > 1 && events[index2][1].end.offset - events[index2][1].start.offset > 1 ? 2 : 1;
           const start = {
             ...events[open][1].end
           };
@@ -4145,21 +4271,21 @@ function resolveAllAttention(events, context) {
           };
           movePoint(start, -use);
           movePoint(end, use);
-          openingSequence = {
+          const openingSequence = {
             type: use > 1 ? "strongSequence" : "emphasisSequence",
             start,
             end: {
               ...events[open][1].end
             }
           };
-          closingSequence = {
+          const closingSequence = {
             type: use > 1 ? "strongSequence" : "emphasisSequence",
             start: {
               ...events[index2][1].start
             },
             end
           };
-          text5 = {
+          const text5 = {
             type: use > 1 ? "strongText" : "emphasisText",
             start: {
               ...events[open][1].end
@@ -4168,7 +4294,7 @@ function resolveAllAttention(events, context) {
               ...events[index2][1].start
             }
           };
-          group = {
+          const group = {
             type: use > 1 ? "strong" : "emphasis",
             start: {
               ...openingSequence.start
@@ -4190,11 +4316,10 @@ function resolveAllAttention(events, context) {
           nextEvents = push(nextEvents, [["enter", group, context], ["enter", openingSequence, context], ["exit", openingSequence, context], ["enter", text5, context]]);
           nextEvents = push(nextEvents, resolveAll(context.parser.constructs.insideSpan.null, events.slice(open + 1, index2), context));
           nextEvents = push(nextEvents, [["exit", text5, context], ["enter", closingSequence, context], ["exit", closingSequence, context], ["exit", group, context]]);
+          let offset = 0;
           if (events[index2][1].end.offset - events[index2][1].start.offset) {
             offset = 2;
             nextEvents = push(nextEvents, [["enter", events[index2][1], context], ["exit", events[index2][1], context]]);
-          } else {
-            offset = 0;
           }
           splice(events, open - 1, index2 - open + 3, nextEvents);
           index2 = open + nextEvents.length - offset - 2;
@@ -4229,8 +4354,8 @@ function tokenizeAttention(effects, ok3) {
     }
     const token = effects.exit("attentionSequence");
     const after = classifyCharacter(code3);
-    const open = !after || after === 2 && before || attentionMarkers2.includes(code3);
-    const close = !before || before === 2 && after || attentionMarkers2.includes(previous4);
+    const open = !after || after === 2 && before || attentionMarkers2.includes(code3) && code3 !== 42 && code3 !== 95;
+    const close = !before || before === 2 && after || attentionMarkers2.includes(previous4) && previous4 !== 42 && previous4 !== 95;
     token._open = Boolean(marker === 42 ? open : open && (before || !close));
     token._close = Boolean(marker === 42 ? close : close && (after || !open));
     return ok3(code3);
@@ -4242,7 +4367,7 @@ function movePoint(point3, offset) {
   point3._bufferIndex += offset;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/autolink.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/autolink.js
 var autolink = {
   name: "autolink",
   tokenize: tokenizeAutolink
@@ -4343,7 +4468,7 @@ function tokenizeAutolink(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/blank-line.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/blank-line.js
 var blankLine = {
   partial: true,
   tokenize: tokenizeBlankLine
@@ -4358,7 +4483,7 @@ function tokenizeBlankLine(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/block-quote.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/block-quote.js
 var blockQuote = {
   continuation: {
     tokenize: tokenizeBlockQuoteContinuation
@@ -4416,7 +4541,7 @@ function exit(effects) {
   effects.exit("blockQuote");
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/character-escape.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/character-escape.js
 var characterEscape = {
   name: "characterEscape",
   tokenize: tokenizeCharacterEscape
@@ -4442,7 +4567,7 @@ function tokenizeCharacterEscape(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/character-reference.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/character-reference.js
 var characterReference = {
   name: "characterReference",
   tokenize: tokenizeCharacterReference
@@ -4507,11 +4632,29 @@ function tokenizeCharacterReference(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-fenced.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/partial-non-lazy-continuation.js
 var nonLazyContinuation = {
   partial: true,
   tokenize: tokenizeNonLazyContinuation
 };
+function tokenizeNonLazyContinuation(effects, ok3, nok) {
+  const self = this;
+  return start;
+  function start(code3) {
+    if (code3 === null) {
+      return nok(code3);
+    }
+    effects.enter("lineEnding");
+    effects.consume(code3);
+    effects.exit("lineEnding");
+    return after;
+  }
+  function after(code3) {
+    return self.parser.lazy[self.now().line] ? nok(code3) : ok3(code3);
+  }
+}
+
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-fenced.js
 var codeFenced = {
   concrete: true,
   name: "codeFenced",
@@ -4673,24 +4816,8 @@ function tokenizeCodeFenced(effects, ok3, nok) {
     }
   }
 }
-function tokenizeNonLazyContinuation(effects, ok3, nok) {
-  const self = this;
-  return start;
-  function start(code3) {
-    if (code3 === null) {
-      return nok(code3);
-    }
-    effects.enter("lineEnding");
-    effects.consume(code3);
-    effects.exit("lineEnding");
-    return lineStart;
-  }
-  function lineStart(code3) {
-    return self.parser.lazy[self.now().line] ? nok(code3) : ok3(code3);
-  }
-}
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-indented.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-indented.js
 var codeIndented = {
   name: "codeIndented",
   tokenize: tokenizeCodeIndented
@@ -4700,15 +4827,10 @@ var furtherStart = {
   tokenize: tokenizeFurtherStart
 };
 function tokenizeCodeIndented(effects, ok3, nok) {
-  const self = this;
   return start;
   function start(code3) {
     effects.enter("codeIndented");
-    return factorySpace(effects, afterPrefix, "linePrefix", 4 + 1)(code3);
-  }
-  function afterPrefix(code3) {
-    const tail = self.events[self.events.length - 1];
-    return tail && tail[1].type === "linePrefix" && tail[2].sliceSerialize(tail[1], true).length >= 4 ? atBreak(code3) : nok(code3);
+    return factorySpaceMinMax(effects, atBreak, nok, "linePrefix", 4, 4)(code3);
   }
   function atBreak(code3) {
     if (code3 === null) {
@@ -4746,15 +4868,14 @@ function tokenizeFurtherStart(effects, ok3, nok) {
       effects.exit("lineEnding");
       return furtherStart2;
     }
-    return factorySpace(effects, afterPrefix, "linePrefix", 4 + 1)(code3);
+    return factorySpaceMinMax(effects, ok3, onNotEnoughPrefix, "linePrefix", 4, 4)(code3);
   }
-  function afterPrefix(code3) {
-    const tail = self.events[self.events.length - 1];
-    return tail && tail[1].type === "linePrefix" && tail[2].sliceSerialize(tail[1], true).length >= 4 ? ok3(code3) : markdownLineEnding(code3) ? furtherStart2(code3) : nok(code3);
+  function onNotEnoughPrefix(code3) {
+    return markdownLineEnding(code3) ? furtherStart2(code3) : nok(code3);
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/code-text.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/code-text.js
 var codeText = {
   name: "codeText",
   previous,
@@ -4869,7 +4990,7 @@ function tokenizeCodeText(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-subtokenize/lib/splice-buffer.js
+// node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/lib/splice-buffer.js
 var SpliceBuffer = class {
   /**
    * @param {ReadonlyArray<T> | null | undefined} [initial]
@@ -5062,7 +5183,7 @@ function chunkedPush(list3, right) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-subtokenize/index.js
+// node_modules/.pnpm/micromark-util-subtokenize@2.1.0/node_modules/micromark-util-subtokenize/index.js
 function subtokenize(eventsArray) {
   const jumps = {};
   let index2 = -1;
@@ -5215,7 +5336,7 @@ function subcontent(events, eventIndex) {
   return gaps;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/content.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/content.js
 var content2 = {
   resolve: resolveContent,
   tokenize: tokenizeContent
@@ -5286,7 +5407,7 @@ function tokenizeContinuation(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-destination/index.js
+// node_modules/.pnpm/micromark-factory-destination@2.0.1/node_modules/micromark-factory-destination/index.js
 function factoryDestination(effects, ok3, nok, type, literalType, literalMarkerType, rawType, stringType, max) {
   const limit = max || Number.POSITIVE_INFINITY;
   let balance = 0;
@@ -5378,7 +5499,7 @@ function factoryDestination(effects, ok3, nok, type, literalType, literalMarkerT
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-label/index.js
+// node_modules/.pnpm/micromark-factory-label@2.0.1/node_modules/micromark-factory-label/index.js
 function factoryLabel(effects, ok3, nok, type, markerType, stringType) {
   const self = this;
   let size = 0;
@@ -5439,7 +5560,7 @@ function factoryLabel(effects, ok3, nok, type, markerType, stringType) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-title/index.js
+// node_modules/.pnpm/micromark-factory-title@2.0.1/node_modules/micromark-factory-title/index.js
 function factoryTitle(effects, ok3, nok, type, markerType, stringType) {
   let marker;
   return start;
@@ -5501,7 +5622,7 @@ function factoryTitle(effects, ok3, nok, type, markerType, stringType) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-factory-whitespace/index.js
+// node_modules/.pnpm/micromark-factory-whitespace@2.0.1/node_modules/micromark-factory-whitespace/index.js
 function factoryWhitespace(effects, ok3) {
   let seen;
   return start;
@@ -5520,7 +5641,7 @@ function factoryWhitespace(effects, ok3) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/definition.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/definition.js
 var definition = {
   name: "definition",
   tokenize: tokenizeDefinition
@@ -5606,7 +5727,7 @@ function tokenizeTitleBefore(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/hard-break-escape.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/hard-break-escape.js
 var hardBreakEscape = {
   name: "hardBreakEscape",
   tokenize: tokenizeHardBreakEscape
@@ -5627,7 +5748,7 @@ function tokenizeHardBreakEscape(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/heading-atx.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/heading-atx.js
 var headingAtx = {
   name: "headingAtx",
   resolve: resolveHeadingAtx,
@@ -5636,8 +5757,6 @@ var headingAtx = {
 function resolveHeadingAtx(events, context) {
   let contentEnd = events.length - 2;
   let contentStart = 3;
-  let content3;
-  let text5;
   if (events[contentStart][1].type === "whitespace") {
     contentStart += 2;
   }
@@ -5648,12 +5767,12 @@ function resolveHeadingAtx(events, context) {
     contentEnd -= contentStart + 1 === contentEnd ? 2 : 4;
   }
   if (contentEnd > contentStart) {
-    content3 = {
+    const content3 = {
       type: "atxHeadingText",
       start: events[contentStart][1].start,
       end: events[contentEnd][1].end
     };
-    text5 = {
+    const text5 = {
       type: "chunkText",
       start: events[contentStart][1].start,
       end: events[contentEnd][1].end,
@@ -5718,7 +5837,7 @@ function tokenizeHeadingAtx(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-html-tag-name/index.js
+// node_modules/.pnpm/micromark-util-html-tag-name@2.0.1/node_modules/micromark-util-html-tag-name/index.js
 var htmlBlockNames = [
   "address",
   "article",
@@ -5785,7 +5904,7 @@ var htmlBlockNames = [
 ];
 var htmlRawNames = ["pre", "script", "style", "textarea"];
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/html-flow.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/html-flow.js
 var htmlFlow = {
   concrete: true,
   name: "htmlFlow",
@@ -5795,10 +5914,6 @@ var htmlFlow = {
 var blankLineBefore = {
   partial: true,
   tokenize: tokenizeBlankLineBefore
-};
-var nonLazyContinuationStart = {
-  partial: true,
-  tokenize: tokenizeNonLazyContinuationStart
 };
 function resolveToHtmlFlow(events) {
   let index2 = events.length;
@@ -6061,7 +6176,7 @@ function tokenizeHtmlFlow(effects, ok3, nok) {
     return continuation;
   }
   function continuationStart(code3) {
-    return effects.check(nonLazyContinuationStart, continuationStartNonLazy, continuationAfter)(code3);
+    return effects.check(nonLazyContinuation, continuationStartNonLazy, continuationAfter)(code3);
   }
   function continuationStartNonLazy(code3) {
     effects.enter("lineEnding");
@@ -6138,22 +6253,6 @@ function tokenizeHtmlFlow(effects, ok3, nok) {
     return ok3(code3);
   }
 }
-function tokenizeNonLazyContinuationStart(effects, ok3, nok) {
-  const self = this;
-  return start;
-  function start(code3) {
-    if (markdownLineEnding(code3)) {
-      effects.enter("lineEnding");
-      effects.consume(code3);
-      effects.exit("lineEnding");
-      return after;
-    }
-    return nok(code3);
-  }
-  function after(code3) {
-    return self.parser.lazy[self.now().line] ? nok(code3) : ok3(code3);
-  }
-}
 function tokenizeBlankLineBefore(effects, ok3, nok) {
   return start;
   function start(code3) {
@@ -6164,7 +6263,7 @@ function tokenizeBlankLineBefore(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/html-text.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/html-text.js
 var htmlText = {
   name: "htmlText",
   tokenize: tokenizeHtmlText
@@ -6470,7 +6569,7 @@ function tokenizeHtmlText(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-end.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-end.js
 var labelEnd = {
   name: "labelEnd",
   resolveAll: resolveAllLabelEnd,
@@ -6506,12 +6605,11 @@ function resolveAllLabelEnd(events) {
 function resolveToLabelEnd(events, context) {
   let index2 = events.length;
   let offset = 0;
-  let token;
   let open;
   let close;
   let media;
   while (index2--) {
-    token = events[index2][1];
+    const token = events[index2][1];
     if (open) {
       if (token.type === "link" || token.type === "labelLink" && token._inactive) {
         break;
@@ -6570,14 +6668,14 @@ function resolveToLabelEnd(events, context) {
 }
 function tokenizeLabelEnd(effects, ok3, nok) {
   const self = this;
-  let index2 = self.events.length;
+  const labelStarts = self._labelStarts;
   let labelStart;
   let defined;
-  while (index2--) {
-    if ((self.events[index2][1].type === "labelImage" || self.events[index2][1].type === "labelLink") && !self.events[index2][1]._balanced) {
-      labelStart = self.events[index2][1];
-      break;
+  if (labelStarts) {
+    while (labelStarts.length > 0 && labelStarts[labelStarts.length - 1]._balanced) {
+      labelStarts.pop();
     }
+    labelStart = labelStarts[labelStarts.length - 1];
   }
   return start;
   function start(code3) {
@@ -6611,6 +6709,7 @@ function tokenizeLabelEnd(effects, ok3, nok) {
     return effects.attempt(referenceCollapsedConstruct, labelEndOk, labelEndNok)(code3);
   }
   function labelEndOk(code3) {
+    labelStarts.pop();
     return ok3(code3);
   }
   function labelEndNok(code3) {
@@ -6696,7 +6795,7 @@ function tokenizeReferenceCollapsed(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-start-image.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-start-image.js
 var labelStartImage = {
   name: "labelStartImage",
   resolveAll: labelEnd.resolveAll,
@@ -6704,6 +6803,7 @@ var labelStartImage = {
 };
 function tokenizeLabelStartImage(effects, ok3, nok) {
   const self = this;
+  let labelImage;
   return start;
   function start(code3) {
     effects.enter("labelImage");
@@ -6717,17 +6817,22 @@ function tokenizeLabelStartImage(effects, ok3, nok) {
       effects.enter("labelMarker");
       effects.consume(code3);
       effects.exit("labelMarker");
-      effects.exit("labelImage");
+      labelImage = effects.exit("labelImage");
       return after;
     }
     return nok(code3);
   }
   function after(code3) {
-    return code3 === 94 && "_hiddenFootnoteSupport" in self.parser.constructs ? nok(code3) : ok3(code3);
+    if (code3 === 94 && "_hiddenFootnoteSupport" in self.parser.constructs) {
+      return nok(code3);
+    }
+    self._labelStarts = self._labelStarts || [];
+    self._labelStarts.push(labelImage);
+    return ok3(code3);
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/label-start-link.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/label-start-link.js
 var labelStartLink = {
   name: "labelStartLink",
   resolveAll: labelEnd.resolveAll,
@@ -6735,21 +6840,27 @@ var labelStartLink = {
 };
 function tokenizeLabelStartLink(effects, ok3, nok) {
   const self = this;
+  let labelLink;
   return start;
   function start(code3) {
     effects.enter("labelLink");
     effects.enter("labelMarker");
     effects.consume(code3);
     effects.exit("labelMarker");
-    effects.exit("labelLink");
+    labelLink = effects.exit("labelLink");
     return after;
   }
   function after(code3) {
-    return code3 === 94 && "_hiddenFootnoteSupport" in self.parser.constructs ? nok(code3) : ok3(code3);
+    if (code3 === 94 && "_hiddenFootnoteSupport" in self.parser.constructs) {
+      return nok(code3);
+    }
+    self._labelStarts = self._labelStarts || [];
+    self._labelStarts.push(labelLink);
+    return ok3(code3);
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/line-ending.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/line-ending.js
 var lineEnding = {
   name: "lineEnding",
   tokenize: tokenizeLineEnding
@@ -6764,7 +6875,7 @@ function tokenizeLineEnding(effects, ok3) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/thematic-break.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/thematic-break.js
 var thematicBreak = {
   name: "thematicBreak",
   tokenize: tokenizeThematicBreak
@@ -6803,7 +6914,7 @@ function tokenizeThematicBreak(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/list.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/list.js
 var list = {
   continuation: {
     tokenize: tokenizeListContinuation
@@ -6933,13 +7044,14 @@ function tokenizeListItemPrefixWhitespace(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-core-commonmark/lib/setext-underline.js
+// node_modules/.pnpm/micromark-core-commonmark@2.0.4/node_modules/micromark-core-commonmark/lib/setext-underline.js
 var setextUnderline = {
   name: "setextUnderline",
   resolveTo: resolveToSetextUnderline,
   tokenize: tokenizeSetextUnderline
 };
 function resolveToSetextUnderline(events, context) {
+  const editMap = new EditMap();
   let index2 = events.length;
   let content3;
   let text5;
@@ -6955,7 +7067,7 @@ function resolveToSetextUnderline(events, context) {
       }
     } else {
       if (events[index2][1].type === "content") {
-        events.splice(index2, 1);
+        editMap.add(index2, 1, []);
       }
       if (!definition3 && events[index2][1].type === "definition") {
         definition3 = index2;
@@ -6973,15 +7085,16 @@ function resolveToSetextUnderline(events, context) {
   };
   events[text5][1].type = "setextHeadingText";
   if (definition3) {
-    events.splice(text5, 0, ["enter", heading2, context]);
-    events.splice(definition3 + 1, 0, ["exit", events[content3][1], context]);
+    editMap.add(text5, 0, [["enter", heading2, context]]);
+    editMap.add(definition3 + 1, 0, [["exit", events[content3][1], context]]);
     events[content3][1].end = {
       ...events[definition3][1].end
     };
   } else {
     events[content3][1] = heading2;
   }
-  events.push(["exit", heading2, context]);
+  editMap.add(events.length, 0, [["exit", heading2, context]]);
+  editMap.consume(events);
   return events;
 }
 function tokenizeSetextUnderline(effects, ok3, nok) {
@@ -7025,7 +7138,7 @@ function tokenizeSetextUnderline(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/flow.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/initialize/flow.js
 var flow = {
   tokenize: initializeFlow
 };
@@ -7063,7 +7176,7 @@ function initializeFlow(effects) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/initialize/text.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/initialize/text.js
 var resolver = {
   resolveAll: createResolver()
 };
@@ -7141,6 +7254,7 @@ function createResolver(extraResolver) {
   }
 }
 function resolveAllLineSuffixes(events, context) {
+  const editMap = new EditMap();
   let eventIndex = 0;
   while (++eventIndex <= events.length) {
     if ((eventIndex === events.length || events[eventIndex][1].type === "lineEnding") && events[eventIndex - 1][1].type === "data") {
@@ -7158,7 +7272,9 @@ function resolveAllLineSuffixes(events, context) {
             size++;
             bufferIndex--;
           }
-          if (bufferIndex) break;
+          if (bufferIndex) {
+            break;
+          }
           bufferIndex = -1;
         } else if (chunk === -2) {
           tabs = true;
@@ -7192,17 +7308,17 @@ function resolveAllLineSuffixes(events, context) {
         if (data.start.offset === data.end.offset) {
           Object.assign(data, token);
         } else {
-          events.splice(eventIndex, 0, ["enter", token, context], ["exit", token, context]);
-          eventIndex += 2;
+          editMap.add(eventIndex, 0, [["enter", token, context], ["exit", token, context]]);
         }
       }
       eventIndex++;
     }
   }
+  editMap.consume(events);
   return events;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/constructs.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/constructs.js
 var constructs_exports = {};
 __export(constructs_exports, {
   attentionMarkers: () => attentionMarkers,
@@ -7277,7 +7393,7 @@ var disable = {
   null: []
 };
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/create-tokenizer.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/create-tokenizer.js
 function createTokenizer(parser, initialize, from) {
   let point3 = {
     _bufferIndex: -1,
@@ -7356,11 +7472,10 @@ function createTokenizer(parser, initialize, from) {
     accountForPotentialSkip();
   }
   function main() {
-    let chunkIndex;
     while (point3._index < chunks.length) {
       const chunk = chunks[point3._index];
       if (typeof chunk === "string") {
-        chunkIndex = point3._index;
+        const chunkIndex = point3._index;
         if (point3._bufferIndex < 0) {
           point3._bufferIndex = 0;
         }
@@ -7568,30 +7683,34 @@ function serializeChunks(chunks, expandTabs) {
     let value;
     if (typeof chunk === "string") {
       value = chunk;
-    } else switch (chunk) {
-      case -5: {
-        value = "\r";
-        break;
-      }
-      case -4: {
-        value = "\n";
-        break;
-      }
-      case -3: {
-        value = "\r\n";
-        break;
-      }
-      case -2: {
-        value = expandTabs ? " " : "	";
-        break;
-      }
-      case -1: {
-        if (!expandTabs && atTab) continue;
-        value = " ";
-        break;
-      }
-      default: {
-        value = String.fromCharCode(chunk);
+    } else {
+      switch (chunk) {
+        case -5: {
+          value = "\r";
+          break;
+        }
+        case -4: {
+          value = "\n";
+          break;
+        }
+        case -3: {
+          value = "\r\n";
+          break;
+        }
+        case -2: {
+          value = expandTabs ? " " : "	";
+          break;
+        }
+        case -1: {
+          if (!expandTabs && atTab) {
+            continue;
+          }
+          value = " ";
+          break;
+        }
+        default: {
+          value = String.fromCharCode(chunk);
+        }
       }
     }
     atTab = chunk === -2;
@@ -7600,7 +7719,7 @@ function serializeChunks(chunks, expandTabs) {
   return result.join("");
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/parse.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/parse.js
 function parse(options) {
   const settings = options || {};
   const constructs2 = (
@@ -7626,14 +7745,14 @@ function parse(options) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/postprocess.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/postprocess.js
 function postprocess(events) {
   while (!subtokenize(events)) {
   }
   return events;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark/lib/preprocess.js
+// node_modules/.pnpm/micromark@4.0.3/node_modules/micromark/lib/preprocess.js
 var search = /[\0\t\n\r]/g;
 function preprocess() {
   let column = 1;
@@ -7642,14 +7761,9 @@ function preprocess() {
   let atCarriageReturn;
   return preprocessor;
   function preprocessor(value, encoding, end) {
-    const chunks = [];
-    let match;
-    let next;
-    let startPosition;
-    let endPosition;
-    let code3;
     value = buffer + (typeof value === "string" ? value.toString() : new TextDecoder(encoding || void 0).decode(value));
-    startPosition = 0;
+    const chunks = [];
+    let startPosition = 0;
     buffer = "";
     if (start) {
       if (value.charCodeAt(0) === 65279) {
@@ -7659,9 +7773,9 @@ function preprocess() {
     }
     while (startPosition < value.length) {
       search.lastIndex = startPosition;
-      match = search.exec(value);
-      endPosition = match && match.index !== void 0 ? match.index : value.length;
-      code3 = value.charCodeAt(endPosition);
+      const match = search.exec(value);
+      const endPosition = match && match.index !== void 0 ? match.index : value.length;
+      const code3 = value.charCodeAt(endPosition);
       if (!match) {
         buffer = value.slice(startPosition);
         break;
@@ -7685,9 +7799,11 @@ function preprocess() {
             break;
           }
           case 9: {
-            next = Math.ceil(column / 4) * 4;
+            const next = Math.ceil(column / 4) * 4;
             chunks.push(-2);
-            while (column++ < next) chunks.push(-1);
+            while (column++ < next) {
+              chunks.push(-1);
+            }
             break;
           }
           case 10: {
@@ -7704,15 +7820,19 @@ function preprocess() {
       startPosition = endPosition + 1;
     }
     if (end) {
-      if (atCarriageReturn) chunks.push(-5);
-      if (buffer) chunks.push(buffer);
+      if (atCarriageReturn) {
+        chunks.push(-5);
+      }
+      if (buffer) {
+        chunks.push(buffer);
+      }
       chunks.push(null);
     }
     return chunks;
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-util-decode-string/index.js
+// node_modules/.pnpm/micromark-util-decode-string@2.0.1/node_modules/micromark-util-decode-string/index.js
 var characterEscapeOrReference = /\\([!-/:-@[-`{-~])|&(#(?:\d{1,7}|x[\da-f]{1,6})|[\da-z]{1,31});/gi;
 function decodeString(value) {
   return value.replace(characterEscapeOrReference, decode);
@@ -7730,7 +7850,7 @@ function decode($0, $1, $2) {
   return decodeNamedCharacterReference($2) || $0;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-from-markdown/lib/index.js
+// node_modules/.pnpm/mdast-util-from-markdown@2.1.0/node_modules/mdast-util-from-markdown/lib/index.js
 var own3 = {}.hasOwnProperty;
 function fromMarkdown(value, encoding, options) {
   if (encoding && typeof encoding === "object") {
@@ -7741,6 +7861,8 @@ function fromMarkdown(value, encoding, options) {
 }
 function compiler(options) {
   const config = {
+    afterExit: [],
+    beforeEnter: [],
     transforms: [],
     canContainEols: ["emphasis", "fragment", "heading", "paragraph", "strong"],
     enter: {
@@ -7844,7 +7966,8 @@ function compiler(options) {
   function compile(events) {
     let tree = {
       type: "root",
-      children: []
+      children: [],
+      position: void 0
     };
     const context = {
       stack: [tree],
@@ -7857,24 +7980,40 @@ function compiler(options) {
       data
     };
     const listStack = [];
+    const prepared = [];
     let index2 = -1;
     while (++index2 < events.length) {
+      prepared.push(events[index2]);
       if (events[index2][1].type === "listOrdered" || events[index2][1].type === "listUnordered") {
         if (events[index2][0] === "enter") {
-          listStack.push(index2);
+          listStack.push(prepared.length - 1);
         } else {
           const tail = listStack.pop();
-          index2 = prepareList(events, tail, index2);
+          prepareList(prepared, tail);
         }
       }
     }
+    events = prepared;
     index2 = -1;
     while (++index2 < events.length) {
       const handler = config[events[index2][0]];
-      if (own3.call(handler, events[index2][1].type)) {
-        handler[events[index2][1].type].call(Object.assign({
+      if (events[index2][0] === "enter" && config.beforeEnter.length > 0) {
+        callListeners(config.beforeEnter, {
+          ...context,
           sliceSerialize: events[index2][2].sliceSerialize
-        }, context), events[index2][1]);
+        }, events[index2][1]);
+      }
+      if (own3.call(handler, events[index2][1].type)) {
+        handler[events[index2][1].type].call({
+          ...context,
+          sliceSerialize: events[index2][2].sliceSerialize
+        }, events[index2][1]);
+      }
+      if (events[index2][0] === "exit" && config.afterExit.length > 0) {
+        callListeners(config.afterExit, {
+          ...context,
+          sliceSerialize: events[index2][2].sliceSerialize
+        }, events[index2][1]);
       }
     }
     if (context.tokenStack.length > 0) {
@@ -7900,7 +8039,14 @@ function compiler(options) {
     }
     return tree;
   }
-  function prepareList(events, start, length) {
+  function callListeners(listeners, context, token) {
+    let index2 = -1;
+    while (++index2 < listeners.length) {
+      listeners[index2].call(context, token);
+    }
+  }
+  function prepareList(events, start) {
+    const end = events.length - 1;
     let index2 = start - 1;
     let containerBalance = -1;
     let listSpread = false;
@@ -7908,7 +8054,8 @@ function compiler(options) {
     let lineIndex;
     let firstBlankLineIndex;
     let atMarker;
-    while (++index2 <= length) {
+    const insertions = [];
+    while (++index2 <= end) {
       const event = events[index2];
       switch (event[1].type) {
         case "listUnordered":
@@ -7965,9 +8112,10 @@ function compiler(options) {
             listItem3._spread = true;
           }
           listItem3.end = Object.assign({}, lineIndex ? events[lineIndex][1].start : event[1].end);
-          events.splice(lineIndex || index2, 0, ["exit", listItem3, event[2]]);
-          index2++;
-          length++;
+          insertions.push({
+            at: lineIndex || index2,
+            event: ["exit", listItem3, event[2]]
+          });
         }
         if (event[1].type === "listItemPrefix") {
           const item = {
@@ -7978,16 +8126,25 @@ function compiler(options) {
             end: void 0
           };
           listItem3 = item;
-          events.splice(index2, 0, ["enter", item, event[2]]);
-          index2++;
-          length++;
+          insertions.push({
+            at: index2,
+            event: ["enter", item, event[2]]
+          });
           firstBlankLineIndex = void 0;
           atMarker = true;
         }
       }
     }
+    const listEvents = events.splice(start);
+    let insertion = 0;
+    index2 = -1;
+    while (++index2 < listEvents.length) {
+      while (insertion < insertions.length && insertions[insertion].at === start + index2) {
+        events.push(insertions[insertion++].event);
+      }
+      events.push(listEvents[index2]);
+    }
     events[start][1]._spread = listSpread;
-    return length;
   }
   function opener(create, and) {
     return open;
@@ -8029,7 +8186,8 @@ function compiler(options) {
         start: token.start,
         end: token.end
       }) + "): it\u2019s not open");
-    } else if (open[0].type !== token.type) {
+    }
+    if (open[0].type !== token.type) {
       if (onExitError) {
         onExitError.call(this, token, open[0]);
       } else {
@@ -8265,7 +8423,8 @@ function compiler(options) {
   function blockQuote2() {
     return {
       type: "blockquote",
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function codeFlow() {
@@ -8273,13 +8432,15 @@ function compiler(options) {
       type: "code",
       lang: null,
       meta: null,
-      value: ""
+      value: "",
+      position: void 0
     };
   }
   function codeText2() {
     return {
       type: "inlineCode",
-      value: ""
+      value: "",
+      position: void 0
     };
   }
   function definition3() {
@@ -8288,13 +8449,15 @@ function compiler(options) {
       identifier: "",
       label: null,
       title: null,
-      url: ""
+      url: "",
+      position: void 0
     };
   }
   function emphasis2() {
     return {
       type: "emphasis",
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function heading2() {
@@ -8302,18 +8465,21 @@ function compiler(options) {
       type: "heading",
       // @ts-expect-error `depth` will be set later.
       depth: 0,
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function hardBreak2() {
     return {
-      type: "break"
+      type: "break",
+      position: void 0
     };
   }
   function html2() {
     return {
       type: "html",
-      value: ""
+      value: "",
+      position: void 0
     };
   }
   function image2() {
@@ -8321,7 +8487,8 @@ function compiler(options) {
       type: "image",
       title: null,
       url: "",
-      alt: null
+      alt: null,
+      position: void 0
     };
   }
   function link2() {
@@ -8329,7 +8496,8 @@ function compiler(options) {
       type: "link",
       title: null,
       url: "",
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function list3(token) {
@@ -8338,7 +8506,8 @@ function compiler(options) {
       ordered: token.type === "listOrdered",
       start: null,
       spread: token._spread,
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function listItem2(token) {
@@ -8346,30 +8515,35 @@ function compiler(options) {
       type: "listItem",
       spread: token._spread,
       checked: null,
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function paragraph2() {
     return {
       type: "paragraph",
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function strong2() {
     return {
       type: "strong",
-      children: []
+      children: [],
+      position: void 0
     };
   }
   function text5() {
     return {
       type: "text",
-      value: ""
+      value: "",
+      position: void 0
     };
   }
   function thematicBreak3() {
     return {
-      type: "thematicBreak"
+      type: "thematicBreak",
+      position: void 0
     };
   }
 }
@@ -8410,6 +8584,14 @@ function extension(combined, extension2) {
           }
           break;
         }
+        case "afterExit":
+        case "beforeEnter": {
+          const right = extension2[key];
+          if (right) {
+            combined[key].push(right);
+          }
+          break;
+        }
         case "enter":
         case "exit": {
           const right = extension2[key];
@@ -8431,15 +8613,14 @@ function defaultOnError(left, right) {
       start: right.start,
       end: right.end
     }) + ") is open");
-  } else {
-    throw new Error("Cannot close document, a token (`" + right.type + "`, " + stringifyPosition({
-      start: right.start,
-      end: right.end
-    }) + ") is still open");
   }
+  throw new Error("Cannot close document, a token (`" + right.type + "`, " + stringifyPosition({
+    start: right.start,
+    end: right.end
+  }) + ") is still open");
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-parse/lib/index.js
+// node_modules/.pnpm/remark-parse@11.0.0/node_modules/remark-parse/lib/index.js
 function remarkParse(options) {
   const self = this;
   self.parser = parser;
@@ -8456,7 +8637,7 @@ function remarkParse(options) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/ccount/index.js
+// node_modules/.pnpm/ccount@2.0.1/node_modules/ccount/index.js
 function ccount(value, character) {
   const source = String(value);
   if (typeof character !== "string") {
@@ -8471,7 +8652,7 @@ function ccount(value, character) {
   return count;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/escape-string-regexp/index.js
+// node_modules/.pnpm/escape-string-regexp@5.0.0/node_modules/escape-string-regexp/index.js
 function escapeStringRegexp(string3) {
   if (typeof string3 !== "string") {
     throw new TypeError("Expected a string");
@@ -8479,7 +8660,7 @@ function escapeStringRegexp(string3) {
   return string3.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-is/lib/index.js
+// node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js
 var convert = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
@@ -8495,7 +8676,7 @@ var convert = (
    * @param {Test} [test]
    * @returns {Check}
    */
-  (function(test) {
+  function(test) {
     if (test === null || test === void 0) {
       return ok2;
     }
@@ -8516,7 +8697,7 @@ var convert = (
       return typeFactory(test);
     }
     throw new Error("Expected function, string, or object as test");
-  })
+  }
 );
 function anyFactory(tests) {
   const checks = [];
@@ -8578,12 +8759,12 @@ function looksLikeANode(value) {
   return value !== null && typeof value === "object" && "type" in value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit-parents/lib/color.node.js
+// node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.node.js
 function color(d) {
   return "\x1B[33m" + d + "\x1B[39m";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit-parents/lib/index.js
+// node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js
 var empty = [];
 var CONTINUE = true;
 var EXIT = false;
@@ -8660,7 +8841,7 @@ function toResult(value) {
   return value === null || value === void 0 ? empty : [value];
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-find-and-replace/lib/index.js
+// node_modules/.pnpm/mdast-util-find-and-replace@3.0.3/node_modules/mdast-util-find-and-replace/lib/index.js
 function findAndReplace(tree, list3, options) {
   const settings = options || {};
   const ignored = convert(settings.ignore || []);
@@ -8714,15 +8895,12 @@ function findAndReplace(tree, list3, options) {
         find.lastIndex = position2 + 1;
       } else {
         if (start !== position2) {
-          nodes.push({
-            type: "text",
-            value: node2.value.slice(start, position2)
-          });
+          add({ type: "text", value: node2.value.slice(start, position2) });
         }
         if (Array.isArray(value)) {
-          nodes.push(...value);
+          for (const child of value) add(child);
         } else if (value) {
-          nodes.push(value);
+          add(value);
         }
         start = position2 + match[0].length;
         change = true;
@@ -8734,20 +8912,28 @@ function findAndReplace(tree, list3, options) {
     }
     if (change) {
       if (start < node2.value.length) {
-        nodes.push({ type: "text", value: node2.value.slice(start) });
+        add({ type: "text", value: node2.value.slice(start) });
       }
       parent.children.splice(index2, 1, ...nodes);
     } else {
       nodes = [node2];
     }
     return index2 + nodes.length;
+    function add(child) {
+      const previous4 = nodes[nodes.length - 1];
+      if (previous4 && previous4.type === "text" && child.type === "text") {
+        previous4.value += child.value;
+      } else {
+        nodes.push(child);
+      }
+    }
   }
 }
 function toPairs(tupleOrList) {
-  const result = [];
   if (!Array.isArray(tupleOrList)) {
     throw new TypeError("Expected find and replace tuple or list of tuples");
   }
+  const result = [];
   const list3 = !tupleOrList[0] || Array.isArray(tupleOrList[0]) ? tupleOrList : [tupleOrList];
   let index2 = -1;
   while (++index2 < list3.length) {
@@ -8765,7 +8951,7 @@ function toFunction(replace2) {
   };
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-autolink-literal/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm-autolink-literal@2.0.1/node_modules/mdast-util-gfm-autolink-literal/lib/index.js
 var inConstruct = "phrasing";
 var notInConstruct = ["autolink", "link", "image", "label"];
 function gfmAutolinkLiteralFromMarkdown() {
@@ -8915,7 +9101,7 @@ function previous2(match, email) {
   (!email || code3 !== 47);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-footnote/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm-footnote@2.1.0/node_modules/mdast-util-gfm-footnote/lib/index.js
 footnoteReference.peek = footnoteReferencePeek;
 function enterFootnoteCallString() {
   this.buffer();
@@ -9028,7 +9214,7 @@ function mapAll(line, index2, blank) {
   return (blank ? "" : "    ") + line;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-strikethrough/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm-strikethrough@2.0.1/node_modules/mdast-util-gfm-strikethrough/lib/index.js
 var constructsWithoutStrikethrough = [
   "autolink",
   "destinationLiteral",
@@ -9037,6 +9223,7 @@ var constructsWithoutStrikethrough = [
   "titleQuote",
   "titleApostrophe"
 ];
+handleDelete.attention = attentionDelete;
 handleDelete.peek = peekDelete;
 function gfmStrikethroughFromMarkdown() {
   return {
@@ -9047,40 +9234,44 @@ function gfmStrikethroughFromMarkdown() {
 }
 function gfmStrikethroughToMarkdown() {
   return {
+    handlers: { delete: handleDelete },
     unsafe: [
       {
         character: "~",
         inConstruct: "phrasing",
         notInConstruct: constructsWithoutStrikethrough
       }
-    ],
-    handlers: { delete: handleDelete }
+    ]
   };
 }
 function enterStrikethrough(token) {
-  this.enter({ type: "delete", children: [] }, token);
+  this.enter({ type: "delete", children: [], position: void 0 }, token);
 }
 function exitStrikethrough(token) {
   this.exit(token);
 }
 function handleDelete(node2, _, state, info) {
   const tracker = state.createTracker(info);
+  const sequence = state.stack.includes("strikethrough") ? "~" : "~~";
   const exit3 = state.enter("strikethrough");
-  let value = tracker.move("~~");
+  let value = tracker.move(sequence);
   value += state.containerPhrasing(node2, {
     ...tracker.current(),
     before: value,
     after: "~"
   });
-  value += tracker.move("~~");
+  value += tracker.move(sequence);
   exit3();
   return value;
+}
+function attentionDelete() {
+  return { construct: "strikethrough", markers: ["~"], sizes: [2, 1] };
 }
 function peekDelete() {
   return "~";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/markdown-table/index.js
+// node_modules/.pnpm/markdown-table@3.0.4/node_modules/markdown-table/index.js
 function defaultStringLength(value) {
   return value.length;
 }
@@ -9221,7 +9412,35 @@ function toAlignment(value) {
   return code3 === 67 || code3 === 99 ? 99 : code3 === 76 || code3 === 108 ? 108 : code3 === 82 || code3 === 114 ? 114 : 0;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
+// node_modules/.pnpm/mdast-util-phrasing@4.1.0/node_modules/mdast-util-phrasing/lib/index.js
+var phrasing = (
+  /** @type {(node?: unknown) => node is Exclude<PhrasingContent, Html>} */
+  convert([
+    "break",
+    "delete",
+    "emphasis",
+    // To do: next major: removed since footnotes were added to GFM.
+    "footnote",
+    "footnoteReference",
+    "image",
+    "imageReference",
+    "inlineCode",
+    // Enabled by `mdast-util-math`:
+    "inlineMath",
+    "link",
+    "linkReference",
+    // Enabled by `mdast-util-mdx`:
+    "mdxJsxTextElement",
+    // Enabled by `mdast-util-mdx`:
+    "mdxTextExpression",
+    "strong",
+    "text",
+    // Enabled by `mdast-util-directive`:
+    "textDirective"
+  ])
+);
+
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
 function blockquote(node2, _, state, info) {
   const exit3 = state.enter("blockquote");
   const tracker = state.createTracker(info);
@@ -9238,7 +9457,7 @@ function map(line, _, blank) {
   return ">" + (blank ? "" : " ") + line;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
 function patternInScope(stack, pattern) {
   return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
 }
@@ -9258,18 +9477,19 @@ function listInScope(stack, list3, none) {
   return false;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/break.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/break.js
 function hardBreak(_, _1, state, info) {
   let index2 = -1;
   while (++index2 < state.unsafe.length) {
-    if (state.unsafe[index2].character === "\n" && patternInScope(state.stack, state.unsafe[index2])) {
-      return /[ \t]/.test(info.before) ? "" : " ";
+    const pattern = state.unsafe[index2];
+    if (pattern.character === "\n" && !pattern.before && !pattern.after && patternInScope(state.stack, pattern)) {
+      return /[\t ]/.test(info.before) ? "" : " ";
     }
   }
   return "\\\n";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/longest-streak/index.js
+// node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js
 function longestStreak(value, substring) {
   const source = String(value);
   let index2 = source.indexOf(substring);
@@ -9293,17 +9513,17 @@ function longestStreak(value, substring) {
   return max;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-code-as-indented.js
 function formatCodeAsIndented(node2, state) {
   return Boolean(
     state.options.fences === false && node2.value && // If there’s no info…
     !node2.lang && // And there’s a non-whitespace character…
-    /[^ \r\n]/.test(node2.value) && // And the value doesn’t start or end in a blank…
-    !/^[\t ]*(?:[\r\n]|$)|(?:^|[\r\n])[\t ]*$/.test(node2.value)
+    /[^\n\r ]/.test(node2.value) && // And the value doesn’t start or end in a blank…
+    !/^[\t ]*(?:[\n\r]|$)|(?:^|[\n\r])[\t ]*$/.test(node2.value)
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-fence.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-fence.js
 function checkFence(state) {
   const marker = state.options.fence || "`";
   if (marker !== "`" && marker !== "~") {
@@ -9314,11 +9534,10 @@ function checkFence(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/code.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/code.js
 function code(node2, _, state, info) {
   const marker = checkFence(state);
   const raw = node2.value || "";
-  const suffix = marker === "`" ? "GraveAccent" : "Tilde";
   if (formatCodeAsIndented(node2, state)) {
     const exit4 = state.enter("codeIndented");
     const value2 = state.indentLines(raw, map2);
@@ -9328,6 +9547,7 @@ function code(node2, _, state, info) {
   const tracker = state.createTracker(info);
   const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3));
   const exit3 = state.enter("codeFenced");
+  const suffix = marker === "`" ? "GraveAccent" : "Tilde";
   let value = tracker.move(sequence);
   if (node2.lang) {
     const subexit = state.enter(`codeFencedLang${suffix}`);
@@ -9366,7 +9586,7 @@ function map2(line, _, blank) {
   return (blank ? "" : "    ") + line;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
 function checkQuote(state) {
   const marker = state.options.quote || '"';
   if (marker !== '"' && marker !== "'") {
@@ -9377,7 +9597,7 @@ function checkQuote(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/definition.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/definition.js
 function definition2(node2, _, state, info) {
   const quote = checkQuote(state);
   const suffix = quote === '"' ? "Quote" : "Apostrophe";
@@ -9433,7 +9653,7 @@ function definition2(node2, _, state, info) {
   return value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-emphasis.js
 function checkEmphasis(state) {
   const marker = state.options.emphasis || "*";
   if (marker !== "*" && marker !== "_") {
@@ -9444,94 +9664,33 @@ function checkEmphasis(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js
+emphasis.attention = attention2;
+emphasis.peek = peek;
+function emphasis(node2, _, state, info) {
+  const exit3 = state.enter("phrasing");
+  const value = state.containerPhrasing({ type: "root", children: [node2] }, info);
+  exit3();
+  return value;
+}
+function attention2(_, state) {
+  const marker = checkEmphasis(state);
+  return {
+    construct: "emphasis",
+    markers: marker === "*" ? ["*", "_"] : ["_", "*"],
+    sizes: [1]
+  };
+}
+function peek(_, _1, state) {
+  return state.options.emphasis || "*";
+}
+
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/encode-character-reference.js
 function encodeCharacterReference(code3) {
   return "&#x" + code3.toString(16).toUpperCase() + ";";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/encode-info.js
-function encodeInfo(outside, inside, marker) {
-  const outsideKind = classifyCharacter(outside);
-  const insideKind = classifyCharacter(inside);
-  if (outsideKind === void 0) {
-    return insideKind === void 0 ? (
-      // Letter inside:
-      // we have to encode *both* letters for `_` as it is looser.
-      // it already forms for `*` (and GFMs `~`).
-      marker === "_" ? { inside: true, outside: true } : { inside: false, outside: false }
-    ) : insideKind === 1 ? (
-      // Whitespace inside: encode both (letter, whitespace).
-      { inside: true, outside: true }
-    ) : (
-      // Punctuation inside: encode outer (letter)
-      { inside: false, outside: true }
-    );
-  }
-  if (outsideKind === 1) {
-    return insideKind === void 0 ? (
-      // Letter inside: already forms.
-      { inside: false, outside: false }
-    ) : insideKind === 1 ? (
-      // Whitespace inside: encode both (whitespace).
-      { inside: true, outside: true }
-    ) : (
-      // Punctuation inside: already forms.
-      { inside: false, outside: false }
-    );
-  }
-  return insideKind === void 0 ? (
-    // Letter inside: already forms.
-    { inside: false, outside: false }
-  ) : insideKind === 1 ? (
-    // Whitespace inside: encode inner (whitespace).
-    { inside: true, outside: false }
-  ) : (
-    // Punctuation inside: already forms.
-    { inside: false, outside: false }
-  );
-}
-
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/emphasis.js
-emphasis.peek = emphasisPeek;
-function emphasis(node2, _, state, info) {
-  const marker = checkEmphasis(state);
-  const exit3 = state.enter("emphasis");
-  const tracker = state.createTracker(info);
-  const before = tracker.move(marker);
-  let between = tracker.move(
-    state.containerPhrasing(node2, {
-      after: marker,
-      before,
-      ...tracker.current()
-    })
-  );
-  const betweenHead = between.charCodeAt(0);
-  const open = encodeInfo(
-    info.before.charCodeAt(info.before.length - 1),
-    betweenHead,
-    marker
-  );
-  if (open.inside) {
-    between = encodeCharacterReference(betweenHead) + between.slice(1);
-  }
-  const betweenTail = between.charCodeAt(between.length - 1);
-  const close = encodeInfo(info.after.charCodeAt(0), betweenTail, marker);
-  if (close.inside) {
-    between = between.slice(0, -1) + encodeCharacterReference(betweenTail);
-  }
-  const after = tracker.move(marker);
-  exit3();
-  state.attentionEncodeSurroundingInfo = {
-    after: close.outside,
-    before: open.outside
-  };
-  return before + between + after;
-}
-function emphasisPeek(_, _1, state) {
-  return state.options.emphasis || "*";
-}
-
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/unist-util-visit/lib/index.js
+// node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js
 function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   let reverse;
   let test;
@@ -9553,7 +9712,7 @@ function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-heading-as-setext.js
 function formatHeadingAsSetext(node2, state) {
   let literalWithBreak = false;
   visit(node2, function(node3) {
@@ -9567,7 +9726,7 @@ function formatHeadingAsSetext(node2, state) {
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/heading.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/heading.js
 function heading(node2, _, state, info) {
   const rank = Math.max(Math.min(6, node2.depth || 1), 1);
   const tracker = state.createTracker(info);
@@ -9597,8 +9756,9 @@ function heading(node2, _, state, info) {
     after: "\n",
     ...tracker.current()
   });
-  if (/^[\t ]/.test(value)) {
-    value = encodeCharacterReference(value.charCodeAt(0)) + value.slice(1);
+  const head = value.charCodeAt(0);
+  if (head === 9 || head === 32) {
+    value = encodeCharacterReference(head) + value.slice(1);
   }
   value = value ? sequence + " " + value : sequence;
   if (state.options.closeAtx) {
@@ -9609,7 +9769,7 @@ function heading(node2, _, state, info) {
   return value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/html.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/html.js
 html.peek = htmlPeek;
 function html(node2) {
   return node2.value || "";
@@ -9618,7 +9778,7 @@ function htmlPeek() {
   return "<";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/image.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/image.js
 image.peek = imagePeek;
 function image(node2, _, state, info) {
   const quote = checkQuote(state);
@@ -9675,7 +9835,7 @@ function imagePeek() {
   return "!";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/image-reference.js
 imageReference.peek = imageReferencePeek;
 function imageReference(node2, _, state, info) {
   const type = node2.referenceType;
@@ -9691,7 +9851,9 @@ function imageReference(node2, _, state, info) {
   value += tracker.move(alt + "][");
   subexit();
   const stack = state.stack;
-  state.stack = [];
+  state.stack = stack.filter(function(d) {
+    return d !== "phrasing";
+  });
   subexit = state.enter("reference");
   const reference = state.safe(state.associationId(node2), {
     before: value,
@@ -9714,7 +9876,7 @@ function imageReferencePeek() {
   return "!";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/inline-code.js
 inlineCode.peek = inlineCodePeek;
 function inlineCode(node2, _, state) {
   let value = node2.value || "";
@@ -9723,14 +9885,14 @@ function inlineCode(node2, _, state) {
   while (new RegExp("(^|[^`])" + sequence + "([^`]|$)").test(value)) {
     sequence += "`";
   }
-  if (/[^ \r\n]/.test(value) && (/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value) || /^`|`$/.test(value))) {
+  if (/[^\n\r ]/.test(value) && (/^[\n\r ]/.test(value) && /[\n\r ]$/.test(value) || /^`|`$/.test(value))) {
     value = " " + value + " ";
   }
   while (++index2 < state.unsafe.length) {
     const pattern = state.unsafe[index2];
     const expression = state.compilePattern(pattern);
-    let match;
     if (!pattern.atBreak) continue;
+    let match;
     while (match = expression.exec(value)) {
       let position2 = match.index;
       if (value.charCodeAt(position2) === 10 && value.charCodeAt(position2 - 1) === 13) {
@@ -9745,33 +9907,33 @@ function inlineCodePeek() {
   return "`";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/format-link-as-autolink.js
 function formatLinkAsAutolink(node2, state) {
   const raw = toString(node2);
   return Boolean(
     !state.options.resourceLink && // If there’s a url…
-    node2.url && // And there’s a no title…
+    node2.url && // And there’s no title…
     !node2.title && // And the content of `node` is a single text node…
     node2.children && node2.children.length === 1 && node2.children[0].type === "text" && // And if the url is the same as the content…
     (raw === node2.url || "mailto:" + raw === node2.url) && // And that starts w/ a protocol…
-    /^[a-z][a-z+.-]+:/i.test(node2.url) && // And that doesn’t contain ASCII control codes (character escapes and
+    /^[a-z][+\-.a-z]+:/i.test(node2.url) && // And that doesn’t contain ASCII control codes (character escapes and
     // references don’t work), space, or angle brackets…
     !/[\0- <>\u007F]/.test(node2.url)
   );
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/link.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/link.js
 link.peek = linkPeek;
 function link(node2, _, state, info) {
   const quote = checkQuote(state);
   const suffix = quote === '"' ? "Quote" : "Apostrophe";
   const tracker = state.createTracker(info);
-  let exit3;
-  let subexit;
   if (formatLinkAsAutolink(node2, state)) {
     const stack = state.stack;
-    state.stack = [];
-    exit3 = state.enter("autolink");
+    state.stack = stack.filter(function(d) {
+      return d !== "phrasing";
+    });
+    const exit4 = state.enter("autolink");
     let value2 = tracker.move("<");
     value2 += tracker.move(
       state.containerPhrasing(node2, {
@@ -9781,12 +9943,12 @@ function link(node2, _, state, info) {
       })
     );
     value2 += tracker.move(">");
-    exit3();
+    exit4();
     state.stack = stack;
     return value2;
   }
-  exit3 = state.enter("link");
-  subexit = state.enter("label");
+  const exit3 = state.enter("link");
+  let subexit = state.enter("label");
   let value = tracker.move("[");
   value += tracker.move(
     state.containerPhrasing(node2, {
@@ -9840,7 +10002,7 @@ function linkPeek(node2, _, state) {
   return formatLinkAsAutolink(node2, state) ? "<" : "[";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/link-reference.js
 linkReference.peek = linkReferencePeek;
 function linkReference(node2, _, state, info) {
   const type = node2.referenceType;
@@ -9856,7 +10018,9 @@ function linkReference(node2, _, state, info) {
   value += tracker.move(text5 + "][");
   subexit();
   const stack = state.stack;
-  state.stack = [];
+  state.stack = stack.filter(function(d) {
+    return d !== "phrasing";
+  });
   subexit = state.enter("reference");
   const reference = state.safe(state.associationId(node2), {
     before: value,
@@ -9879,7 +10043,7 @@ function linkReferencePeek() {
   return "[";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet.js
 function checkBullet(state) {
   const marker = state.options.bullet || "*";
   if (marker !== "*" && marker !== "+" && marker !== "-") {
@@ -9890,7 +10054,7 @@ function checkBullet(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet-other.js
 function checkBulletOther(state) {
   const bullet = checkBullet(state);
   const bulletOther = state.options.bulletOther;
@@ -9910,7 +10074,7 @@ function checkBulletOther(state) {
   return bulletOther;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-bullet-ordered.js
 function checkBulletOrdered(state) {
   const marker = state.options.bulletOrdered || ".";
   if (marker !== "." && marker !== ")") {
@@ -9921,7 +10085,7 @@ function checkBulletOrdered(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-rule.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-rule.js
 function checkRule(state) {
   const marker = state.options.rule || "*";
   if (marker !== "*" && marker !== "-" && marker !== "_") {
@@ -9932,7 +10096,7 @@ function checkRule(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/list.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/list.js
 function list2(node2, parent, state, info) {
   const exit3 = state.enter("list");
   const bulletCurrent = state.bulletCurrent;
@@ -9972,7 +10136,7 @@ function list2(node2, parent, state, info) {
   return value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-list-item-indent.js
 function checkListItemIndent(state) {
   const style = state.options.listItemIndent || "one";
   if (style !== "tab" && style !== "one" && style !== "mixed") {
@@ -9983,7 +10147,7 @@ function checkListItemIndent(state) {
   return style;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/list-item.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/list-item.js
 function listItem(node2, parent, state, info) {
   const listItemIndent = checkListItemIndent(state);
   let bullet = state.bulletCurrent || checkBullet(state);
@@ -10012,7 +10176,7 @@ function listItem(node2, parent, state, info) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
 function paragraph(node2, _, state, info) {
   const exit3 = state.enter("paragraph");
   const subexit = state.enter("phrasing");
@@ -10022,44 +10186,19 @@ function paragraph(node2, _, state, info) {
   return value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-phrasing/lib/index.js
-var phrasing = (
-  /** @type {(node?: unknown) => node is Exclude<PhrasingContent, Html>} */
-  convert([
-    "break",
-    "delete",
-    "emphasis",
-    // To do: next major: removed since footnotes were added to GFM.
-    "footnote",
-    "footnoteReference",
-    "image",
-    "imageReference",
-    "inlineCode",
-    // Enabled by `mdast-util-math`:
-    "inlineMath",
-    "link",
-    "linkReference",
-    // Enabled by `mdast-util-mdx`:
-    "mdxJsxTextElement",
-    // Enabled by `mdast-util-mdx`:
-    "mdxTextExpression",
-    "strong",
-    "text",
-    // Enabled by `mdast-util-directive`:
-    "textDirective"
-  ])
-);
-
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/root.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/root.js
 function root(node2, _, state, info) {
   const hasPhrasing = node2.children.some(function(d) {
     return phrasing(d);
   });
-  const container = hasPhrasing ? state.containerPhrasing : state.containerFlow;
-  return container.call(state, node2, info);
+  if (!hasPhrasing) return state.containerFlow(node2, info);
+  const exit3 = state.enter("phrasing");
+  const value = state.containerPhrasing(node2, info);
+  exit3();
+  return value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-strong.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-strong.js
 function checkStrong(state) {
   const marker = state.options.strong || "*";
   if (marker !== "*" && marker !== "_") {
@@ -10070,52 +10209,39 @@ function checkStrong(state) {
   return marker;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/strong.js
-strong.peek = strongPeek;
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/strong.js
+strong.attention = attention3;
+strong.peek = peek2;
 function strong(node2, _, state, info) {
-  const marker = checkStrong(state);
-  const exit3 = state.enter("strong");
-  const tracker = state.createTracker(info);
-  const before = tracker.move(marker + marker);
-  let between = tracker.move(
-    state.containerPhrasing(node2, {
-      after: marker,
-      before,
-      ...tracker.current()
-    })
-  );
-  const betweenHead = between.charCodeAt(0);
-  const open = encodeInfo(
-    info.before.charCodeAt(info.before.length - 1),
-    betweenHead,
-    marker
-  );
-  if (open.inside) {
-    between = encodeCharacterReference(betweenHead) + between.slice(1);
-  }
-  const betweenTail = between.charCodeAt(between.length - 1);
-  const close = encodeInfo(info.after.charCodeAt(0), betweenTail, marker);
-  if (close.inside) {
-    between = between.slice(0, -1) + encodeCharacterReference(betweenTail);
-  }
-  const after = tracker.move(marker + marker);
+  const exit3 = state.enter("phrasing");
+  const value = state.containerPhrasing({ type: "root", children: [node2] }, info);
   exit3();
-  state.attentionEncodeSurroundingInfo = {
-    after: close.outside,
-    before: open.outside
-  };
-  return before + between + after;
+  return value;
 }
-function strongPeek(_, _1, state) {
+function attention3(_, state) {
+  const marker = checkStrong(state);
+  return {
+    construct: "strong",
+    markers: marker === "*" ? ["*", "_"] : ["_", "*"],
+    sizes: [2]
+  };
+}
+function peek2(_, _1, state) {
   return state.options.strong || "*";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/text.js
-function text3(node2, _, state, info) {
-  return state.safe(node2.value, info);
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/text.js
+function text3(node2, parent, state, info) {
+  const siblings = parent ? parent.children : [];
+  const index2 = siblings.indexOf(node2);
+  return state.safe(node2.value, {
+    ...info,
+    afterNode: siblings[index2 + 1],
+    beforeNode: siblings[index2 - 1]
+  });
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/util/check-rule-repetition.js
 function checkRuleRepetition(state) {
   const repetition = state.options.ruleRepetition || 3;
   if (repetition < 3) {
@@ -10126,13 +10252,13 @@ function checkRuleRepetition(state) {
   return repetition;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/thematic-break.js
 function thematicBreak2(_, _1, state) {
   const value = (checkRule(state) + (state.options.ruleSpaces ? " " : "")).repeat(checkRuleRepetition(state));
   return state.options.ruleSpaces ? value.slice(0, -1) : value;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-to-markdown/lib/handle/index.js
+// node_modules/.pnpm/mdast-util-to-markdown@2.2.0/node_modules/mdast-util-to-markdown/lib/handle/index.js
 var handle = {
   blockquote,
   break: hardBreak,
@@ -10156,7 +10282,7 @@ var handle = {
   thematicBreak: thematicBreak2
 };
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-table/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm-table@2.0.0/node_modules/mdast-util-gfm-table/lib/index.js
 function gfmTableFromMarkdown() {
   return {
     enter: {
@@ -10309,7 +10435,7 @@ function gfmTableToMarkdown(options) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm-task-list-item/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm-task-list-item@2.0.0/node_modules/mdast-util-gfm-task-list-item/lib/index.js
 function gfmTaskListItemFromMarkdown() {
   return {
     exit: {
@@ -10382,7 +10508,7 @@ function listItemWithTaskListItem(node2, parent, state, info) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-gfm/lib/index.js
+// node_modules/.pnpm/mdast-util-gfm@3.1.0/node_modules/mdast-util-gfm/lib/index.js
 function gfmFromMarkdown() {
   return [
     gfmAutolinkLiteralFromMarkdown(),
@@ -10404,7 +10530,7 @@ function gfmToMarkdown(options) {
   };
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-gfm-autolink-literal@2.1.0/node_modules/micromark-extension-gfm-autolink-literal/lib/syntax.js
 var wwwPrefix = {
   tokenize: tokenizeWwwPrefix,
   partial: true
@@ -10746,7 +10872,7 @@ function previousUnbalanced(events) {
   return result;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-footnote/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-gfm-footnote@2.1.0/node_modules/micromark-extension-gfm-footnote/lib/syntax.js
 var indent = {
   tokenize: tokenizeIndent2,
   partial: true
@@ -11021,7 +11147,7 @@ function tokenizeIndent2(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-gfm-strikethrough@2.1.0/node_modules/micromark-extension-gfm-strikethrough/lib/syntax.js
 function gfmStrikethrough(options) {
   const options_ = options || {};
   let single = options_.singleTilde;
@@ -11115,8 +11241,8 @@ function gfmStrikethrough(options) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/edit-map.js
-var EditMap = class {
+// node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/edit-map.js
+var EditMap2 = class {
   /**
    * Create a new edit map.
    */
@@ -11137,7 +11263,7 @@ var EditMap = class {
    *   Nothing.
    */
   add(index2, remove, add) {
-    addImplementation(this, index2, remove, add);
+    addImplementation2(this, index2, remove, add);
   }
   // To do: add this when moving to `micromark`.
   // /**
@@ -11186,7 +11312,7 @@ var EditMap = class {
     this.index.clear();
   }
 };
-function addImplementation(editMap, at, remove, add) {
+function addImplementation2(editMap, at, remove, add) {
   if (remove === 0 && add.length === 0) {
     return;
   }
@@ -11201,7 +11327,7 @@ function addImplementation(editMap, at, remove, add) {
   editMap.index.set(at, change);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/infer.js
+// node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/infer.js
 function gfmTableAlign(events, index2) {
   let inDelimiterRow = false;
   const align = [];
@@ -11228,7 +11354,7 @@ function gfmTableAlign(events, index2) {
   return align;
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-table/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-gfm-table@2.1.2/node_modules/micromark-extension-gfm-table/lib/syntax.js
 function gfmTable() {
   return {
     flow: {
@@ -11471,7 +11597,7 @@ function resolveTable(events, context) {
   let currentTable;
   let currentBody;
   let currentCell;
-  const map3 = new EditMap();
+  const map3 = new EditMap2();
   while (++index2 < events.length) {
     const event = events[index2];
     const token = event[1];
@@ -11619,7 +11745,7 @@ function getPoint(events, index2) {
   return event[1][side];
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-gfm-task-list-item@2.1.0/node_modules/micromark-extension-gfm-task-list-item/lib/syntax.js
 var tasklistCheck = {
   name: "tasklistCheck",
   tokenize: tokenizeTasklistCheck
@@ -11693,7 +11819,7 @@ function spaceThenNonSpace(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-gfm/index.js
+// node_modules/.pnpm/micromark-extension-gfm@3.0.0/node_modules/micromark-extension-gfm/index.js
 function gfm(options) {
   return combineExtensions([
     gfmAutolinkLiteral(),
@@ -11704,7 +11830,7 @@ function gfm(options) {
   ]);
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-gfm/lib/index.js
+// node_modules/.pnpm/remark-gfm@4.0.1/node_modules/remark-gfm/lib/index.js
 var emptyOptions2 = {};
 function remarkGfm(options) {
   const self = (
@@ -11721,7 +11847,7 @@ function remarkGfm(options) {
   toMarkdownExtensions.push(gfmToMarkdown(settings));
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/mdast-util-math/lib/index.js
+// node_modules/.pnpm/mdast-util-math@3.0.0/node_modules/mdast-util-math/lib/index.js
 function mathFromMarkdown() {
   return {
     enter: {
@@ -11900,7 +12026,7 @@ function mathToMarkdown(options) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/math-flow.js
+// node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-flow.js
 var mathFlow = {
   tokenize: tokenizeMathFenced,
   concrete: true,
@@ -12040,7 +12166,7 @@ function tokenizeNonLazyContinuation2(effects, ok3, nok) {
   }
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/math-text.js
+// node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-text.js
 function mathText(options) {
   const options_ = options || {};
   let single = options_.singleDollarTextMath;
@@ -12165,7 +12291,7 @@ function previous3(code3) {
   return code3 !== 36 || this.events[this.events.length - 1][1].type === "characterEscape";
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/micromark-extension-math/lib/syntax.js
+// node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/syntax.js
 function math(options) {
   return {
     flow: {
@@ -12177,7 +12303,7 @@ function math(options) {
   };
 }
 
-// ../../../../../项目/yuyinchajian/dsh-voice-mode/plugin/dsh-voice-mode/node_modules/remark-math/lib/index.js
+// node_modules/.pnpm/remark-math@6.0.0/node_modules/remark-math/lib/index.js
 var emptyOptions3 = {};
 function remarkMath(options) {
   const self = (
@@ -15250,16 +15376,19 @@ function createVoiceSettingsSchema(defs) {
   });
 }
 var VoiceSettingsSchema = createVoiceSettingsSchema();
-var Config = z.intersect([
-  createVoiceSettingsSchema(),
-  z.object({
+var voiceDict = createVoiceSettingsSchema().dict;
+var Config = (() => {
+  const schema = z.object({
+    ...voiceDict,
     enabled: z.boolean().default(true),
     cacheDir: z.string().default(defaultModelCacheDir()),
     modelHost: z.string().default("https://huggingface.co"),
     allowLan: z.boolean().default(false),
     allowCustomModelHost: z.boolean().default(false)
-  })
-]);
+  });
+  for (const field of Object.values(schema.dict)) field.meta.volatile = true;
+  return schema;
+})();
 function apply(ctx, config) {
   let autoReadSession = null;
   const streamGen = /* @__PURE__ */ new Map();
